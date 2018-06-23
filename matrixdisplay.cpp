@@ -8,7 +8,7 @@ MatrixDisplay::MatrixDisplay(byte height)
     :height_(height)
 {
     // allocate memory for (columnwise) display content
-    rows_ = static_cast<byte*>(malloc(height_*8));
+    rows_ = static_cast<byte*>(malloc(height_));
 
     //	// declare selected pins of Port C as OUTPUT
     DDRC |= _BV(latch_pin_);
@@ -22,7 +22,7 @@ MatrixDisplay::MatrixDisplay(byte height)
 void MatrixDisplay::show(){
     for(int col = 0; col < 8; col++) {
         bitClear(PORTC, latch_pin_); // clear latc
-        for(byte *matrix_row = rows_ + col, *end = rows_ + (height_*8) + col; matrix_row != end; matrix_row+=8){
+        for(byte *matrix_row = rows_ + col, *end = rows_ + (height_) + col; matrix_row != end; matrix_row+=8){
             SPI_SendByte(~*matrix_row);
         }
         bitSet(PORTC, clock_pin_);
