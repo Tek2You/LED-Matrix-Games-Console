@@ -1,0 +1,5 @@
+/build
+*CMake*
+Tetris.cbp
+cmake_install.cmake
+
