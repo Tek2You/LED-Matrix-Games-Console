@@ -7,6 +7,7 @@ class Game : MatrixDisplay
 {
 public:
 	 Game(byte height, byte width);
+	 void render();
 
 private:
 	 const byte height_;
