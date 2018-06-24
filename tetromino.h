@@ -1,6 +1,5 @@
 #pragma once
 #include "avr.h"
-#include "matrixdisplay.h"
 
 namespace tetromino {
 enum TETROMINO : byte {
@@ -59,7 +58,7 @@ public:
 
 	Tetromino(tetromino::TETROMINO shape, byte heigth, byte *field, tetromino::DIRECTION direction, tetromino::POS pos);
 
-	void setPos(tetromino::POS pos);
+	void setPos(tetromino::POS pos) {pos_ = pos;}
 	tetromino::POS getPos() {return pos_;}
 
 	void setDirection(tetromino::DIRECTION direction);
@@ -67,6 +66,8 @@ public:
 
 	bool getPositions(tetromino::POS(&positions)[4]);
 	bool getPositions(tetromino::POS(&positions)[4],tetromino::TETROMINO shape, tetromino::DIRECTION direction, tetromino::POS pos);
+
+	void rotate();
 
 	byte isValid();
 	byte isValid(tetromino::TETROMINO shape, tetromino::DIRECTION direction, tetromino::POS pos);

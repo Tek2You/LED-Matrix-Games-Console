@@ -47,6 +47,11 @@ bool Tetromino::getPositions(tetromino::POS (&positions)[4], tetromino::TETROMIN
 	return true;
 }
 
+void Tetromino::rotate()
+{
+
+}
+
 byte Tetromino::isValid()
 {
 	 return isValid(shape_,direction_, pos_);

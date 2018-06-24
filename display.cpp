@@ -1,7 +1,7 @@
 #include "display.h"
 
-Display::Display (byte height)
-   : MatrixDisplay(height)
+Display::Display (byte height, byte width)
+   : MatrixDisplay(height,width)
 {
 
 }

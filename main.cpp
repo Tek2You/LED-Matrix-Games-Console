@@ -1,7 +1,12 @@
 #include "avr.h"
 #include "tetris_sm.h"
+#include "display.h"
 
-TetrisSM sm;
+
+
+Display dp(16,8);
+TetrisSM sm(&dp);
+
 
 int main(void)
 {
@@ -12,6 +17,11 @@ int main(void)
 	while(1){
 		byte event;
 		sm.process(event);
+		dp.show();
 	}
 	return 0;
+}
+
+ISR(PCINT1_vect){
+
 }

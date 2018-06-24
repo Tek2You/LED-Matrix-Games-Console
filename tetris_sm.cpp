@@ -7,10 +7,10 @@
 	process(ON_ENTRY); \
 	}
 
-TetrisSM::TetrisSM()
-   :StateMachine(STATE_CAST(&TetrisSM::stateDefault))
+TetrisSM::TetrisSM(Display *display)
+   :StateMachine(STATE_CAST(&TetrisSM::stateDefault)), display_(display)
 {
-
+	Game game(display);
 }
 
 void TetrisSM::stateDefault(byte event)

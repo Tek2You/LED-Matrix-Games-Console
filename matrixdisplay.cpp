@@ -1,11 +1,12 @@
 #include "matrixdisplay.h"
 #include "ATmega-master/include/spi.h"
 
+
 const byte row_order[] = {4,2,1,3,5,0,6,7};
 const byte col_order[] = {1,3,6,2,4,7,0,5};
 
-MatrixDisplay::MatrixDisplay(byte height)
-    :height_(height)
+MatrixDisplay::MatrixDisplay(byte height, byte width)
+    :height_(height), width_(width)
 {
 	 // allocate memory for (columnwise) display content
 	 rows_ = static_cast<byte*>(malloc(height_));
