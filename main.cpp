@@ -1,18 +1,17 @@
-#include <avr/io.h>
-#include <util/delay.h>
-#include "tetromino.h"
+#include "avr.h"
+#include "tetris_sm.h"
 
-void setup(void)
-{
-}
-
-void loop(void)
-{
-}
+TetrisSM sm;
 
 int main(void)
 {
-    while(1)
-        loop();
-    return 0;
+	// init pin change interrup for buttons
+	PCMSK1 |= INPUT_MASK; // select mask
+	PCICR |= PCIE1; // enable mask1
+	sei(); // enable global interrupts
+	while(1){
+		byte event;
+		sm.process(event);
+	}
+	return 0;
 }

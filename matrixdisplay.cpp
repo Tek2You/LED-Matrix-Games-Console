@@ -45,3 +45,16 @@ void MatrixDisplay::setPixel(byte x, byte y, bool value)
 {
 	bitWrite(rows_[y],x,value);
 }
+
+void MatrixDisplay::setRow(byte row, byte value)
+{
+
+}
+
+void MatrixDisplay::setArray(byte *array)
+{
+	for(int i = 0; i < 16; i++)
+	{
+		*(rows_ + i) = *(array + i);
+	}
+}

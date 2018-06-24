@@ -1,7 +1,7 @@
 #include "tetromino.h"
 
-Tetromino::Tetromino(tetromino::TETROMINO shape, byte * field, tetromino::DIRECTION direction, tetromino::POS pos)
-    :shape_(shape), field_(field), direction_(direction),pos_(pos)
+Tetromino::Tetromino(tetromino::TETROMINO shape, byte heigth, byte * field, tetromino::DIRECTION direction, tetromino::POS pos)
+    :shape_(shape), heigth_(heigth), field_(field), direction_(direction),pos_(pos)
 {
 
 }
@@ -57,6 +57,28 @@ byte Tetromino::isValid(tetromino::TETROMINO shape, tetromino::DIRECTION directi
 	tetromino::POS positions[4];
 	getPositions(positions,shape,direction,pos);
 	for(int i = 0; i < 4; i++){
+		if(positions[i].pos_x < 0)
+		{
+			return 1; // is left over
+		}
 
+		else if(positions[i].pos_x > 7)
+		{
+			return 2; // is right over
+		}
+
+		else if(positions[i].pos_y < 0)
+		{
+			return 3; // is over below
+		}
+		else if(positions[i].pos_y > heigth_)
+		{
+			return 4; // is above at top
+		}
+		else if(bitRead(*(field_ + positions[i].pos_x),byte(positions[i].pos_y)))
+		{
+			return 5; // collides with exiting tetromino part
+		}
 	}
+	return 0; // no collisions - valid
 }

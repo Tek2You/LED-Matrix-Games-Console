@@ -57,7 +57,7 @@ class Tetromino
 {
 public:
 
-	Tetromino(tetromino::TETROMINO shape, byte *field, tetromino::DIRECTION direction, tetromino::POS pos);
+	Tetromino(tetromino::TETROMINO shape, byte heigth, byte *field, tetromino::DIRECTION direction, tetromino::POS pos);
 
 	void setPos(tetromino::POS pos);
 	tetromino::POS getPos() {return pos_;}
@@ -76,6 +76,7 @@ private:
 	const tetromino::TETROMINO shape_;
 	tetromino::DIRECTION direction_;
 	tetromino::POS pos_;
+	const byte heigth_;
 	byte * field_;
 };
 
