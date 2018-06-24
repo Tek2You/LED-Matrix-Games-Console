@@ -24,9 +24,68 @@ void Game::render()
 	}
 }
 
-void Game::rotate()
+bool Game::rotate()
 {
-	current_tetromino_->rotate();
+	/*
+	 * function scheme:
+	 * 1. get current values
+	 * 2. calculate next(possible) direction. Possible means not that the brick dosnt collides
+	 * 3. Check if the new direction is valid
+	 *    4. if not: try to change to a valid position
+	 *
+	*/
+
+	tetromino::DIRECTION direction = current_tetromino_->getDirection();
+	tetromino::DIRECTION new_direction;
+	tetromino::POS position = current_tetromino_->getPos();
+	tetromino::POS new_position = position;
+	tetromino::SHAPE shape = current_tetromino_->getShape();
+
+	byte possible_directions = current_tetromino_->possibleRotations();
+	if(possible_directions != direction){ // more than one possible direction
+		for(int i = 0; i < 4; i++){
+			if(new_direction == tetromino::LEFT)
+				new_direction = tetromino::TOP;
+			else
+				new_direction = tetromino::DIRECTION(new_direction << 1);
+			if(new_direction & possible_directions){
+				break;
+			}
+		}
+	}
+
+	// position is not valid
+	byte valid_output = current_tetromino_->isValid(shape,new_direction,position);
+	if(valid_output != 0)
+	{
+		if(valid_output == 1) // left over
+		{
+			for(int i = 0; i < 2; i++){
+				if(current_tetromino_->isValid(shape,new_direction,new_position)){
+				}
+				++new_position.pos_x;
+			}
+		}
+		else if(valid_output == 2) // right over
+		{
+
+		}
+		if(valid_output == 3) // over below
+		{
+
+		}
+		else if(valid_output == 4) // above over
+		{
+			while(current_tetromino_->isValid(shape,new_direction,new_position) == 4){
+				--new_position.pos_y;
+			}
+		}
+		if(valid_output == 5) // collides with exiting tetromino
+		{
+
+		}
+	}
+
 }
 
 bool Game::step()
@@ -34,7 +93,7 @@ bool Game::step()
 
 }
 
-bool Game::newTetromino(tetromino::TETROMINO shape, tetromino::DIRECTION direction)
+bool Game::newTetromino(tetromino::SHAPE shape, tetromino::DIRECTION direction)
 {
 	if(current_tetromino_ != nullptr){
 		delete current_tetromino_;

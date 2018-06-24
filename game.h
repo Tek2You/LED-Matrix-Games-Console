@@ -19,9 +19,9 @@ public:
 	 Game(Display * display);
 	 void process();
 	 void render();
-	 void rotate();
+	 bool rotate();
 	 bool step();
-	 bool newTetromino(tetromino::TETROMINO shape, tetromino::DIRECTION direction);
+	 bool newTetromino(tetromino::SHAPE shape, tetromino::DIRECTION direction);
 
 
 private:
