@@ -1,4 +1,4 @@
-#include "tetris_sm.h"
+#include "game_sm.h"
 
 
 #undef TRANSITION

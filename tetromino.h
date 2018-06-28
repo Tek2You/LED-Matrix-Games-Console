@@ -12,6 +12,14 @@ enum DIRECTION : byte {
 	LEFT = 1 << 3,
 };
 
+enum VALIDATION_ERROR : byte{
+	OVER_BELOW = 1 << 0,
+	OVER_ABOVE = 1 << 1,
+	OVER_RIGHT = 1 << 2,
+	OVER_LEFT = 1 << 3,
+	COLLIDE = 1 << 4,
+};
+
 struct POS {
 	char pos_x;
 	char pos_y;

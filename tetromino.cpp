@@ -71,30 +71,31 @@ byte Tetromino::isValid()
 byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos)
 {
 	tetromino::POS positions[4];
+	byte valid_errors;
 	getPositions(positions,shape,direction,pos);
 	for(int i = 0; i < 4; i++){
 		if(positions[i].pos_y > heigth_)
 		{
-			return 4; // is above at top
+			valid_errors |= tetromino::OVER_ABOVE;
 		}
 		else if(positions[i].pos_y < 0)
 		{
-			return 3; // is over below
+			valid_errors |= tetromino::OVER_BELOW; // is over below
 		}
 		else if(positions[i].pos_x < 0)
 		{
-			return 1; // is left over
+			valid_errors |= tetromino::OVER_LEFT; // is left over
 		}
 
 		else if(positions[i].pos_x > 7)
 		{
-			return 2; // is right over
+			valid_errors |= tetromino::OVER_RIGHT; // is right over
 		}
 
 		else if(bitRead(*(field_ + positions[i].pos_x),byte(positions[i].pos_y)))
 		{
-			return 5; // collides with exiting tetromino part
+			valid_errors |= tetromino::COLLIDE; // collides with exiting tetromino part
 		}
 	}
-	return 0; // no collisions - valid
+	return valid_errors; // no collisions - valid
 }

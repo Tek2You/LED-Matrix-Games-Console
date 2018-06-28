@@ -1,5 +1,5 @@
 #include "avr.h"
-#include "tetris_sm.h"
+#include "game_sm.h"
 #include "display.h"
 
 

@@ -58,29 +58,35 @@ bool Game::rotate()
 	byte valid_output = current_tetromino_->isValid(shape,new_direction,position);
 	if(valid_output != 0)
 	{
-		if(valid_output == 1) // left over
+		if(valid_output & tetromino::OVER_LEFT) // left over
 		{
-			for(int i = 0; i < 2; i++){
-				if(current_tetromino_->isValid(shape,new_direction,new_position)){
-				}
-				++new_position.pos_x;
+			++new_position.pos_x;
+			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_LEFT){
+				new_position.pos_x++;
 			}
 		}
-		else if(valid_output == 2) // right over
+		else if(valid_output & tetromino::OVER_RIGHT) // right over
 		{
-
-		}
-		if(valid_output == 3) // over below
-		{
-
-		}
-		else if(valid_output == 4) // above over
-		{
-			while(current_tetromino_->isValid(shape,new_direction,new_position) == 4){
-				--new_position.pos_y;
+			new_position.pos_x --;
+			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_RIGHT){
+				new_position.pos_x--;
 			}
 		}
-		if(valid_output == 5) // collides with exiting tetromino
+		if(valid_output & tetromino::OVER_BELOW) // over below
+		{
+			new_position.pos_y ++;
+			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_BELOW){
+				new_position.pos_y++;
+			}
+		}
+		else if(valid_output & tetromino::OVER_ABOVE) // above over
+		{
+			new_position.pos_y --;
+			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_ABOVE){
+				new_position.pos_y--;
+			}
+		}
+		if(valid_output & tetromino::COLLIDE) // collides with exiting tetromino
 		{
 
 		}
