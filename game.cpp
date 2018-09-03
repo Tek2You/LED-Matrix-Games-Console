@@ -8,6 +8,14 @@ Game::Game(Display *display):
 	current_tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::POS{2,5});
 }
 
+Game::~Game()
+{
+	if(current_tetromino_ != nullptr){
+		delete current_tetromino_;
+	}
+	free(field_);
+}
+
 void Game::process(){
 
 }

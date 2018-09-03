@@ -5,3 +5,13 @@ Display::Display (byte height, byte width)
 {
 
 }
+
+void Display::setText(const char *text)
+{
+
+}
+
+void Display::update()
+{
+
+}

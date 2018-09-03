@@ -5,7 +5,7 @@
 
 
 Display dp(16,8);
-TetrisSM sm(&dp);
+GameSM sm(&dp);
 
 
 int main(void)
@@ -25,3 +25,4 @@ int main(void)
 ISR(PCINT1_vect){
 
 }
+

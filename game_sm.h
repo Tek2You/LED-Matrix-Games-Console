@@ -14,15 +14,31 @@
 #define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_FLIP)
 
 class Display;
-class TetrisSM : public StateMachine
+class GameSM : public StateMachine
 {
 public:
-	TetrisSM(Display * display);
+	inline void * operator new(size_t size)
+	{
+	  return malloc(size);
+	}
+
+	inline void operator delete(void * ptr)
+	{
+	  free(ptr);
+	}
+
+	GameSM(Display * display);
 
 private: // states
 	void stateDefault(byte event);
+	void stateGame(byte event);
+	void stateSettingsMenu(byte event);
 
 private:
+
 	Display * display_;
 	Game * game_;
+	bool advance(byte event, char &item, const char num, const char min = 0);
+
+	byte language_ = 0;
 };
