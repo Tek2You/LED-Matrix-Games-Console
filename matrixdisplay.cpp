@@ -43,7 +43,9 @@ void MatrixDisplay::show(){
 }
 
 void MatrixDisplay::clear(){
-
+	for(int i = 0; i < height_; i++){
+		rows_[i] = 0;
+	}
 }
 
 void MatrixDisplay::setPixel(byte x, byte y, bool value)
@@ -56,8 +58,8 @@ void MatrixDisplay::setPixel(byte x, byte y, bool value)
 void MatrixDisplay::setRow(byte row, int value, int column, byte column_height)
 {
 	for(int i = column; i < column + column_height; i++){
-		bitWrite(rows_[row],i,bitRead(value,i - column));
-1	}
+		setPixel(row,i,bitRead(value,i - column));
+	}
 }
 
 void MatrixDisplay::setArray(byte *array)

@@ -47,12 +47,12 @@ bool Tetromino::getPositions(tetromino::POS (&positions)[4], tetromino::SHAPE sh
 	return true;
 }
 
-byte Tetromino::possibleRotations(){
-	return possibleRotations(shape_);
+byte Tetromino::possibleDirections(){
+	return possibleDirections(shape_);
 }
 
 
-byte Tetromino::possibleRotations(tetromino::SHAPE shape){
+byte Tetromino::possibleDirections(tetromino::SHAPE shape){
 	tetromino::SPECIFICATIONS brick;
 	memcpy_P(&brick, &tetromino::tetrominos + shape, sizeof(tetromino::SPECIFICATIONS));
 	return brick.directions;

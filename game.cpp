@@ -1,4 +1,4 @@
-#include "game.h"
+﻿#include "game.h"
 
 Game::Game(Display *display):
    display_(display)
@@ -49,7 +49,7 @@ bool Game::rotate()
 	tetromino::POS new_position = position;
 	tetromino::SHAPE shape = current_tetromino_->getShape();
 
-	byte possible_directions = current_tetromino_->possibleRotations();
+	byte possible_directions = current_tetromino_->possibleDirections();
 	if(possible_directions != direction){ // more than one possible direction
 		for(int i = 0; i < 4; i++){
 			if(new_direction == tetromino::LEFT)
@@ -107,13 +107,14 @@ bool Game::step()
 
 }
 
-bool Game::newTetromino(tetromino::SHAPE shape, tetromino::DIRECTION direction)
+bool Game::newTetromino()
 {
 	if(current_tetromino_ != nullptr){
 		delete current_tetromino_;
 		current_tetromino_ = nullptr;
 	}
-	current_tetromino_ = new Tetromino(shape, display_->rows(), field_, direction,tetromino::POS{4,char(display_->rows())});
+	tetromino::SHAPE shape = randomTetrominoShape();
+	current_tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),tetromino::POS{4,char(display_->rows())});
 	tetromino::POS points[4];
 	current_tetromino_->getPositions(points);
 
@@ -129,5 +130,29 @@ bool Game::newTetromino(tetromino::SHAPE shape, tetromino::DIRECTION direction)
 		return true;
 	}
 	return false;
+}
+
+tetromino::SHAPE Game::randomTetrominoShape()
+{
+	return tetromino::SHAPE(rand());
+}
+
+tetromino::DIRECTION Game::randomTetrominoDirection(tetromino::SHAPE shape){
+	byte directions = Tetromino::possibleDirections(shape);
+	int num;
+	for(int i = 0; i < 8; i++){
+		if(bitRead(directions, i))
+			num++;
+	}
+	int i_direction = rand() % num;
+	for(int i = 0, j; i < 4; i++){
+		if(bitRead(directions, i)){
+			if(j == num){
+				byte value; bitSet(value, i);
+				return tetromino::DIRECTION(value);
+			}
+			++j;
+		}
+	}
 }
 

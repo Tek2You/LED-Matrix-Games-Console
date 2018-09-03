@@ -22,11 +22,14 @@ public:
 	void render();
 	bool rotate();
 	bool step();
-	bool newTetromino(tetromino::SHAPE shape, tetromino::DIRECTION direction);
+	bool newTetromino();
 
 
 private:
 	Display * display_;
 	byte * field_; // field without current tetromino
 	Tetromino * current_tetromino_;
+
+	tetromino::SHAPE randomTetrominoShape();
+	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
 };

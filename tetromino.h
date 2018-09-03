@@ -83,8 +83,8 @@ public:
 	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos);
 
 
-	byte possibleRotations(tetromino::SHAPE shape);
-	byte possibleRotations();
+	static byte possibleDirections(tetromino::SHAPE shape);
+	byte possibleDirections();
 private:
 	const tetromino::SHAPE shape_;
 	tetromino::DIRECTION direction_;
