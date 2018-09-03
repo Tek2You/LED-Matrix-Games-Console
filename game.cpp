@@ -50,17 +50,7 @@ bool Game::rotate()
 	tetromino::SHAPE shape = current_tetromino_->getShape();
 
 	byte possible_directions = current_tetromino_->possibleDirections();
-	if(possible_directions != direction){ // more than one possible direction
-		for(int i = 0; i < 4; i++){
-			if(new_direction == tetromino::LEFT)
-				new_direction = tetromino::TOP;
-			else
-				new_direction = tetromino::DIRECTION(new_direction << 1);
-			if(new_direction & possible_directions){
-				break;
-			}
-		}
-	}
+	new_direction = Tetromino::rotate(direction,shape);
 
 	// position is not valid
 	byte valid_output = current_tetromino_->isValid(shape,new_direction,position);

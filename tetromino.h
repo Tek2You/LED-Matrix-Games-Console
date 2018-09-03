@@ -60,6 +60,7 @@ const PROGMEM SPECIFICATIONS tetrominos[7] = {
 };
 }
 
+using namespace tetromino;
 class Tetromino
 {
 public:
@@ -77,6 +78,7 @@ public:
 	bool getPositions(tetromino::POS(&positions)[4]);
 	bool getPositions(tetromino::POS(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos);
 
+	static DIRECTION rotate(DIRECTION direction, SHAPE shape);
 	void rotate();
 
 	byte isValid();
