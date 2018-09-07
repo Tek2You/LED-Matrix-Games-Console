@@ -23,12 +23,13 @@ public:
 	bool rotate();
 	bool step();
 	bool newTetromino();
+	void checkRowsFinished();
 
 
 private:
 	Display * display_;
 	byte * field_; // field without current tetromino
-	Tetromino * current_tetromino_;
+	Tetromino * tetromino_;
 
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);

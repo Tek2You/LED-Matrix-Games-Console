@@ -1,6 +1,16 @@
 #include "matrixdisplay.h"
 #include "ATmega-master/include/spi.h"
 
+// class for driving display
+
+
+// ... X X X X
+//  3  X X X X
+//  2  X X X X
+//  1  X X X X
+//  0  X X X X
+//     0 1 2 ...
+
 
 const byte row_order[] = {4,2,1,3,5,0,6,7};
 const byte col_order[] = {1,3,6,2,4,7,0,5};

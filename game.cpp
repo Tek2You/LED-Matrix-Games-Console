@@ -5,13 +5,13 @@ Game::Game(Display *display):
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
-	current_tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::POS{2,5});
+	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::POS{2,5});
 }
 
 Game::~Game()
 {
-	if(current_tetromino_ != nullptr){
-		delete current_tetromino_;
+	if(tetromino_ != nullptr){
+		delete tetromino_;
 	}
 	free(field_);
 }
@@ -23,9 +23,9 @@ void Game::process(){
 void Game::render()
 {
 	display_->setArray(field_);
-	if(current_tetromino_ != nullptr){
+	if(tetromino_ != nullptr){
 		tetromino::POS positions[4];
-		current_tetromino_->getPositions(positions);
+		tetromino_->getPositions(positions);
 		for(int i = 0; i < 4; i++){
 			display_->setPixel(positions[i].pos_x,positions[i].pos_y, true);
 		}
@@ -43,44 +43,44 @@ bool Game::rotate()
 	 *
 	*/
 
-	tetromino::DIRECTION direction = current_tetromino_->getDirection();
+	tetromino::DIRECTION direction = tetromino_->getDirection();
 	tetromino::DIRECTION new_direction;
-	tetromino::POS position = current_tetromino_->getPos();
+	tetromino::POS position = tetromino_->getPos();
 	tetromino::POS new_position = position;
-	tetromino::SHAPE shape = current_tetromino_->getShape();
+	tetromino::SHAPE shape = tetromino_->getShape();
 
-	byte possible_directions = current_tetromino_->possibleDirections();
+	byte possible_directions = tetromino_->possibleDirections();
 	new_direction = Tetromino::rotate(direction,shape);
 
 	// position is not valid
-	byte valid_output = current_tetromino_->isValid(shape,new_direction,position);
+	byte valid_output = tetromino_->isValid(shape,new_direction,position);
 	if(valid_output != 0)
 	{
 		if(valid_output & tetromino::OVER_LEFT) // left over
 		{
 			++new_position.pos_x;
-			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_LEFT){
+			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_LEFT){
 				new_position.pos_x++;
 			}
 		}
 		else if(valid_output & tetromino::OVER_RIGHT) // right over
 		{
 			new_position.pos_x --;
-			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_RIGHT){
+			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_RIGHT){
 				new_position.pos_x--;
 			}
 		}
 		if(valid_output & tetromino::OVER_BELOW) // over below
 		{
 			new_position.pos_y ++;
-			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_BELOW){
+			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_BELOW){
 				new_position.pos_y++;
 			}
 		}
 		else if(valid_output & tetromino::OVER_ABOVE) // above over
 		{
 			new_position.pos_y --;
-			while(current_tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_ABOVE){
+			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_ABOVE){
 				new_position.pos_y--;
 			}
 		}
@@ -89,37 +89,61 @@ bool Game::rotate()
 
 		}
 	}
-
 }
 
 bool Game::step()
 {
-
+	POS pos = tetromino_->getPos();
+	pos.pos_y--;
+	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
+		newTetromino();
+		checkRowsFinished();
+		return true;
+	}
+	return false;
+	tetromino_->setPos(pos);
 }
 
 bool Game::newTetromino()
 {
-	if(current_tetromino_ != nullptr){
-		delete current_tetromino_;
-		current_tetromino_ = nullptr;
+	if(tetromino_ != nullptr){
+		POS pos[4];
+		tetromino_->getPositions(pos);
+		for(POS p : pos) {
+			display_->setPixel(p.pos_x,p.pos_y,true);
+		}
+		delete tetromino_;
+		tetromino_ = nullptr;
 	}
 	tetromino::SHAPE shape = randomTetrominoShape();
-	current_tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),tetromino::POS{4,char(display_->rows())});
+	tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),tetromino::POS{4,char(display_->rows())});
 	tetromino::POS points[4];
-	current_tetromino_->getPositions(points);
+	tetromino_->getPositions(points);
 
 	for(int i = 0; i < 4; i++){
 		if(points[i].pos_y > display_->rows()){
-			tetromino::POS pos = current_tetromino_->getPos();
+			tetromino::POS pos = tetromino_->getPos();
 			pos.pos_y -= (points[i].pos_y - display_->rows());
-			current_tetromino_->setPos(pos);
+			tetromino_->setPos(pos);
 		}
 	}
 	render();
-	if(current_tetromino_->isValid() != 0){ // not valid
+	if(tetromino_->isValid() != 0){ // not valid
 		return true;
 	}
 	return false;
+}
+
+void Game::checkRowsFinished()
+{
+	for(int i = 0; i < display_->rows(); i++){
+		if(field_[i] == 0xFF){ // row is full
+			for(int j = display_->rows() - 1; i > i; j--){
+				field_[j] = field_[j+1];
+			}
+			field_[display_->rows_] = 0;
+		}
+	}
 }
 
 tetromino::SHAPE Game::randomTetrominoShape()
