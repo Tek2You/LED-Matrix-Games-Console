@@ -21,6 +21,8 @@ public:
 	void process();
 	void render();
 	bool rotate();
+	bool right();
+	bool left();
 	bool step();
 	bool newTetromino();
 	void checkRowsFinished();

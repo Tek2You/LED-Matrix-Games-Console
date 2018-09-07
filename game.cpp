@@ -91,6 +91,28 @@ bool Game::rotate()
 	}
 }
 
+bool Game::right()
+{
+	POS pos = tetromino_->getPos();
+	pos.pos_x++;
+	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
+		return false;
+	}
+	tetromino_->setPos(pos);
+	return true;
+}
+
+bool Game::left()
+{
+	POS pos = tetromino_->getPos();
+	pos.pos_x--;
+	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
+		return false;
+	}
+	tetromino_->setPos(pos);
+	return true;
+}
+
 bool Game::step()
 {
 	POS pos = tetromino_->getPos();
@@ -100,8 +122,8 @@ bool Game::step()
 		checkRowsFinished();
 		return true;
 	}
-	return false;
 	tetromino_->setPos(pos);
+	return false;
 }
 
 bool Game::newTetromino()
@@ -141,7 +163,7 @@ void Game::checkRowsFinished()
 			for(int j = display_->rows() - 1; i > i; j--){
 				field_[j] = field_[j+1];
 			}
-			field_[display_->rows_] = 0;
+			field_[display_->rows()] = 0;
 		}
 	}
 }

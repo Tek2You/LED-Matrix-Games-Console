@@ -72,6 +72,8 @@ void Tetromino::rotate()
 	rotate(direction_,shape_);
 }
 
+
+
 byte Tetromino::possibleDirections(){
 	return possibleDirections(shape_);
 }
