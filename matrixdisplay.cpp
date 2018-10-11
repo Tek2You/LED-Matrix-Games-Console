@@ -11,7 +11,7 @@
 //  0  X X X X
 //     0 1 2 ...
 
-#define FIRST_LETTER (' ' - 5)
+#define FIRST_LETTER (' ' - 10)
 #define LAST_LETTER '~'
 const byte LETTERS[] PROGMEM = {
    0b00001110, 0b00010001, 0b00100001, 0b01000010, 0b00100001, // smiley
@@ -236,7 +236,7 @@ const int PTN_LETTERS[] PROGMEM{
 };
 
 
-const byte col_order[] = {1,4,2,3,5,0,6,7};
+const byte col_order[] = {5,0,2,3,1,4,6,7};
 const byte row_order[] = {7,6,5,4,3,2,1,0};
 
 MatrixDisplay::MatrixDisplay(byte height, byte width)
@@ -256,11 +256,18 @@ MatrixDisplay::MatrixDisplay(byte height, byte width)
 	clear();
 	// for calibration
 
-	//	byte value;
-	//	for(int i = 0; i < 8; i++){
-	//	   setRow(i,value |= 0x00FF << i);
-	//	}
-	//	setColumn(9,0xFF);
+#if 0
+	for(int i = 0; i < 8; i++){
+		setRow(i,0x00FF << i);
+//		setPixel(i,i,1);
+	}
+#endif
+//	setRow(4,0b01001101);
+//	setColumn(1,0b01001101);
+//	setPixel(0,7,1);
+//	setPixel(4,2,1);
+//	setPixel(4,3,1);
+//	setPixel(4,6,1);
 }
 
 MatrixDisplay::~MatrixDisplay(){
@@ -322,14 +329,13 @@ void MatrixDisplay::clear(){
 
 void MatrixDisplay::setPixel(byte col, byte row, bool value)
 {
-	byte r = mapCol(row);
-	bitWrite(rows_[r],col,value);
+	bitWrite(rows_[row],col_order[col],value);
 }
 
 byte MatrixDisplay::orderCols(byte value){
 	byte out;
 	for(byte i = 0; i<8;i++){
-		bitWrite(out,i,bitRead(value,col_order[i]));
+		bitWrite(out,col_order[i],bitRead(value,i));
 	}
 	return out;
 }
@@ -345,12 +351,13 @@ byte MatrixDisplay::mapCol(byte row){
 	return ((row / 8) * 8) +  col_order[row % 8];
 }
 
-void MatrixDisplay::setColumn(byte column, byte value,byte offset)
+void MatrixDisplay::setColumn(byte column, byte value,byte offset, bool flipped)
 {
 	if(column > width_)
 		return;
+	byte minuend = (flipped ? 7 : 0);
 	for(int r = 0; r < 8; r++){
-		setPixel(column,r+offset,bitRead(value,r));
+		setPixel(column,r+offset,bitRead(value,minuend-r));
 	}
 }
 
@@ -401,7 +408,7 @@ byte MatrixDisplay::setChar(char ch, int column, byte offset)
 	int width = letterWidth(ch);
 	end = start + width;
 	for (; start != end; ++start, ++column)
-		setColumn(column, pgm_read_byte(start),offset);
+		setColumn(column, pgm_read_byte(start),offset, true);
 	return width;
 }
 

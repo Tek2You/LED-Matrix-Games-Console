@@ -18,7 +18,7 @@ public:
 	 int setString(const char *s, int column, char cursor_pos, char spacing, byte offset);
 	 byte setChar(char ch, int column, byte offset);
 	 void clearColumns(int start, int end);
-	 void setColumn(byte column, byte value, byte offset = 0);
+	 void setColumn(byte column, byte value, byte offset = 0, bool flipped = 0);
 
 	 void setRow(byte row, int value);
 protected:
