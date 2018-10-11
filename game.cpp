@@ -129,6 +129,7 @@ void Game::reset()
 {
 	if(tetromino_ != nullptr)
 		delete(tetromino_);
+
 	this->clear();
 	display_->clear();
 }
@@ -136,7 +137,7 @@ void Game::reset()
 void Game::clear()
 {
 	for(byte * ptr = field_; ptr < &field_[display_->rows()];ptr++){
-		ptr = 0;
+		*ptr = 0;
 	}
 }
 

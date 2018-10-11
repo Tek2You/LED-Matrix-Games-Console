@@ -33,16 +33,15 @@ public:
 private: // states
 	class MenuItem{
 	public:
-		void init(byte min, byte num, byte initial){
-			min_ = min;
+		void init(byte num, byte initial){
 			num_ = num;
 			initial_ = initial;
 		}
 		byte advance(byte event);
 		static byte advance(byte event, char &item, const char num, const char min = 0);
-		byte item_;
+		byte value_;
 	private:
-		char min_, num_, initial_;
+		char num_, initial_;
 	};
 
 	void stateDefault(byte event);

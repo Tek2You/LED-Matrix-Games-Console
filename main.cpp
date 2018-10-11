@@ -12,12 +12,17 @@ Display dp(16,8);
 GameSM sm(&dp,255);
 
 byte button_event;
-byte counter = 0;
+int counter = 0;
+
+byte have_input = 0;
+byte input_count = 0;
 
 void initGame(){
 	// init pin change interrup for buttons
+	DDRC &= ~INPUT_MASK;
+	PORTC |= INPUT_MASK;
 	PCMSK1 |= INPUT_MASK; // select mask
-	PCICR |= PCIE1; // enable mask1
+	PCICR |= (1 << PCIE1); // enable mask1
 	init();
 
 	// init timer 1
@@ -27,25 +32,25 @@ void initGame(){
 int main(void)
 {
 	bitSet(DDRB,1);
-	bitSet(PORTB,1);
-	bitClear(PORTB,1);
+//	bitSet(PORTB,1);
 	initGame();
 	while(1){
 		dp.show();
-		if(counter++ >= 0xFF){
+		if(input_count){
+			if(--input_count == 1)
+				have_input = CHANGE;
+		}
+		if(have_input || counter++ >= 0xFF){
 			counter = 0;
-			sm.process(button_event);
+			sm.process((have_input | (~PINC & INPUT_MASK)));
 		}
 	}
 	return 0;
 }
 
 ISR(PCINT1_vect){
-	unsigned long now = millis();
-	static unsigned long prev;
-	if(now - prev < 100)
-		return;
-	prev = now;
-	button_event = PINC & INPUT_MASK;
+	if(input_count == 0){
+		input_count = 100;
+	}
 }
 

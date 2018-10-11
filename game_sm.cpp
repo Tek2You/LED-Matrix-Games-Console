@@ -35,18 +35,17 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 void GameSM::stateDefault(byte event)
 {
 	const char * texts[2][2] = {{"Start Game","Setting"}, {"Spiel Starten","Einstellungen"}};
-	static MenuItem item;
+	static char menu_item;
 	if(event & ON_ENTRY){
-		item.init(0,2,0);
-		if(game_ != nullptr){
-			delete(game_);
-		}
-		game_ = new Game(display_);
+//		item.init(2,0);
+		menu_item = 0;
 	}
 	else if(event & INPUT_MASK && event & CHANGE){
-		byte advance_output = item.advance(event);
+//		byte advance_output = item.advance(event);
+		byte advance_output = MenuItem::advance(event,menu_item,2);
+
 		if(advance_output == 1){
-			switch(item.item_){
+			switch(menu_item){
 			case 0:
 				TRANSITION(stateGame);
 				break;
@@ -61,16 +60,23 @@ void GameSM::stateDefault(byte event)
 			return;
 		}
 	}
-	display_->setText(texts[language_][item.item_]);
+	display_->setText(texts[language_][menu_item]);
 }
 
 void GameSM::stateGame(byte event)
 {
 	if(event & ON_ENTRY){
+
+		if(game_ != nullptr){
+			delete(game_);
+		}
+		game_ = new Game(display_);
 		game_->reset();
 		game_->begin();
+
 	}
-	if(event & CHANGE){
+	if(event & CHANGE && event & INPUT_MASK){
+		bitToggle(PORTB,1);
 		if(event & BTN_ROTATE){
 			game_->rotate();
 		}
@@ -117,7 +123,7 @@ void GameSM::stateSettingsMenu(byte event)
 
 	};
 	if(event & ON_ENTRY){
-		item.init(0,2,0);
+		item.init(2,0);
 	}
 	else if(event & ON_ENTRY && event & INPUT_MASK){
 		if(item.advance(event)){
@@ -130,12 +136,12 @@ byte GameSM::MenuItem::advance(byte event)
 {
 	switch (event & INPUT_MASK) {
 	case BTN_LEFT:
-		if (--item_ < min_)
-			item_ = num_-1;
+		if (--value_ < 0)
+			value_ = num_-1;
 		break;
 	case BTN_RIGHT:
-		if (++item_ >= num_)
-			item_ = min_;
+		if (++value_ >= num_)
+			value_ = 0;
 		break;
 	case BTN_DOWN:
 		return 1;
