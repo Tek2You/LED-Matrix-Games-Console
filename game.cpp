@@ -16,10 +16,6 @@ Game::~Game()
 	free(field_);
 }
 
-void Game::process(){
-
-}
-
 void Game::render()
 {
 	display_->setArray(field_);
@@ -117,13 +113,36 @@ bool Game::step()
 {
 	POS pos = tetromino_->getPos();
 	pos.pos_y--;
-	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
+	byte valid_output = tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos);
+	if(valid_output){  // not valid
+		if(valid_output & tetromino::OVER_ABOVE){
+			return true; // game ends
+		}
 		newTetromino();
 		checkRowsFinished();
-		return true;
 	}
 	tetromino_->setPos(pos);
 	return false;
+}
+
+void Game::reset()
+{
+	if(tetromino_ != nullptr)
+		delete(tetromino_);
+	this->clear();
+	display_->clear();
+}
+
+void Game::clear()
+{
+	for(byte * ptr = field_; ptr < &field_[display_->rows()];ptr++){
+		ptr = 0;
+	}
+}
+
+void Game::begin()
+{
+	newTetromino();
 }
 
 bool Game::newTetromino()
@@ -160,6 +179,7 @@ void Game::checkRowsFinished()
 {
 	for(int i = 0; i < display_->rows(); i++){
 		if(field_[i] == 0xFF){ // row is full
+			points_++;
 			for(int j = display_->rows() - 1; i > i; j--){
 				field_[j] = field_[j+1];
 			}

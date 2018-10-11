@@ -9,6 +9,8 @@ Display::Display (byte height, byte width)
 void Display::setText(const char *text)
 {
 
+	const char * first = text;
+	setString(first,0,-1,1,0);
 }
 
 void Display::update()

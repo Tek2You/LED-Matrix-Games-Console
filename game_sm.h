@@ -8,10 +8,10 @@
 // these are the actual input pins (of PINC)
 #define BTN_LEFT bit(0)
 #define BTN_DOWN bit(1)
-#define BTN_FLIP  bit(2)
+#define BTN_ROTATE  bit(2)
 #define BTN_RIGHT bit(3)
 // mask of all input pins
-#define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_FLIP)
+#define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_ROTATE)
 
 class Display;
 class GameSM : public StateMachine
@@ -27,18 +27,34 @@ public:
 	  free(ptr);
 	}
 
-	GameSM(Display * display);
+	GameSM(Display * display, byte speed);
+
 
 private: // states
+	class MenuItem{
+	public:
+		void init(byte min, byte num, byte initial){
+			min_ = min;
+			num_ = num;
+			initial_ = initial;
+		}
+		byte advance(byte event);
+		static byte advance(byte event, char &item, const char num, const char min = 0);
+		byte item_;
+	private:
+		char min_, num_, initial_;
+	};
+
 	void stateDefault(byte event);
 	void stateGame(byte event);
 	void stateSettingsMenu(byte event);
+	void stateShowResult(byte event);
 
-private:
 
 	Display * display_;
 	Game * game_;
-	bool advance(byte event, char &item, const char num, const char min = 0);
 
-	byte language_ = 0;
+	char language_ = 0;
+	char speed_;
+	char step_counter_ = 0;
 };
