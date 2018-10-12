@@ -18,6 +18,7 @@ Game::~Game()
 
 void Game::render()
 {
+	display_->clear();
 	display_->setArray(field_);
 	if(tetromino_ != nullptr){
 		tetromino::POS positions[4];
@@ -26,6 +27,7 @@ void Game::render()
 			display_->setPixel(positions[i].pos_x,positions[i].pos_y, true);
 		}
 	}
+	bitSet(PORTB,1);
 }
 
 bool Game::rotate()
@@ -143,6 +145,7 @@ void Game::clear()
 
 void Game::begin()
 {
+	display_->clear();
 	newTetromino();
 }
 
@@ -169,8 +172,10 @@ bool Game::newTetromino()
 			tetromino_->setPos(pos);
 		}
 	}
+
 	render();
 	if(tetromino_->isValid() != 0){ // not valid
+
 		return true;
 	}
 	return false;

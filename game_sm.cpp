@@ -76,33 +76,32 @@ void GameSM::stateGame(byte event)
 
 	}
 	if(event & CHANGE && event & INPUT_MASK){
-		bitToggle(PORTB,1);
 		if(event & BTN_ROTATE){
-			game_->rotate();
+//			game_->rotate();
 		}
 
 		if(event & BTN_LEFT){
-			game_->left();
+//			game_->left();
 		}
 
 		else if(event & BTN_RIGHT){
-			game_->right();
+//			game_->right();
 		}
 
 		if(event & BTN_DOWN){
-			if(step_counter_ >= speed_ / 3){
-				goto label;
-			}
+//			if(step_counter_ >= speed_ / 3){
+//				goto label;
+//			}
 		}
 	}
 
-	if(step_counter_++ >= speed_){
-label:
-		step_counter_ = 0;
-		if(game_->step()){ // game ends
-			TRANSITION(stateShowResult);
-		}
-	}
+//	if(step_counter_++ >= speed_){
+//label:
+//		step_counter_ = 0;
+//		if(game_->step()){ // game ends
+////			TRANSITION(stateShowResult);
+//		}
+//	}
 }
 
 void GameSM::stateShowResult(byte event){

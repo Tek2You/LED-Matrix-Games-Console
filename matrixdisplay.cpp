@@ -323,7 +323,7 @@ void MatrixDisplay::show(){
 
 void MatrixDisplay::clear(){
 	for(int i = 0; i < height_; i++){
-		rows_[i] = 0;
+		setRow(i,0);
 	}
 }
 

@@ -36,10 +36,11 @@ private: // states
 		void init(byte num, byte initial){
 			num_ = num;
 			initial_ = initial;
+			value_ = initial;
 		}
 		byte advance(byte event);
 		static byte advance(byte event, char &item, const char num, const char min = 0);
-		byte value_;
+		char value_;
 	private:
 		char num_, initial_;
 	};
