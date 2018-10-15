@@ -21,6 +21,9 @@ public:
 	 void setColumn(byte column, byte value, byte offset = 0, bool flipped = 0);
 
 	 void setRow(byte row, int value);
+
+	 void disable();
+
 protected:
 	 const byte *letterStart(char ch);
 	 byte letterWidth(char ch);

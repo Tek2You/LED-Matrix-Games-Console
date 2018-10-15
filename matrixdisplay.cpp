@@ -259,15 +259,15 @@ MatrixDisplay::MatrixDisplay(byte height, byte width)
 #if 0
 	for(int i = 0; i < 8; i++){
 		setRow(i,0x00FF << i);
-//		setPixel(i,i,1);
+		//		setPixel(i,i,1);
 	}
 #endif
-//	setRow(4,0b01001101);
-//	setColumn(1,0b01001101);
-//	setPixel(0,7,1);
-//	setPixel(4,2,1);
-//	setPixel(4,3,1);
-//	setPixel(4,6,1);
+	//	setRow(4,0b01001101);
+	//	setColumn(1,0b01001101);
+	//	setPixel(0,7,1);
+	//	setPixel(4,2,1);
+	//	setPixel(4,3,1);
+	//	setPixel(4,6,1);
 }
 
 MatrixDisplay::~MatrixDisplay(){
@@ -297,26 +297,21 @@ void MatrixDisplay::show(){
 	col++;
 #else
 	static byte row = 0;
-	//	for(int row = 0; row < 8; ++row) {
-	bitClear(PORTB, 2); // clear latc
+	bitClear(PORTB, 2); // clear latch
 	for(byte *col = rows_ + row, *end = rows_ + height_ + row; col != end; col+=8){
-		//	  *row = 0xF0;
 		SPI_SendByte(*col);
 	}
-	bitSet(PORTB, 5);
-	//		}
+	//	SPI_SendByte(*(rows_+row));
+	//	SPI_SendByte(*(rows_+row+8));
+
 	PORTD = 0xFF; // avoid glowing of prev/next row
 	bitSet(PORTB, 2); // set latch
-	// select row to be displayed
 	PORTD = ~_BV(row_order[row]);
+	// select row to be displayed
 	row++;
-	//	}
 	if(row >= 8){
 		row = 0;
-//		     for(byte i = 0; i < 4; i++){
-//				  SPI_SendByte(0);
-//			  }
-//			  PORTD = 0xFF;
+
 	}
 #endif
 }
@@ -345,6 +340,14 @@ void MatrixDisplay::setRow(byte row, int value)
 	if(row > height_)
 		return;
 	rows_[row] = orderCols(value);
+}
+
+void MatrixDisplay::disable()
+{
+	for(byte i = 0; i < 4; i++){
+		SPI_SendByte(0);
+	}
+	PORTD = 0xFF;
 }
 
 byte MatrixDisplay::mapCol(byte row){

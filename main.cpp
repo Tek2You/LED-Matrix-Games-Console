@@ -1,6 +1,7 @@
 #include "avr.h"
 #include "game_sm.h"
 #include "display.h"
+#include "ATmega-master/include/spi.h"
 
 FUSES = {
    LFUSE_DEFAULT | (byte)~FUSE_CKDIV8, // run at 8MHz
@@ -25,7 +26,11 @@ void initGame(){
 	PCICR |= (1 << PCIE1); // enable mask1
 	init();
 
-	// init timer 1
+	// init timer
+	TIMSK1 |= (1 << TOIE1);
+	TCCR1B |= /*(1 << ICNC1) |*/ (1 << CS10);
+
+
 	sei(); // enable global interrupts
 }
 
@@ -36,21 +41,27 @@ int main(void)
 	initGame();
 	while(1){
 		dp.show();
-		if(input_count){
-			if(--input_count == 1)
-				have_input = CHANGE;
-		}
-		if(have_input || counter++ >= 0xFF){
+		if(have_input || counter++ >= 0x2FF){
+			dp.disable();
 			counter = 0;
 			sm.process((have_input | (~PINC & INPUT_MASK)));
 		}
+		have_input = 0;
 	}
 	return 0;
 }
 
 ISR(PCINT1_vect){
-	if(input_count == 0){
-		input_count = 100;
+	if(input_count)
+		return;
+	input_count = 1;
+}
+
+ISR(TIMER1_OVF_vect){
+	if(input_count && input_count++ == 20){
+		input_count = 0;
+		have_input = CHANGE;
 	}
 }
+
 
