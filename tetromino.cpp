@@ -82,8 +82,7 @@ byte Tetromino::possibleDirections(){
 
 
 byte Tetromino::possibleDirections(tetromino::SHAPE shape){
-	SPECIFICATIONS brick;
-	memcpy_P(&brick, &tetromino::tetrominos + shape, sizeof(tetromino::SPECIFICATIONS));
+	SPECIFICATIONS brick = tetrominos[shape];
 	return brick.directions;
 }
 

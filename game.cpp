@@ -200,15 +200,19 @@ tetromino::DIRECTION Game::randomTetrominoDirection(tetromino::SHAPE shape){
 		if(bitRead(directions, i))
 			num++;
 	}
-	int i_direction = millis() % num;
-//	for(int i = 0, j = 0; i < 4; i++){
-//		if(bitRead(directions, i)){
-//			if(j == i_direction){
-//				return tetromino::DIRECTION(1 << 1);
-//			}
-//			++j;
-//		}
-//	}
-	return tetromino::DIRECTION(i_direction);
+	if(num <= 1){
+		return TOP;
+	}
+	bitSet(PORTB,1);
+	int i_direction = (micros() * 883) % (num-1);
+	for(int i = 0, j = 0; i < 4; i++){
+		if(bitRead(directions,i)){
+			if(j == i_direction){
+				tetromino::DIRECTION dir = tetromino::DIRECTION(j);
+				return dir;
+			}
+			j++;
+		}
+	}
 }
 
