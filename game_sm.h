@@ -10,6 +10,8 @@
 #define BTN_DOWN bit(1)
 #define BTN_ROTATE  bit(2)
 #define BTN_RIGHT bit(3)
+
+#define TIMEOUT bit(4)
 // mask of all input pins
 #define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_ROTATE)
 
@@ -28,6 +30,7 @@ public:
 	}
 
 	GameSM(Display * display, byte speed);
+	void processStateMaschine(byte event);
 
 
 private: // states
@@ -35,21 +38,30 @@ private: // states
 	public:
 		void init(byte num, byte initial){
 			num_ = num;
-			initial_ = initial;
 			value_ = initial;
 		}
 		byte advance(byte event);
 		static byte advance(byte event, char &item, const char num, const char min = 0);
 		char value_;
 	private:
-		char num_, initial_;
+		char num_;
 	};
+
 
 	void stateDefault(byte event);
 	void stateGame(byte event);
 	void stateSettingsMenu(byte event);
 	void stateShowResult(byte event);
 
+	enum ProcessCriterum{
+		EVER = 1 << 0,
+		TIMER = 1 << 1,
+		PCINT = 1 << 2
+	};
+
+
+	byte process_criterium_;
+	unsigned long process_timer_process_time_;
 
 	Display * display_;
 	Game * game_;

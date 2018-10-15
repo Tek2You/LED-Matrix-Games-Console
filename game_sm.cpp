@@ -5,12 +5,25 @@
 #define TRANSITION(s) {\
 	setState(STATE_CAST(&GameSM::s)); \
 	process(ON_ENTRY); \
+	process_criterium_ = 0;\
 	}
 
 GameSM::GameSM(Display *display, byte speed)
-   :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), speed_(speed)
+   :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), speed_(speed), process_timer_process_time_ (0)
 {
+	process(ON_ENTRY);
+}
 
+void GameSM::processStateMaschine(byte event)
+{
+	if((process_criterium_ & EVER) || (process_criterium_ & ProcessCriterum::PCINT && event & CHANGE)){
+		this->process(event);
+	}
+
+	else if (process_criterium_ & ProcessCriterum::TIMER && process_timer_process_time_ && process_timer_process_time_ > millis()){
+		this->process(event);
+		process_timer_process_time_ = 0;
+	}
 }
 
 byte GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
@@ -32,20 +45,25 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 	return 0;
 }
 
+
 void GameSM::stateDefault(byte event)
 {
+
 	const char * texts[2][2] = {{"Start Game","Setting"}, {"Spiel Starten","Einstellungen"}};
-	static char menu_item;
+	static MenuItem item;
 	if(event & ON_ENTRY){
-//		item.init(2,0);
-		menu_item = 0;
+		process_criterium_ |= PCINT;
+		item.init(2,0);
+//		item = 0;
 	}
+
 	else if(event & INPUT_MASK && event & CHANGE){
-//		byte advance_output = item.advance(event);
-		byte advance_output = MenuItem::advance(event,menu_item,2);
+		bitToggle(PORTB,1);
+		byte advance_output = item.advance(event);
+//		byte advance_output = MenuItem::advance(event,item,2);
 
 		if(advance_output == 1){
-			switch(menu_item){
+			switch(item.value_){
 			case 0:
 				TRANSITION(stateGame);
 				break;
@@ -53,20 +71,19 @@ void GameSM::stateDefault(byte event)
 				TRANSITION(stateSettingsMenu);
 				break;
 			}
+			return;
 		}
-
 		else if(advance_output == 0){
 			display_->update();
 			return;
 		}
 	}
-	display_->setText(texts[language_][menu_item]);
+	display_->setText(texts[language_][item.value_]);
 }
 
 void GameSM::stateGame(byte event)
 {
 	if(event & ON_ENTRY){
-
 		if(game_ != nullptr){
 			delete(game_);
 		}
@@ -77,31 +94,31 @@ void GameSM::stateGame(byte event)
 	}
 	if(event & CHANGE && event & INPUT_MASK){
 		if(event & BTN_ROTATE){
-//			game_->rotate();
+			//			game_->rotate();
 		}
 
 		if(event & BTN_LEFT){
-//			game_->left();
+			//			game_->left();
 		}
 
 		else if(event & BTN_RIGHT){
-//			game_->right();
+			//			game_->right();
 		}
 
 		if(event & BTN_DOWN){
-//			if(step_counter_ >= speed_ / 3){
-//				goto label;
-//			}
+			//			if(step_counter_ >= speed_ / 3){
+			//				goto label;
+			//			}
 		}
 	}
 
-//	if(step_counter_++ >= speed_){
-//label:
-//		step_counter_ = 0;
-//		if(game_->step()){ // game ends
-////			TRANSITION(stateShowResult);
-//		}
-//	}
+	//	if(step_counter_++ >= speed_){
+	//label:
+	//		step_counter_ = 0;
+	//		if(game_->step()){ // game ends
+	////			TRANSITION(stateShowResult);
+	//		}
+	//	}
 }
 
 void GameSM::stateShowResult(byte event){
@@ -133,19 +150,5 @@ void GameSM::stateSettingsMenu(byte event)
 
 byte GameSM::MenuItem::advance(byte event)
 {
-	switch (event & INPUT_MASK) {
-	case BTN_LEFT:
-		if (--value_ < 0)
-			value_ = num_-1;
-		break;
-	case BTN_RIGHT:
-		if (++value_ >= num_)
-			value_ = 0;
-		break;
-	case BTN_DOWN:
-		return 1;
-	case BTN_ROTATE:
-		return 2;
-	}
-	return 0;
+	advance(event,value_,num_);
 }
