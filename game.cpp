@@ -6,7 +6,7 @@ Game::Game(Display *display):
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
-	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::POS{2,5});
+	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
 }
 
 Game::~Game()
@@ -20,19 +20,13 @@ Game::~Game()
 void Game::render()
 {
 	display_->clear();
-//	field_[5] = 0xFF;
 	display_->setArray(field_);
 	if(tetromino_ != nullptr){
-		tetromino::POS positions[4];
+		tetromino::Pos positions[4];
 		tetromino_->getPositions(positions);
-//			display_->setPixel(4,4,true);
-		for(int i = 0; i < 4; i++){
-//			if(positions[i].pos_x == 4 && positions[i].pos_y == 4){
-//				bitSet(PORTB,1);
-//			}
-			display_->setPixel(positions[i].pos_y,positions[i].pos_x, true);
+		for(Pos p : positions){
+			display_->setPixel(p.pos_y,p.pos_x, true);
 		}
-//		display_->setPixel(positions[1].pos_x,positions[1].pos_y,true);
 	}
 }
 
@@ -49,8 +43,8 @@ bool Game::rotate()
 
 	tetromino::DIRECTION direction = tetromino_->getDirection();
 	tetromino::DIRECTION new_direction;
-	tetromino::POS position = tetromino_->getPos();
-	tetromino::POS new_position = position;
+	tetromino::Pos position = tetromino_->getPos();
+	tetromino::Pos new_position = position;
 	tetromino::SHAPE shape = tetromino_->getShape();
 
 	byte possible_directions = tetromino_->possibleDirections();
@@ -97,7 +91,7 @@ bool Game::rotate()
 
 bool Game::right()
 {
-	POS pos = tetromino_->getPos();
+	Pos pos = tetromino_->getPos();
 	pos.pos_x++;
 	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
 		return false;
@@ -108,7 +102,7 @@ bool Game::right()
 
 bool Game::left()
 {
-	POS pos = tetromino_->getPos();
+	Pos pos = tetromino_->getPos();
 	pos.pos_x--;
 	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
 		return false;
@@ -119,7 +113,7 @@ bool Game::left()
 
 bool Game::step()
 {
-	POS pos = tetromino_->getPos();
+	Pos pos = tetromino_->getPos();
 	pos.pos_y--;
 	byte valid_output = tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos);
 	if(valid_output){  // not valid
@@ -156,26 +150,23 @@ void Game::begin()
 bool Game::newTetromino()
 {
 	if(tetromino_ != nullptr){
-		POS pos[4];
-		tetromino_->getPositions(pos);
-		for(POS p : pos) {
-			display_->setPixel(p.pos_x,p.pos_y,true);
-		}
 		delete tetromino_;
 		tetromino_ = nullptr;
 	}
 	tetromino::SHAPE shape = randomTetrominoShape();
-	tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),tetromino::POS{4,char(display_->rows())});
-	tetromino::POS points[4];
-	tetromino_->getPositions(points);
+	tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),Pos(4,char(display_->rows())));
 
-	for(int i = 0; i < 4; i++){
-		if(points[i].pos_y > display_->rows()){
-			tetromino::POS pos = tetromino_->getPos();
-			pos.pos_y -= (points[i].pos_y - display_->rows());
-			tetromino_->setPos(pos);
-		}
-	}
+	tetromino_->setPos(Pos(4,4));
+//	tetromino::POS points[4];
+//	tetromino_->getPositions(points);
+
+//	for(POS p : points){
+//		if(p.pos_y > display_->rows()){
+//			tetromino::POS pos = tetromino_->getPos();
+//			pos.pos_y -= (p.pos_y - display_->rows());
+//			tetromino_->setPos(pos);
+//		}
+//	}
 	render();
 	if(tetromino_->isValid() != 0){ // not valid
 		return true;
@@ -199,25 +190,25 @@ void Game::checkRowsFinished()
 
 tetromino::SHAPE Game::randomTetrominoShape()
 {
-	return tetromino::SHAPE(rand());
+	return tetromino::SHAPE(millis() % 7);
 }
 
 tetromino::DIRECTION Game::randomTetrominoDirection(tetromino::SHAPE shape){
 	byte directions = Tetromino::possibleDirections(shape);
-	int num;
-	for(int i = 0; i < 8; i++){
+	int num = 0;
+	for(int i = 0; i < 4; i++){
 		if(bitRead(directions, i))
 			num++;
 	}
-	int i_direction = rand() % num;
-	for(int i = 0, j; i < 4; i++){
-		if(bitRead(directions, i)){
-			if(j == num){
-				byte value; bitSet(value, i);
-				return tetromino::DIRECTION(value);
-			}
-			++j;
-		}
-	}
+	int i_direction = millis() % num;
+//	for(int i = 0, j = 0; i < 4; i++){
+//		if(bitRead(directions, i)){
+//			if(j == i_direction){
+//				return tetromino::DIRECTION(1 << 1);
+//			}
+//			++j;
+//		}
+//	}
+	return tetromino::DIRECTION(i_direction);
 }
 
