@@ -2,14 +2,14 @@
 #include "avr.h"
 
 namespace tetromino {
-enum SHAPE : byte {
+enum SHAPE {
 	I,J,L,O,S,T,Z
 };
 enum DIRECTION : byte {
-	TOP =  1 << 0,
-	RIGHT = 1 << 1,
-	BOTTOM = 1 << 2,
-	LEFT = 1 << 3,
+	TOP =  0,
+	RIGHT = 1,
+	BOTTOM = 2,
+	LEFT = 3,
 };
 
 enum VALIDATION_ERROR : byte{
@@ -20,9 +20,9 @@ enum VALIDATION_ERROR : byte{
 	COLLIDE = 1 << 4,
 };
 
-struct POS {
-	POS(){}
-	POS(char x, char y) : pos_x(x), pos_y(y){}
+struct Pos {
+	Pos(){}
+	Pos(char x, char y) : pos_x(x), pos_y(y){}
 	char pos_x;
 	char pos_y;
 };
@@ -36,13 +36,13 @@ inline byte getY(byte xy){
 }
 
 inline byte setXy(byte x, byte y){
-	return (y & 0x0F) | ((x & 0xF0) << 4);
+	return (y & 0x0F) | ((x & 0x0F) << 4);
 }
 
-inline POS getPos(byte xy){
-	POS pos;
-	pos.pos_x = (xy & 0xF0) >> 4;
-	pos.pos_y = xy & 0x0F;
+inline Pos getPos(byte xy){
+	Pos pos;
+	pos.pos_x = byte((xy & 0xF0) >> 4);
+	pos.pos_y = byte(xy & 0x0F);
 	return pos;
 }
 
@@ -51,25 +51,28 @@ struct SPECIFICATIONS{
 	byte shape[4];
 
 };
-const PROGMEM SPECIFICATIONS tetrominos[7] = {
-   {TOP | RIGHT                ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
-   {TOP | RIGHT | BOTTOM | LEFT,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
-   {TOP | RIGHT | BOTTOM | LEFT,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
-   {TOP                        ,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
-   {TOP | RIGHT                ,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
-   {TOP | RIGHT| BOTTOM | LEFT ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,1)}},
-   {TOP | RIGHT                ,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
-};
-const SPECIFICATIONS tetrominos1[7] = {
-   {TOP | RIGHT                ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
-   {TOP | RIGHT | BOTTOM | LEFT,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
-   {TOP | RIGHT | BOTTOM | LEFT,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
-   {TOP                        ,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
-   {TOP | RIGHT                ,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
-   {TOP | RIGHT| BOTTOM | LEFT ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,1)}},
-   {TOP | RIGHT                ,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
+#define BV_(bit) 1 << bit
+
+//const PROGMEM SPECIFICATIONS tetrominos[7] = {
+//   {TOP | RIGHT                ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
+//   {TOP | RIGHT | BOTTOM | LEFT,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
+//   {TOP | RIGHT | BOTTOM | LEFT,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
+//   {TOP                        ,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
+//   {TOP | RIGHT                ,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
+//   {TOP | RIGHT| BOTTOM | LEFT ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,1)}},
+//   {TOP | RIGHT                ,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
+//};
+const SPECIFICATIONS tetrominos[7] = {
+   {BV_(TOP) | BV_(RIGHT)										,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
+   {BV_(TOP)														,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
+   {BV_(TOP) | BV_(RIGHT)										,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(1,1),setXy(0,0),setXy(1,0),setXy(2,0)}},
+   {BV_(TOP) | BV_(RIGHT)										,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
 };
 }
+
 
 
 using namespace tetromino;
@@ -77,24 +80,24 @@ class Tetromino
 {
 public:
 
-	Tetromino(tetromino::SHAPE shape, byte heigth, byte *field, tetromino::DIRECTION direction, tetromino::POS pos);
+	Tetromino(tetromino::SHAPE shape, byte heigth, byte *field, tetromino::DIRECTION direction, tetromino::Pos pos);
 
-	void setPos(tetromino::POS pos) {pos_ = pos;}
-	tetromino::POS getPos() {return pos_;}
+	void setPos(tetromino::Pos pos) {pos_ = pos;}
+	tetromino::Pos getPos() {return pos_;}
 
 	void setDirection(tetromino::DIRECTION direction);
 	tetromino::DIRECTION getDirection() {return direction_;}
 
 	tetromino::SHAPE getShape() {return shape_;}
 
-	bool getPositions(tetromino::POS(&positions)[4]);
-	bool getPositions(tetromino::POS(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos);
+	bool getPositions(tetromino::Pos(&positions)[4]);
+	bool getPositions(tetromino::Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
 
 	static DIRECTION rotate(DIRECTION direction, SHAPE shape);
 	void rotate();
 
 	byte isValid();
-	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos);
+	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
 
 
 	static byte possibleDirections(tetromino::SHAPE shape);
@@ -102,7 +105,7 @@ public:
 private:
 	const tetromino::SHAPE shape_;
 	tetromino::DIRECTION direction_;
-	tetromino::POS pos_;
+	tetromino::Pos pos_;
 	const byte heigth_;
 	byte * field_;
 };

@@ -1,64 +1,51 @@
 #include "tetromino.h"
 
-Tetromino::Tetromino(tetromino::SHAPE shape, byte heigth, byte * field, tetromino::DIRECTION direction, tetromino::POS pos)
+Tetromino::Tetromino(tetromino::SHAPE shape, byte heigth, byte * field, tetromino::DIRECTION direction, tetromino::Pos pos)
    :shape_(shape), heigth_(heigth), field_(field), direction_(direction),pos_(pos)
 {
-	//	tetromino::SPECIFICATIONS brick = tetrominos1[I];
-	//	if(brick.shape[0] == setXy(0,1)){
-	//		bitSet(PORTB,1);
-	//	}
+
 }
 
-bool Tetromino::getPositions(tetromino::POS (&positions)[4])
+bool Tetromino::getPositions(tetromino::Pos (&positions)[4])
 {
 	return getPositions(positions,shape_,direction_, pos_);
 }
 
-bool Tetromino::getPositions(POS (&positions)[4], SHAPE shape, DIRECTION direction, POS pos)
+bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION direction, Pos pos)
 {
-	pos.pos_x = 4;
-	pos.pos_y = 4;
-	direction = DIRECTION::TOP;
-	tetromino::SPECIFICATIONS brick = tetrominos1[shape];
-	//	memcpy_P(&brick, &tetrominos + shape, sizeof(SPECIFICATIONS));
-//	if(!(direction & brick.directions)){
-//		return false; // failure: direction isnt available
-//	}
-	tetromino::POS pos_flip = tetromino::getPos(brick.shape[0]);
+//	pos.pos_x = 4;
+//	pos.pos_y = 4;
+//	direction = DIRECTION::TOP;
+//	shape = SHAPE::Z;
+	tetromino::SPECIFICATIONS brick = tetrominos[shape];
+	if(!brick.directions & BV_(direction))
+		return false;
+	tetromino::Pos pos_rotate = tetromino::getPos(brick.shape[0]);
 	for(int i = 0; i < 4; i++)
 	{
-		tetromino::POS rotated_brick_part_pos, brick_position;
+		tetromino::Pos rotated_brick_part_pos, brick_position;
 
-		brick_position.pos_x = tetromino::getPos(brick.shape[i]).pos_x - pos_flip.pos_x;
-		brick_position.pos_y = tetromino::getPos(brick.shape[i]).pos_y - pos_flip.pos_y;
+		brick_position.pos_x = tetromino::getPos(brick.shape[i]).pos_x - pos_rotate.pos_x;
+		brick_position.pos_y = tetromino::getPos(brick.shape[i]).pos_y - pos_rotate.pos_y;
 
-		if(direction == tetromino::TOP){
+		if(direction == tetromino::LEFT){
 			rotated_brick_part_pos = brick_position;
 		}
-		else if(direction == tetromino::RIGHT){
+		else if(direction == tetromino::BOTTOM){
 			rotated_brick_part_pos.pos_x = brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = -brick_position.pos_x;
 		}
-		else if(direction == tetromino::BOTTOM){
+		else if(direction == tetromino::RIGHT){
 			rotated_brick_part_pos.pos_x = -brick_position.pos_x;
 			rotated_brick_part_pos.pos_y = -brick_position.pos_y;
 		}
-		else if(direction == tetromino::LEFT){
+		else if(direction == tetromino::TOP){
 			rotated_brick_part_pos.pos_x = -brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = brick_position.pos_x;
 		}
-//		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
-//		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
-		positions[i].pos_x = pos.pos_x + POS(i,i).pos_x;
-		positions[i].pos_y = pos.pos_y + POS(i,i).pos_y;
-		//		if(positions[1].pos_x == POS(4,4).pos_x && positions[1].pos_y == POS(4,4).pos_y){
-		//			bitSet(PORTB,1);
-		//		}
-//		positions[i].pos_x = 2 + i;
-//		positions[i].pos_y = 2 + i;
+		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
+		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
 	}
-//	for(int i = 0; i < 4; i++){
-//	}
 	return true;
 }
 
@@ -106,9 +93,9 @@ byte Tetromino::isValid()
 	return isValid(shape_,direction_, pos_);
 }
 
-byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos)
+byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos)
 {
-	tetromino::POS positions[4];
+	tetromino::Pos positions[4];
 	byte valid_errors;
 	getPositions(positions,shape,direction,pos);
 	for(int i = 0; i < 4; i++){
