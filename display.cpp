@@ -10,7 +10,7 @@ void Display::setText(const char *text)
 {
 	clear();
 	const char * first = text;
-	setString(first,0,-1,1,0);
+	setString(first,0,-1,1,4);
 }
 
 void Display::update()
