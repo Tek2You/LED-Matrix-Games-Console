@@ -54,13 +54,11 @@ void GameSM::stateDefault(byte event)
 	if(event & ON_ENTRY){
 		process_criterium_ |= PCINT;
 		item.init(2,0);
-//		item = 0;
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
-		bitToggle(PORTB,1);
+//		bitToggle(PORTB,1);
 		byte advance_output = item.advance(event);
-//		byte advance_output = MenuItem::advance(event,item,2);
 
 		if(advance_output == 1){
 			switch(item.value_){
@@ -106,9 +104,9 @@ void GameSM::stateGame(byte event)
 		}
 
 		if(event & BTN_DOWN){
-			//			if(step_counter_ >= speed_ / 3){
-			//				goto label;
-			//			}
+//			if(step_counter_ >= speed_ / 3){
+//				goto label;
+//			}
 		}
 	}
 

@@ -1,7 +1,6 @@
 #include "avr.h"
 #include "game_sm.h"
 #include "display.h"
-#include "ATmega-master/include/spi.h"
 
 FUSES = {
    LFUSE_DEFAULT | (byte)~FUSE_CKDIV8, // run at 8MHz
@@ -44,7 +43,7 @@ int main(void)
 		if(have_input || counter++ >= 0x2FF){
 			dp.disable();
 			counter = 0;
-			sm.process((have_input | (~PINC & INPUT_MASK)));
+			sm.processStateMaschine((have_input | (~PINC & INPUT_MASK)));
 		}
 		have_input = 0;
 	}
@@ -58,10 +57,11 @@ ISR(PCINT1_vect){
 }
 
 ISR(TIMER1_OVF_vect){
-	if(input_count && input_count++ == 20){
+	if(input_count && input_count++ == 5){
 		input_count = 0;
-		have_input = CHANGE;
 	}
+	if(input_count == 2)
+		have_input = CHANGE;
 }
 
 
