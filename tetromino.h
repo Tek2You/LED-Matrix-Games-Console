@@ -21,6 +21,8 @@ enum VALIDATION_ERROR : byte{
 };
 
 struct POS {
+	POS(){}
+	POS(char x, char y) : pos_x(x), pos_y(y){}
 	char pos_x;
 	char pos_y;
 };
@@ -58,7 +60,17 @@ const PROGMEM SPECIFICATIONS tetrominos[7] = {
    {TOP | RIGHT| BOTTOM | LEFT ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,1)}},
    {TOP | RIGHT                ,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
 };
+const SPECIFICATIONS tetrominos1[7] = {
+   {TOP | RIGHT                ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
+   {TOP | RIGHT | BOTTOM | LEFT,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
+   {TOP | RIGHT | BOTTOM | LEFT,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
+   {TOP                        ,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
+   {TOP | RIGHT                ,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
+   {TOP | RIGHT| BOTTOM | LEFT ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,1)}},
+   {TOP | RIGHT                ,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
+};
 }
+
 
 using namespace tetromino;
 class Tetromino

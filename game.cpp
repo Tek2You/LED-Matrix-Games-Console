@@ -1,4 +1,5 @@
 ﻿#include "game.h"
+#include "string.h"
 
 Game::Game(Display *display):
    display_(display)
@@ -19,15 +20,20 @@ Game::~Game()
 void Game::render()
 {
 	display_->clear();
+//	field_[5] = 0xFF;
 	display_->setArray(field_);
 	if(tetromino_ != nullptr){
 		tetromino::POS positions[4];
 		tetromino_->getPositions(positions);
+//			display_->setPixel(4,4,true);
 		for(int i = 0; i < 4; i++){
-			display_->setPixel(positions[i].pos_x,positions[i].pos_y, true);
+//			if(positions[i].pos_x == 4 && positions[i].pos_y == 4){
+//				bitSet(PORTB,1);
+//			}
+			display_->setPixel(positions[i].pos_y,positions[i].pos_x, true);
 		}
+//		display_->setPixel(positions[1].pos_x,positions[1].pos_y,true);
 	}
-	bitSet(PORTB,1);
 }
 
 bool Game::rotate()
@@ -131,7 +137,6 @@ void Game::reset()
 {
 	if(tetromino_ != nullptr)
 		delete(tetromino_);
-
 	this->clear();
 	display_->clear();
 }
@@ -145,7 +150,6 @@ void Game::clear()
 
 void Game::begin()
 {
-	display_->clear();
 	newTetromino();
 }
 
@@ -172,11 +176,10 @@ bool Game::newTetromino()
 			tetromino_->setPos(pos);
 		}
 	}
-
 	render();
 	if(tetromino_->isValid() != 0){ // not valid
-
 		return true;
+
 	}
 	return false;
 }

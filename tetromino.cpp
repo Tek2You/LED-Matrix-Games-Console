@@ -3,7 +3,10 @@
 Tetromino::Tetromino(tetromino::SHAPE shape, byte heigth, byte * field, tetromino::DIRECTION direction, tetromino::POS pos)
    :shape_(shape), heigth_(heigth), field_(field), direction_(direction),pos_(pos)
 {
-
+	//	tetromino::SPECIFICATIONS brick = tetrominos1[I];
+	//	if(brick.shape[0] == setXy(0,1)){
+	//		bitSet(PORTB,1);
+	//	}
 }
 
 bool Tetromino::getPositions(tetromino::POS (&positions)[4])
@@ -11,13 +14,16 @@ bool Tetromino::getPositions(tetromino::POS (&positions)[4])
 	return getPositions(positions,shape_,direction_, pos_);
 }
 
-bool Tetromino::getPositions(tetromino::POS (&positions)[4], tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::POS pos)
+bool Tetromino::getPositions(POS (&positions)[4], SHAPE shape, DIRECTION direction, POS pos)
 {
-	tetromino::SPECIFICATIONS brick;
-	memcpy_P(&brick, &tetromino::tetrominos + shape, sizeof(tetromino::SPECIFICATIONS));
-	if(!(direction & brick.directions)){
-		return false; // failure: direction isnt available
-	}
+	pos.pos_x = 4;
+	pos.pos_y = 4;
+	direction = DIRECTION::TOP;
+	tetromino::SPECIFICATIONS brick = tetrominos1[shape];
+	//	memcpy_P(&brick, &tetrominos + shape, sizeof(SPECIFICATIONS));
+//	if(!(direction & brick.directions)){
+//		return false; // failure: direction isnt available
+//	}
 	tetromino::POS pos_flip = tetromino::getPos(brick.shape[0]);
 	for(int i = 0; i < 4; i++)
 	{
@@ -41,9 +47,18 @@ bool Tetromino::getPositions(tetromino::POS (&positions)[4], tetromino::SHAPE sh
 			rotated_brick_part_pos.pos_x = -brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = brick_position.pos_x;
 		}
-		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
-		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
+//		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
+//		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
+		positions[i].pos_x = pos.pos_x + POS(i,i).pos_x;
+		positions[i].pos_y = pos.pos_y + POS(i,i).pos_y;
+		//		if(positions[1].pos_x == POS(4,4).pos_x && positions[1].pos_y == POS(4,4).pos_y){
+		//			bitSet(PORTB,1);
+		//		}
+//		positions[i].pos_x = 2 + i;
+//		positions[i].pos_y = 2 + i;
 	}
+//	for(int i = 0; i < 4; i++){
+//	}
 	return true;
 }
 
