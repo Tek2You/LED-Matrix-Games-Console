@@ -199,10 +199,9 @@ void Game::checkRowsFinished()
 		if(field_[i] == 0xFF){ // row is full
 			field_[i] = 0;
 			points_++;
-			for(int j = display_->rows()-1; j > i; j--){
-				field_[j-1] = field_[j];
+			for(int j = i; j < display_->rows() - 1;j++){
+				field_[j] = field_[j+1];
 			}
-			field_[display_->rows() - 1] = 0;
 		}
 	}
 	render();
