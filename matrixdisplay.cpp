@@ -368,7 +368,7 @@ void MatrixDisplay::setArray(byte *array)
 {
 	for(int i = 0; i < 16; i++)
 	{
-		rows_[i] = array[i];
+		setRow(i,array[i]);
 	}
 }
 
