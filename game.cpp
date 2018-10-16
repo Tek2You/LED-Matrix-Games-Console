@@ -128,8 +128,10 @@ bool Game::step()
 		if(valid_output & tetromino::OVER_ABOVE){
 			return true; // game ends
 		}
+		takeOverTetromino();
+//		checkRowsFinished();
 		newTetromino();
-		checkRowsFinished();
+		return false;
 	}
 	tetromino_->setPos(pos);
 	render();
@@ -181,6 +183,16 @@ bool Game::newTetromino()
 
 	}
 	return false;
+}
+
+void Game::takeOverTetromino()
+{
+	Pos positions[4];
+	tetromino_->getPositions(positions);
+	for(Pos p : positions){
+		bitWrite(field_[p.pos_y],p.pos_x,true);
+	}
+	render();
 }
 
 void Game::checkRowsFinished()

@@ -37,6 +37,7 @@ private:
 	int points_;
 
 	bool newTetromino();
+	void takeOverTetromino();
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
 };
