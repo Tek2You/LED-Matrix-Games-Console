@@ -103,10 +103,10 @@ byte Tetromino::isValid()
 byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos)
 {
 	tetromino::Pos positions[4];
-	byte valid_errors;
+	byte valid_errors = 0;
 	getPositions(positions,shape,direction,pos);
 	for(int i = 0; i < 4; i++){
-		if(positions[i].pos_y > heigth_)
+		if(positions[i].pos_y > (heigth_ - 1))
 		{
 			valid_errors |= tetromino::OVER_ABOVE;
 		}
@@ -114,7 +114,7 @@ byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, 
 		{
 			valid_errors |= tetromino::OVER_BELOW; // is over below
 		}
-		else if(positions[i].pos_x < 0)
+		if(positions[i].pos_x < 0)
 		{
 			valid_errors |= tetromino::OVER_LEFT; // is left over
 		}
