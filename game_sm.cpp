@@ -20,9 +20,10 @@ void GameSM::processStateMaschine(byte event)
 		this->process(event);
 	}
 
-	else if (process_criterium_ & ProcessCriterum::TIMER && process_timer_process_time_ && process_timer_process_time_ > millis()){
-		this->process(event);
+	else if (process_criterium_ & ProcessCriterum::TIMER && process_timer_process_time_ && process_timer_process_time_ < millis()){
+		event |= TIMEOUT;
 		process_timer_process_time_ = 0;
+		this->process(event);
 	}
 }
 
@@ -81,6 +82,9 @@ void GameSM::stateDefault(byte event)
 
 void GameSM::stateGame(byte event)
 {
+	static bool btn_down_state	= false;
+	static unsigned long step_interval;
+	static bool first_down = false;
 	if(event & ON_ENTRY){
 		if(game_ != nullptr){
 			delete(game_);
@@ -88,39 +92,55 @@ void GameSM::stateGame(byte event)
 		game_ = new Game(display_);
 		game_->reset();
 		game_->begin();
-		process_criterium_ |= PCINT;
+		btn_down_state = false;
+		process_criterium_ |= PCINT | TIMER;
+		step_interval = 1000;
+		process_timer_process_time_ = millis() + step_interval;
+		first_down = false;
 		return;
 	}
 
-	if(event & CHANGE && event & INPUT_MASK){
-		if(event & BTN_ROTATE){
-			game_->rotate();
-//			bitToggle(PORTB,1);
+	if(event & CHANGE){
+		if(event & INPUT_MASK){
+			if(event & BTN_ROTATE){
+				game_->rotate();
+			}
 
+			if(event & BTN_LEFT){
+				game_->left();
+			}
+
+			else if(event & BTN_RIGHT){
+				game_->right();
+			}
+
+			if(event & BTN_DOWN){
+				if(btn_down_state == false){
+					process_timer_process_time_ = step_interval = 800;
+					first_down = true;
+					btn_down_state = true;
+					goto step;
+				}
+			}
 		}
-
-		if(event & BTN_LEFT){
-//			game_->left();
-		}
-
-		else if(event & BTN_RIGHT){
-//			game_->right();
-		}
-
-		if(event & BTN_DOWN){
-//			if(step_counter_ >= speed_ / 3){
-//				goto label;
-//			}
+		if(btn_down_state == true && !(event % BTN_DOWN)){
+			process_timer_process_time_ = step_interval = 1000;
+			btn_down_state = false;
+			first_down = false;
 		}
 	}
-
-//	if(step_counter_++ >= speed_){
-//label:
-//		step_counter_ = 0;
-//		if(game_->step()){ // game ends
-//			//			TRANSITION(stateShowResult);
-//		}
-//	}
+	if(event & TIMEOUT){
+		if(first_down){
+			step_interval = 400;
+			first_down = false;
+		}
+step:
+		if(game_->step()){ // game ends
+			TRANSITION(stateShowResult);
+			return;
+		}
+		process_timer_process_time_ =	millis() + step_interval;
+	}
 }
 
 void GameSM::stateShowResult(byte event){

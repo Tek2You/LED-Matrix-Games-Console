@@ -6,7 +6,7 @@ Game::Game(Display *display):
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
-//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
+	//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
 }
 
 Game::~Game()
@@ -53,8 +53,7 @@ bool Game::rotate()
 
 	// position is not valid
 	byte valid_output = tetromino_->isValid(shape,new_direction,position);
-	if(valid_output != 0)
-		bitToggle(PORTB,1);
+	if(valid_output)
 	{
 		if(valid_output & tetromino::OVER_LEFT) // left over
 		{
@@ -73,24 +72,27 @@ bool Game::rotate()
 		if(valid_output & tetromino::OVER_BELOW) // over below
 		{
 			new_position.pos_y ++;
-			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_BELOW){
+			while(valid_output = tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_BELOW){
 				new_position.pos_y++;
 			}
 		}
 		else if(valid_output & tetromino::OVER_ABOVE) // above over
 		{
+			bitSet(PORTB,1);
 			new_position.pos_y --;
-			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_ABOVE){
+			while(valid_output = tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_ABOVE){
 				new_position.pos_y--;
 			}
 		}
 		if(valid_output & tetromino::COLLIDE) // collides with exiting tetromino
 		{
-
+			return false;
 		}
 	}
+	tetromino_->setPos(new_position);
 	tetromino_->setDirection(new_direction);
 	render();
+	return true;
 }
 
 bool Game::right()
@@ -101,6 +103,7 @@ bool Game::right()
 		return false;
 	}
 	tetromino_->setPos(pos);
+	render();
 	return true;
 }
 
@@ -112,6 +115,7 @@ bool Game::left()
 		return false;
 	}
 	tetromino_->setPos(pos);
+	render();
 	return true;
 }
 
@@ -128,6 +132,7 @@ bool Game::step()
 		checkRowsFinished();
 	}
 	tetromino_->setPos(pos);
+	render();
 	return false;
 }
 
