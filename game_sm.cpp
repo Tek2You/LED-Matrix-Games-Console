@@ -4,8 +4,8 @@
 #undef TRANSITION
 #define TRANSITION(s) {\
 	setState(STATE_CAST(&GameSM::s)); \
-	process(ON_ENTRY); \
 	process_criterium_ = 0;\
+	process(ON_ENTRY); \
 	}
 
 GameSM::GameSM(Display *display, byte speed)
@@ -57,7 +57,7 @@ void GameSM::stateDefault(byte event)
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
-//		bitToggle(PORTB,1);
+		//		bitToggle(PORTB,1);
 		byte advance_output = item.advance(event);
 
 		if(advance_output == 1){
@@ -88,19 +88,23 @@ void GameSM::stateGame(byte event)
 		game_ = new Game(display_);
 		game_->reset();
 		game_->begin();
-
+		process_criterium_ |= PCINT;
+		return;
 	}
+
 	if(event & CHANGE && event & INPUT_MASK){
 		if(event & BTN_ROTATE){
-			//			game_->rotate();
+			game_->rotate();
+//			bitToggle(PORTB,1);
+
 		}
 
 		if(event & BTN_LEFT){
-			//			game_->left();
+//			game_->left();
 		}
 
 		else if(event & BTN_RIGHT){
-			//			game_->right();
+//			game_->right();
 		}
 
 		if(event & BTN_DOWN){
@@ -110,13 +114,13 @@ void GameSM::stateGame(byte event)
 		}
 	}
 
-	//	if(step_counter_++ >= speed_){
-	//label:
-	//		step_counter_ = 0;
-	//		if(game_->step()){ // game ends
-	////			TRANSITION(stateShowResult);
-	//		}
-	//	}
+//	if(step_counter_++ >= speed_){
+//label:
+//		step_counter_ = 0;
+//		if(game_->step()){ // game ends
+//			//			TRANSITION(stateShowResult);
+//		}
+//	}
 }
 
 void GameSM::stateShowResult(byte event){

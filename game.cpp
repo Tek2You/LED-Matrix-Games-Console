@@ -41,6 +41,7 @@ bool Game::rotate()
 	 *
 	*/
 
+
 	tetromino::DIRECTION direction = tetromino_->getDirection();
 	tetromino::DIRECTION new_direction;
 	tetromino::Pos position = tetromino_->getPos();
@@ -53,18 +54,19 @@ bool Game::rotate()
 	// position is not valid
 	byte valid_output = tetromino_->isValid(shape,new_direction,position);
 	if(valid_output != 0)
+		bitToggle(PORTB,1);
 	{
 		if(valid_output & tetromino::OVER_LEFT) // left over
 		{
 			++new_position.pos_x;
-			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_LEFT){
+			while(valid_output = tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_LEFT){
 				new_position.pos_x++;
 			}
 		}
 		else if(valid_output & tetromino::OVER_RIGHT) // right over
 		{
 			new_position.pos_x --;
-			while(tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_RIGHT){
+			while(valid_output = tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_RIGHT){
 				new_position.pos_x--;
 			}
 		}
@@ -87,6 +89,8 @@ bool Game::rotate()
 
 		}
 	}
+	tetromino_->setDirection(new_direction);
+	render();
 }
 
 bool Game::right()
@@ -156,10 +160,8 @@ bool Game::newTetromino()
 	tetromino::SHAPE shape = randomTetrominoShape();
 	tetromino_ = new Tetromino(shape, display_->rows(), field_,	randomTetrominoDirection(shape),Pos(4,display_->rows()-1));
 
-//	tetromino_->setPos(Pos(4,6));
 	tetromino::Pos points[4];
 	tetromino_->getPositions(points);
-
 	for(Pos p : points){
 		if(p.pos_y > display_->rows() - 1){
 			tetromino::Pos pos = tetromino_->getPos();
@@ -203,9 +205,6 @@ tetromino::DIRECTION Game::randomTetrominoDirection(tetromino::SHAPE shape){
 	}
 
 	byte i_direction = ((millis()) % (num));
-	if(i_direction == 3){
-		bitSet(PORTB,1);
-	}
 	for(int i = 0, j = 0; i < 4; i++){
 		if(bitRead(directions,i)){
 			if(j == i_direction){

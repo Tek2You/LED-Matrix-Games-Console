@@ -13,10 +13,6 @@ bool Tetromino::getPositions(tetromino::Pos (&positions)[4])
 
 bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION direction, Pos pos)
 {
-//	pos.pos_x = 4;
-//	pos.pos_y = 4;
-//	direction = DIRECTION::TOP;
-//	shape = SHAPE::Z;
 	tetromino::SPECIFICATIONS brick = tetrominos[shape];
 	if(!brick.directions & BV_(direction))
 		return false;
@@ -52,19 +48,16 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 DIRECTION Tetromino::rotate(DIRECTION direction, SHAPE shape)
 {
 	byte directions = getPossibleDirections(shape);
-	if(directions == direction){
+	if(directions == bit(direction)){
 		return direction; // not rotateable
 	}
+
 	DIRECTION new_direction = direction;
+
 	for(int i = 0; i < 4; i++){
-		new_direction = DIRECTION(new_direction << 1);
-		if(new_direction > (1 << 3)){
-			new_direction = TOP;
-		}
-		if(new_direction & directions){
-			direction = new_direction;
-			return direction;
-		}
+		new_direction = DIRECTION((byte(new_direction)+1)%4);
+		if(directions & bit(new_direction))
+			return new_direction;
 	}
 	return direction;
 }

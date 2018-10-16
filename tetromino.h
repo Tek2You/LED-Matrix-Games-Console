@@ -68,7 +68,7 @@ const SPECIFICATIONS tetrominos[7] = {
    {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
    {BV_(TOP)														,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
    {BV_(TOP) | BV_(RIGHT)										,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
-   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(1,1),setXy(0,0),setXy(1,0),setXy(2,0)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,0)}},
    {BV_(TOP) | BV_(RIGHT)										,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
 };
 }
@@ -85,7 +85,7 @@ public:
 	void setPos(tetromino::Pos pos) {pos_ = pos;}
 	tetromino::Pos getPos() {return pos_;}
 
-	void setDirection(tetromino::DIRECTION direction);
+	void setDirection(tetromino::DIRECTION direction){direction_ = direction;}
 	tetromino::DIRECTION getDirection() {return direction_;}
 
 	tetromino::SHAPE getShape() {return shape_;}
