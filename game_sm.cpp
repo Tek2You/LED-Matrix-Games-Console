@@ -50,7 +50,7 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 void GameSM::stateDefault(byte event)
 {
 
-	const char * texts[2][2] = {{"Start Game","Setting"}, {"Spiel Starten","Einstellungen"}};
+	const char * texts[2][2] = {{"Tetris","Setting"}, {"Tetris","Einstellungen"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
 		process_criterium_ |= PCINT;
