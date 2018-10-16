@@ -124,7 +124,7 @@ byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, 
 			valid_errors |= tetromino::OVER_RIGHT; // is right over
 		}
 
-		else if(bitRead(*(field_ + positions[i].pos_x),byte(positions[i].pos_y)))
+		if(bitRead(*(field_ + positions[i].pos_y),byte(positions[i].pos_x)))
 		{
 			valid_errors |= tetromino::COLLIDE; // collides with exiting tetromino part
 		}

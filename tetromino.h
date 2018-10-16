@@ -91,7 +91,7 @@ public:
 	tetromino::SHAPE getShape() {return shape_;}
 
 	bool getPositions(tetromino::Pos(&positions)[4]);
-	bool getPositions(tetromino::Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
+	static bool getPositions(tetromino::Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
 
 	static DIRECTION rotate(DIRECTION direction, SHAPE shape);
 	void rotate();
