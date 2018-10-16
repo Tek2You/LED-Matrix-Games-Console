@@ -145,6 +145,7 @@ step:
 
 void GameSM::stateShowResult(byte event){
 	if(event & ON_ENTRY){
+		display_->clear();
 		int points = game_->getPoints();
 		//	display_->setString();
 	}

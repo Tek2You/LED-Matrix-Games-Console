@@ -125,12 +125,10 @@ bool Game::step()
 	pos.pos_y--;
 	byte valid_output = tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos);
 	if(valid_output){  // not valid
-		if(valid_output & tetromino::OVER_ABOVE){
-			return true; // game ends
-		}
 		takeOverTetromino();
-//		checkRowsFinished();
-		newTetromino();
+		checkRowsFinished();
+		if(newTetromino())
+			return true;
 		return false;
 	}
 	tetromino_->setPos(pos);
@@ -178,7 +176,7 @@ bool Game::newTetromino()
 		}
 	}
 	render();
-	if(tetromino_->isValid() != 0){ // not valid
+	if(tetromino_->isValid() & COLLIDE){ // not valid
 		return true;
 
 	}
@@ -199,13 +197,15 @@ void Game::checkRowsFinished()
 {
 	for(int i = 0; i < display_->rows(); i++){
 		if(field_[i] == 0xFF){ // row is full
+			field_[i] = 0;
 			points_++;
-			for(int j = display_->rows() - 1; i > i; j--){
-				field_[j] = field_[j+1];
+			for(int j = display_->rows()-1; j > i; j--){
+				field_[j-1] = field_[j];
 			}
-			field_[display_->rows()] = 0;
+			field_[display_->rows() - 1] = 0;
 		}
 	}
+	render();
 }
 
 tetromino::SHAPE Game::randomTetrominoShape()
