@@ -100,6 +100,8 @@ public:
 	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
 
 
+	static byte getPossibleDirections(tetromino::SHAPE shape);
+	byte getPossibleDirections();
 	static byte possibleDirections(tetromino::SHAPE shape);
 	byte possibleDirections();
 private:

@@ -51,7 +51,7 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 
 DIRECTION Tetromino::rotate(DIRECTION direction, SHAPE shape)
 {
-	byte directions = possibleDirections(shape);
+	byte directions = getPossibleDirections(shape);
 	if(directions == direction){
 		return direction; // not rotateable
 	}
@@ -76,14 +76,29 @@ void Tetromino::rotate()
 
 
 
-byte Tetromino::possibleDirections(){
-	return possibleDirections(shape_);
+byte Tetromino::getPossibleDirections(){
+	return getPossibleDirections(shape_);
 }
 
 
-byte Tetromino::possibleDirections(tetromino::SHAPE shape){
+byte Tetromino::getPossibleDirections(tetromino::SHAPE shape){
 	SPECIFICATIONS brick = tetrominos[shape];
 	return brick.directions;
+}
+
+byte Tetromino::possibleDirections(tetromino::SHAPE shape){
+	byte num = 0;
+	byte directions = getPossibleDirections(shape);
+	for(int i = 0; i < 4; i++){
+		if(bitRead(directions, i))
+			num++;
+	}
+	return num;
+}
+
+byte Tetromino::possibleDirections()
+{
+	possibleDirections(shape_);
 }
 
 

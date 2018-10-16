@@ -47,7 +47,7 @@ bool Game::rotate()
 	tetromino::Pos new_position = position;
 	tetromino::SHAPE shape = tetromino_->getShape();
 
-	byte possible_directions = tetromino_->possibleDirections();
+	byte possible_directions = tetromino_->getPossibleDirections();
 	new_direction = Tetromino::rotate(direction,shape);
 
 	// position is not valid
@@ -190,21 +190,21 @@ void Game::checkRowsFinished()
 
 tetromino::SHAPE Game::randomTetrominoShape()
 {
-	return tetromino::SHAPE(millis() % 7);
+	return tetromino::SHAPE(micros() % 7);
 }
 
 tetromino::DIRECTION Game::randomTetrominoDirection(tetromino::SHAPE shape){
-	byte directions = Tetromino::possibleDirections(shape);
-	int num = 0;
-	for(int i = 0; i < 4; i++){
-		if(bitRead(directions, i))
-			num++;
-	}
+	byte directions = Tetromino::getPossibleDirections(shape);
+	byte num = Tetromino::possibleDirections(shape);
+
 	if(num <= 1){
 		return TOP;
 	}
-	bitSet(PORTB,1);
-	int i_direction = (micros() * 883) % (num-1);
+
+	byte i_direction = ((millis()) % (num));
+	if(i_direction == 3){
+		bitSet(PORTB,1);
+	}
 	for(int i = 0, j = 0; i < 4; i++){
 		if(bitRead(directions,i)){
 			if(j == i_direction){
