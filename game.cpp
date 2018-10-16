@@ -6,7 +6,7 @@ Game::Game(Display *display):
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
-	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
+//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
 }
 
 Game::~Game()
@@ -25,7 +25,7 @@ void Game::render()
 		tetromino::Pos positions[4];
 		tetromino_->getPositions(positions);
 		for(Pos p : positions){
-			display_->setPixel(p.pos_y,p.pos_x, true);
+			display_->setPixel(p.pos_x,p.pos_y, true);
 		}
 	}
 }
@@ -154,19 +154,20 @@ bool Game::newTetromino()
 		tetromino_ = nullptr;
 	}
 	tetromino::SHAPE shape = randomTetrominoShape();
-	tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),Pos(4,char(display_->rows())));
+	tetromino_ = new Tetromino(shape, display_->rows(), field_,	randomTetrominoDirection(shape),Pos(4,display_->rows()-1));
 
-	tetromino_->setPos(Pos(4,4));
-//	tetromino::POS points[4];
-//	tetromino_->getPositions(points);
+//	tetromino_->setPos(Pos(4,6));
+	tetromino::Pos points[4];
+	tetromino_->getPositions(points);
 
-//	for(POS p : points){
-//		if(p.pos_y > display_->rows()){
-//			tetromino::POS pos = tetromino_->getPos();
-//			pos.pos_y -= (p.pos_y - display_->rows());
-//			tetromino_->setPos(pos);
-//		}
-//	}
+	for(Pos p : points){
+		if(p.pos_y > display_->rows() - 1){
+			tetromino::Pos pos = tetromino_->getPos();
+			pos.pos_y -= (p.pos_y - (display_->rows()-1));
+			tetromino_->setPos(pos);
+			tetromino_->getPositions(points);
+		}
+	}
 	render();
 	if(tetromino_->isValid() != 0){ // not valid
 		return true;

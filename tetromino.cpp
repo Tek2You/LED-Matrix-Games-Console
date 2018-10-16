@@ -28,18 +28,18 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 		brick_position.pos_x = tetromino::getPos(brick.shape[i]).pos_x - pos_rotate.pos_x;
 		brick_position.pos_y = tetromino::getPos(brick.shape[i]).pos_y - pos_rotate.pos_y;
 
-		if(direction == tetromino::LEFT){
+		if(direction == tetromino::BOTTOM){
 			rotated_brick_part_pos = brick_position;
 		}
-		else if(direction == tetromino::BOTTOM){
+		else if(direction == tetromino::LEFT){
 			rotated_brick_part_pos.pos_x = brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = -brick_position.pos_x;
 		}
-		else if(direction == tetromino::RIGHT){
+		else if(direction == tetromino::TOP){
 			rotated_brick_part_pos.pos_x = -brick_position.pos_x;
 			rotated_brick_part_pos.pos_y = -brick_position.pos_y;
 		}
-		else if(direction == tetromino::TOP){
+		else if(direction == tetromino::RIGHT){
 			rotated_brick_part_pos.pos_x = -brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = brick_position.pos_x;
 		}
