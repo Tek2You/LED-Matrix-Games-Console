@@ -58,7 +58,6 @@ void GameSM::stateDefault(byte event)
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
-		//		bitToggle(PORTB,1);
 		byte advance_output = item.advance(event);
 
 		if(advance_output == 1){
@@ -84,11 +83,12 @@ void GameSM::stateGame(byte event)
 {
 	static bool btn_down_state	= false;
 	static unsigned long step_interval;
-	static bool first_down = false;
 	if(event & ON_ENTRY){
 		if(game_ != nullptr){
-			delete(game_);
+			delete game_ ;
+			game_ = nullptr;
 		}
+		bitToggle(PORTB,1);
 		game_ = new Game(display_);
 		game_->reset();
 		game_->begin();
@@ -96,7 +96,6 @@ void GameSM::stateGame(byte event)
 		process_criterium_ |= PCINT | TIMER;
 		step_interval = 1000;
 		process_timer_process_time_ = millis() + step_interval;
-		first_down = false;
 		return;
 	}
 
@@ -116,8 +115,7 @@ void GameSM::stateGame(byte event)
 
 			if(event & BTN_DOWN){
 				if(btn_down_state == false){
-					process_timer_process_time_ = step_interval = 800;
-					first_down = true;
+					process_timer_process_time_ = step_interval = 100;
 					btn_down_state = true;
 					goto step;
 				}
@@ -126,19 +124,18 @@ void GameSM::stateGame(byte event)
 		if(btn_down_state == true && !(event % BTN_DOWN)){
 			process_timer_process_time_ = step_interval = 1000;
 			btn_down_state = false;
-			first_down = false;
 		}
 	}
 	if(event & TIMEOUT){
-		if(first_down){
-			step_interval = 400;
-			first_down = false;
-		}
 step:
 		if(game_->step()){ // game ends
 			TRANSITION(stateShowResult);
 			return;
 		}
+		if(!(event & BTN_DOWN))
+			step_interval = 1000;
+		else if(event & BTN_DOWN)
+			step_interval = 100;
 		process_timer_process_time_ =	millis() + step_interval;
 	}
 }
@@ -146,8 +143,14 @@ step:
 void GameSM::stateShowResult(byte event){
 	if(event & ON_ENTRY){
 		display_->clear();
-		int points = game_->getPoints();
-		//	display_->setString();
+		process_criterium_ |= PCINT;
+		if(game_ != nullptr){
+			int points = game_->getPoints();
+			delete game_;
+			game_ = nullptr;
+		}
+		//			display_->setString();
+
 	}
 	if(event & CHANGE && event & INPUT_MASK){
 		TRANSITION(stateDefault);

@@ -6,6 +6,7 @@ Game::Game(Display *display):
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
+	tetromino_ = nullptr;
 	//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
 }
 
@@ -15,6 +16,8 @@ Game::~Game()
 		delete tetromino_;
 	}
 	free(field_);
+	bitToggle(PORTB,1);
+
 }
 
 void Game::render()
@@ -40,8 +43,8 @@ bool Game::rotate()
 	 *    4. if not: try to change to a valid position
 	 *
 	*/
-
-
+	if(tetromino_ == nullptr)
+		return false;
 	tetromino::DIRECTION direction = tetromino_->getDirection();
 	tetromino::DIRECTION new_direction;
 	tetromino::Pos position = tetromino_->getPos();
@@ -78,7 +81,6 @@ bool Game::rotate()
 		}
 		else if(valid_output & tetromino::OVER_ABOVE) // above over
 		{
-			bitSet(PORTB,1);
 			new_position.pos_y --;
 			while(valid_output = tetromino_->isValid(shape,new_direction,new_position) & tetromino::OVER_ABOVE){
 				new_position.pos_y--;
@@ -96,7 +98,10 @@ bool Game::rotate()
 }
 
 bool Game::right()
+
 {
+	if(tetromino_ == nullptr)
+		return false;
 	Pos pos = tetromino_->getPos();
 	pos.pos_x++;
 	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
@@ -109,6 +114,8 @@ bool Game::right()
 
 bool Game::left()
 {
+	if(tetromino_ == nullptr)
+		return false;
 	Pos pos = tetromino_->getPos();
 	pos.pos_x--;
 	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
@@ -121,6 +128,8 @@ bool Game::left()
 
 bool Game::step()
 {
+	if(tetromino_ == nullptr)
+		return false;
 	Pos pos = tetromino_->getPos();
 	pos.pos_y--;
 	byte valid_output = tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos);
@@ -138,8 +147,10 @@ bool Game::step()
 
 void Game::reset()
 {
-	if(tetromino_ != nullptr)
+	if(tetromino_ != nullptr){
 		delete(tetromino_);
+		tetromino_ = nullptr;
+	}
 	this->clear();
 	display_->clear();
 }
@@ -162,6 +173,7 @@ bool Game::newTetromino()
 		delete tetromino_;
 		tetromino_ = nullptr;
 	}
+
 	tetromino::SHAPE shape = randomTetrominoShape();
 	tetromino_ = new Tetromino(shape, display_->rows(), field_,	randomTetrominoDirection(shape),Pos(4,display_->rows()-1));
 
@@ -196,7 +208,7 @@ void Game::takeOverTetromino()
 void Game::checkRowsFinished()
 {
 	for(int i = 0; i < display_->rows(); i++){
-		if(field_[i] == 0xFF){ // row is full
+		while(field_[i] == 0xFF){ // row is full
 			field_[i] = 0;
 			points_++;
 			for(int j = i; j < display_->rows() - 1;j++){
