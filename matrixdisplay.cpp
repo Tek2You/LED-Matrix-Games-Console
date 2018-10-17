@@ -275,27 +275,6 @@ MatrixDisplay::~MatrixDisplay(){
 }
 
 void MatrixDisplay::show(){
-#if 0
-	bitSet(DDRB,1);
-	bitToggle(PORTB,1);
-	static int col = 0;
-	//	for(int col = 0; col < 8; col++) {
-	bitClear(PORTB,2);
-	for(byte *matrix_row = rows_ + col, *end = rows_ + (height_) + col; matrix_row != end; matrix_row+=8){
-		SPI_SendByte(*matrix_row);
-	}
-	PORTD = 0xFF; // avoid glowing of prev/next row
-	bitSet(PORTB,2);
-	// select row to be displayed
-	PORTD = ~_BV(col);
-	//	}
-	for(byte i = 0; i < 2; i++){
-		SPI_SendByte(0);
-	}
-	PORTD = 0xFF;
-	//	PORTD = 0;
-	col++;
-#else
 	static byte row = 0;
 	bitClear(PORTB, 2); // clear latch
 	for(byte *col = rows_ + row, *end = rows_ + height_ + row; col != end; col+=8){
@@ -313,7 +292,6 @@ void MatrixDisplay::show(){
 		row = 0;
 
 	}
-#endif
 }
 
 void MatrixDisplay::clear(){
