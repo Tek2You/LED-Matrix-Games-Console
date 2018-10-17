@@ -15,7 +15,8 @@ byte button_event;
 int counter = 0;
 
 byte have_input = 0;
-byte input_count = 0;
+byte debounce_count[4] =  {0,0,0,0};
+byte button_states, button_transitional_states, prev_button_transitional_states;
 
 void initGame(){
 	// init pin change interrup for buttons
@@ -25,25 +26,23 @@ void initGame(){
 	PCICR |= (1 << PCIE1); // enable mask1
 	init();
 
-	// init timer
-	TIMSK1 |= (1 << TOIE1);
-	TCCR1B |= /*(1 << ICNC1) |*/ (1 << CS10);
-
-
+	TCNT2 = 200;
+	TCCR2A |= (1 << WGM21);
+	TIMSK2 |= (1 << OCIE2A);
+	TCCR2B |= (1 << CS20);
 	sei(); // enable global interrupts
 }
 
 int main(void)
 {
 	bitSet(DDRB,1);
-//	bitSet(PORTB,1);
 	initGame();
 	while(1){
 		dp.show();
 		if(have_input || counter++ >= 0xFF){
 			dp.disable();
 			counter = 0;
-			sm.processStateMaschine((have_input | (~PINC & INPUT_MASK)));
+			sm.processStateMaschine(have_input | button_states);
 		}
 		have_input = 0;
 	}
@@ -51,17 +50,29 @@ int main(void)
 }
 
 ISR(PCINT1_vect){
-	if(input_count)
-		return;
-	input_count = 1;
+	button_transitional_states = ~PINC & INPUT_MASK;
+	byte change = button_transitional_states ^ prev_button_transitional_states;
+	for(int i = 0; i < 4; i++){
+		if(bitRead(change,i)){
+			debounce_count[i] = 1;
+		}
+	}
+	prev_button_transitional_states = button_transitional_states;
 }
 
-ISR(TIMER1_OVF_vect){
-	if(input_count && input_count++ == 5){
-		input_count = 0;
+ISR(TIMER2_COMPA_vect){
+	TCNT2 = 200;
+
+	for(int i = 0; i < 4; i++){
+		if(debounce_count[i] && debounce_count[i]++ == 20){
+			debounce_count[i] = 0;
+			bool value = bitRead(~PINC,i);
+			if(value != bitRead(button_states,i)){
+				bitWrite(button_states,i,value);
+				have_input = CHANGE;
+			}
+		}
 	}
-	if(input_count == 2)
-		have_input = CHANGE;
 }
 
 
