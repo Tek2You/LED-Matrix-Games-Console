@@ -25,7 +25,7 @@ void GameSM::processStateMaschine(byte event)
 		process_timer_process_time_ = 0;
 		this->process(event);
 	}
-	display_->setShiftSpeed(5);
+//	display setShiftSpeed(5);
 }
 
 byte GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
@@ -77,7 +77,7 @@ void GameSM::stateDefault(byte event)
 			return;
 		}
 	}
-	display_->setText(texts[language_][item.value_]);
+//	display_->setText(texts[language_][item.value_]);
 }
 
 void GameSM::stateGame(byte event)

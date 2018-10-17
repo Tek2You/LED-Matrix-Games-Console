@@ -3,19 +3,18 @@
 #include "display.h"
 #include "tetromino.h"
 
-inline void * operator new(size_t size)
-{
-	return malloc(size);
-}
-
-inline void operator delete(void * ptr)
-{
-	free(ptr);
-}
-
 class Game
 {
 public:
+	inline void * operator new(size_t size)
+	{
+		 return malloc(size);
+	}
+
+	inline void operator delete(void * ptr)
+	{
+		 free(ptr);
+	}
 	Game(Display * display);
 	~Game();
 	void render();

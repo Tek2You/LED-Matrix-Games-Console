@@ -39,8 +39,8 @@ int main(void)
 	initGame();
 	while(1){
 		dp.show();
-		dp.update();
 		if(have_input || counter++ >= 0xFF){
+			dp.update();
 			dp.disable();
 			counter = 0;
 			sm.processStateMaschine(have_input | button_states);

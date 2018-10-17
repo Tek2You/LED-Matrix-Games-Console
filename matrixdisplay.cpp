@@ -329,7 +329,7 @@ byte MatrixDisplay::mapCol(byte row){
 void MatrixDisplay::setColumn(byte column, byte value,byte offset)
 {
 	if(column > width_)
-		return;
+		return;;
 	for(int r = 0; r < 8; r++){
 		setPixel(column,r+offset,bitRead(value,7-r));
 	}
@@ -344,7 +344,7 @@ void MatrixDisplay::setArray(byte *array)
 }
 
 
-// clear content of columns start to end
+// clear content of rows start to end
 void MatrixDisplay::clearRows(byte start, byte end)
 {
 	if (start < 0) start = 0;
@@ -352,6 +352,14 @@ void MatrixDisplay::clearRows(byte start, byte end)
 
 	for(; start < end; ++start)
 		setRow(start,0);
+}
+
+void MatrixDisplay::clearColumns(byte start, byte end, byte offset){
+	if (start < 0) start = 0;
+	if (end > width_) end = width_;
+	for(;start < end; ++ start){
+		setColumn(start,0,offset);
+	}
 }
 
 // set the column content of given column to given byte value
@@ -389,7 +397,7 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char sp
 			}
 		}
 		column += char_width;
-		clearRows(column, column+spacing);
+		clearColumns(column, column+spacing, offset);
 		column += spacing;
 		++s;
 	}
@@ -399,7 +407,7 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char sp
 
 int MatrixDisplay::width(char ch)
 {
-	return *letterStart(ch);
+	return letterWidth(ch);
 }
 
 // determine the width of the given string
@@ -409,6 +417,7 @@ int MatrixDisplay::width(const char *s, char spacing)
 	while (*s != 0) {
 		column += spacing + width(*s);
 		++s;
+
 	}
 	return column;
 }

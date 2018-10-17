@@ -19,6 +19,7 @@ public:
 	 byte setChar(char ch, int column, byte offset);
 	 void clearRows(byte start, byte end);
 	 void setColumn(byte column, byte value, byte offset = 0);
+	 void clearColumns(byte start, byte end, byte offset);
 	 void setRow(byte row, int value);
 	 void disable();
 
@@ -31,7 +32,7 @@ public:
 
 protected:
 	 static const byte *letterStart(char ch);
-	 const byte letterWidth(char ch);
+	 static const byte letterWidth(char ch);
 	 byte *columnPtr(byte column) const;
 	 byte orderCols(byte value);
 	 byte mapCol(byte row);
