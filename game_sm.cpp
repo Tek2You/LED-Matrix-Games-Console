@@ -25,7 +25,8 @@ void GameSM::processStateMaschine(byte event)
 		process_timer_process_time_ = 0;
 		this->process(event);
 	}
-//	display setShiftSpeed(5);
+	display_->text1_->setShiftSpeed(5);
+	display_->text2_->setShiftSpeed(5);
 }
 
 byte GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
@@ -56,6 +57,7 @@ void GameSM::stateDefault(byte event)
 	if(event & ON_ENTRY){
 		process_criterium_ |= PCINT;
 		item.init(2,0);
+		display_->loadMenuConfiguration();
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
@@ -64,7 +66,7 @@ void GameSM::stateDefault(byte event)
 		if(advance_output == 1){
 			switch(item.value_){
 			case 0:
-				TRANSITION(stateGame);
+				TRANSITION(stateTetris);
 				break;
 			case 1:
 				TRANSITION(stateSettingsMenu);
@@ -77,14 +79,17 @@ void GameSM::stateDefault(byte event)
 			return;
 		}
 	}
-//	display_->setText(texts[language_][item.value_]);
+
+	display_->text1_->setText(texts[language_][item.value_]);
 }
 
-void GameSM::stateGame(byte event)
+void GameSM::stateTetris(byte event)
 {
 	static bool btn_down_state	= false;
 	static unsigned long step_interval;
 	if(event & ON_ENTRY){
+		display_->text1_->clear();
+		display_->text2_->clear();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
@@ -145,12 +150,24 @@ void GameSM::stateShowResult(byte event){
 		display_->clear();
 		process_criterium_ |= PCINT;
 		if(game_ != nullptr){
-			int points = game_->getPoints();
+			int points;
+			points = game_->getPoints();
 			delete game_;
 			game_ = nullptr;
-		}
-//					display_->setString();
 
+			display_->text2_->setOffset(0);
+			display_->text2_->setOperationCols(1,6);
+			display_->text2_->setOperationRows(1,7);
+			display_->text2_->setNumber(points);
+			display_->text1_->setOperationRows(9,15);
+			display_->text1_->setOperationCols(0,7);
+			display_->text1_->setOffset(8);
+			display_->text1_->setText("Game Over");
+			display_->setRow(0,0xFF);
+			display_->setRow(8,0xFF);
+			display_->setColumn(0,0xFF);
+			display_->setColumn(7,0xFF);
+		}
 	}
 	if(event & CHANGE && event & INPUT_MASK){
 		TRANSITION(stateDefault);

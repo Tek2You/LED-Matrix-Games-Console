@@ -65,7 +65,7 @@ ISR(TIMER2_COMPA_vect){
 	TCNT2 = 200;
 
 	for(int i = 0; i < 4; i++){
-		if(debounce_count[i] && debounce_count[i]++ == 20){
+		if(debounce_count[i] && debounce_count[i]++ == 15){
 			debounce_count[i] = 0;
 			bool value = bitRead(~PINC,i);
 			if(value != bitRead(button_states,i)){

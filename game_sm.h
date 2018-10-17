@@ -19,16 +19,6 @@ class Display;
 class GameSM : public StateMachine
 {
 public:
-	inline void * operator new(size_t size)
-	{
-	  return malloc(size);
-	}
-
-	inline void operator delete(void * ptr)
-	{
-	  free(ptr);
-	}
-
 	GameSM(Display * display, byte speed);
 	void processStateMaschine(byte event);
 
@@ -49,7 +39,7 @@ private: // states
 
 
 	void stateDefault(byte event);
-	void stateGame(byte event);
+	void stateTetris(byte event);
 	void stateSettingsMenu(byte event);
 	void stateShowResult(byte event);
 

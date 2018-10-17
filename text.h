@@ -8,17 +8,12 @@ public:
 
 
     enum ShiftMode { NO_SHIFT = 0,
-                      SHIFT = 1
+                     SHIFT = 1,
+                     OFF = 2
                    };
 
-    enum TexMode { TOP,
-                    BOTTOM,
-                    MIDDLE,
-                    DISABLED,
-                 };
-
     enum NumberSize { P5,
-                       P7
+                      P7
                     };
 
     void setText(const char * text);
@@ -27,6 +22,8 @@ public:
     void shift();
 
     void update();
+
+    void clear();
 
     void setShiftSpeed(int speed);
     int shiftSpeed() const { return speed_; }
@@ -37,8 +34,10 @@ public:
     void setCursor(char pos);
     char getCursor() const { return curser_pos_; }
 
-    void setMode();
-    byte mode(){return mode_;}
+    void setOperationRows(byte start, byte end);
+    void setOperationCols(byte start, byte end);
+
+    void setShiftStartCol(byte col){shift_start_col_ = col; setText(text_);}
 
 private:
     void computeShiftMode();
@@ -46,12 +45,14 @@ private:
 
     const char* text_;  // displayed text
     const char* first_; // first visible character
-    int  start_col_;
+    int current_shift_start_col_;
+    byte shift_start_col_;
     ShiftMode shift_mode_;
     unsigned long shift_next_time_;
     int speed_; // columns per second
     int speed_time_;
     byte offset_;
     char curser_pos_;
-    byte mode_;
+    byte start_col_, end_col_, start_row_, end_row_;
+    char number_buffer_[8];
 };

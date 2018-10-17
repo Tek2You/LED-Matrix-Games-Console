@@ -2,19 +2,11 @@
 #include "avr.h"
 #include "display.h"
 #include "tetromino.h"
+#include "operators.h"
 
 class Game
 {
 public:
-	inline void * operator new(size_t size)
-	{
-		 return malloc(size);
-	}
-
-	inline void operator delete(void * ptr)
-	{
-		 free(ptr);
-	}
 	Game(Display * display);
 	~Game();
 	void render();

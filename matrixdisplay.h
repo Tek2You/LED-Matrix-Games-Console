@@ -38,16 +38,6 @@ protected:
 	 byte mapCol(byte row);
 
 private:
-	 inline void * operator new(size_t size)
-	 {
-		return malloc(size);
-	 }
-
-	 inline void operator delete(void * ptr)
-	 {
-		free(ptr);
-	 }
-
 	 byte * rows_;
 	 const byte height_;
 	 const byte width_;
