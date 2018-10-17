@@ -12,21 +12,26 @@ public:
 	 void setPixel(byte col, byte row, bool value);
 //	 void setRow(byte row, int value, int column = 0, byte column_height = 8);
 	 void setArray(byte * array);
-	 void setString(char * string, int start_column = 0, byte row = 0);
+//	 void setString(char * string, int start_column = 0, byte row = 0);
 	 const byte rows() {return 16;}
 	 const byte cols() {return width_;}
-	 int setString(const char *s, int column, char cursor_pos, char spacing, byte offset);
+	 int setString(const char *s, int column, char cursor_pos, char spacing = 1, byte offset = 0);
 	 byte setChar(char ch, int column, byte offset);
-	 void clearColumns(int start, int end);
-	 void setColumn(byte column, byte value, byte offset = 0, bool flipped = 0);
-
+	 void clearRows(byte start, byte end);
+	 void setColumn(byte column, byte value, byte offset = 0);
 	 void setRow(byte row, int value);
-
 	 void disable();
 
+	 // compute width (in columns) of a single char
+	 static int width(char ch);
+	 // compute width (in columns) of text
+	 static int width(const char *s, char spacing=1);
+	 // write integer value into string digits of max size
+	 char *formatInt(char *digits, byte size, int value);
+
 protected:
-	 const byte *letterStart(char ch);
-	 byte letterWidth(char ch);
+	 static const byte *letterStart(char ch);
+	 const byte letterWidth(char ch);
 	 byte *columnPtr(byte column) const;
 	 byte orderCols(byte value);
 	 byte mapCol(byte row);

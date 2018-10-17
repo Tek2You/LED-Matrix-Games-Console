@@ -25,6 +25,7 @@ void GameSM::processStateMaschine(byte event)
 		process_timer_process_time_ = 0;
 		this->process(event);
 	}
+	display_->setShiftSpeed(5);
 }
 
 byte GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
@@ -88,7 +89,6 @@ void GameSM::stateGame(byte event)
 			delete game_ ;
 			game_ = nullptr;
 		}
-		bitToggle(PORTB,1);
 		game_ = new Game(display_);
 		game_->reset();
 		game_->begin();
@@ -149,7 +149,7 @@ void GameSM::stateShowResult(byte event){
 			delete game_;
 			game_ = nullptr;
 		}
-		//			display_->setString();
+//					display_->setString();
 
 	}
 	if(event & CHANGE && event & INPUT_MASK){

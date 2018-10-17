@@ -254,20 +254,14 @@ MatrixDisplay::MatrixDisplay(byte height, byte width)
 
 	SPI_Init();
 	clear();
-	// for calibration
 
+	// for calibration
 #if 0
 	for(int i = 0; i < 8; i++){
 		setRow(i,0x00FF << i);
 		//		setPixel(i,i,1);
 	}
 #endif
-	//	setRow(4,0b01001101);
-	//	setColumn(1,0b01001101);
-	//	setPixel(0,7,1);
-	//	setPixel(4,2,1);
-	//	setPixel(4,3,1);
-	//	setPixel(4,6,1);
 }
 
 MatrixDisplay::~MatrixDisplay(){
@@ -332,13 +326,12 @@ byte MatrixDisplay::mapCol(byte row){
 	return ((row / 8) * 8) +  col_order[row % 8];
 }
 
-void MatrixDisplay::setColumn(byte column, byte value,byte offset, bool flipped)
+void MatrixDisplay::setColumn(byte column, byte value,byte offset)
 {
 	if(column > width_)
 		return;
-	byte minuend = (flipped ? 7 : 0);
 	for(int r = 0; r < 8; r++){
-		setPixel(column,r+offset,bitRead(value,minuend-r));
+		setPixel(column,r+offset,bitRead(value,7-r));
 	}
 }
 
@@ -350,22 +343,15 @@ void MatrixDisplay::setArray(byte *array)
 	}
 }
 
-//byte MatrixDisplay::orderRows(byte value){
-//	byte out;
-//	for(byte i = 0; i<8;i++){
-//		bitWrite(out,i,bitRead(value,row_order[i]));
-//	}
-//	return out;
-//}
 
 // clear content of columns start to end
-void MatrixDisplay::clearColumns(int start, int end)
+void MatrixDisplay::clearRows(byte start, byte end)
 {
 	if (start < 0) start = 0;
 	if (end > height_) end = height_;
 
 	for(; start < end; ++start)
-		setColumn(start,0);
+		setRow(start,0);
 }
 
 // set the column content of given column to given byte value
@@ -375,7 +361,7 @@ inline const byte* MatrixDisplay::letterStart(char ch) {
 	return LETTERS + pgm_read_word(PTN_LETTERS+ch-FIRST_LETTER);
 }
 
-byte MatrixDisplay::letterWidth(char ch){
+const byte MatrixDisplay::letterWidth(char ch){
 	if (ch < FIRST_LETTER || ch > LAST_LETTER) ch = '?';
 	return pgm_read_word(PTN_LETTERS+ch-FIRST_LETTER+1) - pgm_read_word(PTN_LETTERS+ch-FIRST_LETTER);
 }
@@ -389,7 +375,7 @@ byte MatrixDisplay::setChar(char ch, int column, byte offset)
 	int width = letterWidth(ch);
 	end = start + width;
 	for (; start != end; ++start, ++column)
-		setColumn(column, pgm_read_byte(start),offset, true);
+		setColumn(column, pgm_read_byte(start),offset);
 	return width;
 }
 
@@ -403,11 +389,53 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char sp
 			}
 		}
 		column += char_width;
-		clearColumns(column, column+spacing);
+		clearRows(column, column+spacing);
 		column += spacing;
 		++s;
 	}
 	if (*s) column += 1; // there is more text following that we clipped
 	return column;
+}
+
+int MatrixDisplay::width(char ch)
+{
+	return *letterStart(ch);
+}
+
+// determine the width of the given string
+int MatrixDisplay::width(const char *s, char spacing)
+{
+	int column = 0;
+	while (*s != 0) {
+		column += spacing + width(*s);
+		++s;
+	}
+	return column;
+}
+
+// converts an integer to a string
+char* MatrixDisplay::formatInt(char* digits, byte size, int value)
+{
+	if (size < 3) return digits;
+
+	digits[--size] = '\0'; // terminating '\0'
+	digits[--size] = '0'; // zero display if value == 0
+
+	bool neg = false;
+	if (value < 0) {
+		neg = true;
+		value = -value;
+	} else if (value == 0)
+		--size;
+
+	for (; size != 0 && value != 0; --size) {
+		digits[size] = '0' + (value % 10);
+		value = value / 10;
+	}
+
+	if (neg) digits[size] = '-';
+	else ++size;
+
+	return digits + size;
 }
 

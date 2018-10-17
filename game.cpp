@@ -16,8 +16,6 @@ Game::~Game()
 		delete tetromino_;
 	}
 	free(field_);
-	bitToggle(PORTB,1);
-
 }
 
 void Game::render()

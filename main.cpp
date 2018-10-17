@@ -39,6 +39,7 @@ int main(void)
 	initGame();
 	while(1){
 		dp.show();
+		dp.update();
 		if(have_input || counter++ >= 0xFF){
 			dp.disable();
 			counter = 0;
