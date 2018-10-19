@@ -23,7 +23,7 @@ void Tetris::render()
 	display_->clear();
 	display_->setArray(field_);
 	if(tetromino_ != nullptr){
-		tetromino::Pos positions[4];
+		Pos positions[4];
 		tetromino_->getPositions(positions);
 		for(Pos p : positions){
 			display_->setPixel(p.pos_x,p.pos_y, true);
@@ -45,8 +45,8 @@ bool Tetris::up()
 		return false;
 	tetromino::DIRECTION direction = tetromino_->getDirection();
 	tetromino::DIRECTION new_direction;
-	tetromino::Pos position = tetromino_->getPos();
-	tetromino::Pos new_position = position;
+	Pos position = tetromino_->getPos();
+	Pos new_position = position;
 	tetromino::SHAPE shape = tetromino_->getShape();
 
 	byte possible_directions = tetromino_->getPossibleDirections();
@@ -180,11 +180,11 @@ bool Tetris::newTetromino()
 	tetromino::SHAPE shape = randomTetrominoShape();
 	tetromino_ = new Tetromino(shape, display_->rows(), field_,	randomTetrominoDirection(shape),Pos(4,display_->rows()-1));
 
-	tetromino::Pos points[4];
+	Pos points[4];
 	tetromino_->getPositions(points);
 	for(Pos p : points){
 		if(p.pos_y > display_->rows() - 1){
-			tetromino::Pos pos = tetromino_->getPos();
+			Pos pos = tetromino_->getPos();
 			pos.pos_y -= (p.pos_y - (display_->rows()-1));
 			tetromino_->setPos(pos);
 			tetromino_->getPositions(points);

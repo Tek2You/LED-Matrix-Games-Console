@@ -1,5 +1,6 @@
 #pragma once
 #include "avr.h"
+#include "position.h"
 
 namespace tetromino {
 enum SHAPE {
@@ -18,13 +19,6 @@ enum VALIDATION_ERROR : byte{
 	OVER_RIGHT = (1 << 2),
 	OVER_LEFT = (1 << 3),
 	COLLIDE = (1 << 4),
-};
-
-struct Pos {
-	Pos(){}
-	Pos(char x, char y) : pos_x(x), pos_y(y){}
-	char pos_x;
-	char pos_y;
 };
 
 inline byte getX(byte xy){
@@ -80,24 +74,24 @@ class Tetromino
 {
 public:
 
-	Tetromino(tetromino::SHAPE shape, byte heigth, byte *field, tetromino::DIRECTION direction, tetromino::Pos pos);
+	Tetromino(tetromino::SHAPE shape, byte heigth, byte *field, tetromino::DIRECTION direction, Pos pos);
 
-	void setPos(tetromino::Pos pos) {pos_ = pos;}
-	tetromino::Pos getPos() {return pos_;}
+	void setPos(Pos pos) {pos_ = pos;}
+	Pos getPos() {return pos_;}
 
 	void setDirection(tetromino::DIRECTION direction){direction_ = direction;}
 	tetromino::DIRECTION getDirection() {return direction_;}
 
 	tetromino::SHAPE getShape() {return shape_;}
 
-	bool getPositions(tetromino::Pos(&positions)[4]);
-	static bool getPositions(tetromino::Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
+	bool getPositions(Pos(&positions)[4]);
+	static bool getPositions(Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos);
 
 	static DIRECTION rotate(DIRECTION direction, SHAPE shape);
 	void rotate();
 
 	byte isValid();
-	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos);
+	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos);
 
 
 	static byte getPossibleDirections(tetromino::SHAPE shape);
@@ -107,7 +101,7 @@ public:
 private:
 	const tetromino::SHAPE shape_;
 	tetromino::DIRECTION direction_;
-	tetromino::Pos pos_;
+	Pos pos_;
 	const byte heigth_;
 	byte * field_;
 };

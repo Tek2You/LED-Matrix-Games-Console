@@ -1,12 +1,12 @@
 #include "tetromino.h"
 
-Tetromino::Tetromino(tetromino::SHAPE shape, byte heigth, byte * field, tetromino::DIRECTION direction, tetromino::Pos pos)
+Tetromino::Tetromino(tetromino::SHAPE shape, byte heigth, byte * field, tetromino::DIRECTION direction, Pos pos)
    :shape_(shape), heigth_(heigth), field_(field), direction_(direction),pos_(pos)
 {
 
 }
 
-bool Tetromino::getPositions(tetromino::Pos (&positions)[4])
+bool Tetromino::getPositions(Pos (&positions)[4])
 {
 	return getPositions(positions,shape_,direction_, pos_);
 }
@@ -16,10 +16,10 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 	tetromino::SPECIFICATIONS brick = tetrominos[shape];
 	if(!brick.directions & BV_(direction))
 		return false;
-	tetromino::Pos pos_rotate = tetromino::getPos(brick.shape[0]);
+	Pos pos_rotate = tetromino::getPos(brick.shape[0]);
 	for(int i = 0; i < 4; i++)
 	{
-		tetromino::Pos rotated_brick_part_pos, brick_position;
+		Pos rotated_brick_part_pos, brick_position;
 
 		brick_position.pos_x = tetromino::getPos(brick.shape[i]).pos_x - pos_rotate.pos_x;
 		brick_position.pos_y = tetromino::getPos(brick.shape[i]).pos_y - pos_rotate.pos_y;
@@ -100,9 +100,9 @@ byte Tetromino::isValid()
 	return isValid(shape_,direction_, pos_);
 }
 
-byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, tetromino::Pos pos)
+byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos)
 {
-	tetromino::Pos positions[4];
+	Pos positions[4];
 	byte valid_errors = 0;
 	getPositions(positions,shape,direction,pos);
 	for(int i = 0; i < 4; i++){
