@@ -75,8 +75,8 @@ void GameSM::stateDefault(byte event)
 		if(advance_output == 1){
 			switch(item.value_){
 			case 0:
-				TRANSITION(stateTetris)
-				      break;
+				TRANSITION(stateTetris);
+				break;
 			case 1:
 				TRANSITION(stateSnake);
 				break;
@@ -208,8 +208,6 @@ step:
 
 void GameSM::stateSnake(byte event)
 {
-	static bool btn_down_state	= false;
-	static unsigned long step_interval;
 	if(event & ON_ENTRY){
 		display_->text1_->clear();
 		display_->text2_->clear();
@@ -218,53 +216,42 @@ void GameSM::stateSnake(byte event)
 			game_ = nullptr;
 		}
 		game_ = new Snake(display_);
-		game_->reset();
 		game_->start();
-		btn_down_state = false;
 		process_criterium_ |= PCINT | TIMER1;
-		step_interval = 1000;
-		process_timer1_ = millis() + step_interval;
+		process_timer1_ = millis() + 400;
 		return;
 	}
 
+	bool finished = false;
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
 			if(event & BTN_ROTATE){
-				game_->up();
+				finished = game_->up();
 			}
 
-			if(event & BTN_LEFT){
-				game_->left();
+			else if(event & BTN_LEFT){
+				finished = game_->left();
 			}
 
 			else if(event & BTN_RIGHT){
-				game_->right();
+				finished = game_->right();
 			}
 
-			if(event & BTN_DOWN){
-				if(btn_down_state == false){
-					process_timer1_ = step_interval = 100;
-					btn_down_state = true;
-					goto step;
-				}
+			else if(event & BTN_DOWN){
+				finished = game_->down();
 			}
-		}
-		if(btn_down_state == true && !(event % BTN_DOWN)){
-			process_timer1_ = step_interval = 1000;
-			btn_down_state = false;
+			process_timer1_ = millis() + 400;
 		}
 	}
 	if(event & TIMEOUT1){
-step:
-		if(game_->down()){ // game ends
-			TRANSITION(stateShowResult);
-			return;
+		if(game_->process()){ // game ends
+			process_timer1_ = millis() + 400;
+			finished = true;
 		}
-		if(!(event & BTN_DOWN))
-			step_interval = 1000;
-		else if(event & BTN_DOWN)
-			step_interval = 100;
-		process_timer1_ =	millis() + step_interval;
+	}
+	if(finished){
+		TRANSITION(stateShowResult);
+		return;
 	}
 }
 

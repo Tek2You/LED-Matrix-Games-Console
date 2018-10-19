@@ -13,9 +13,9 @@ public:
 	bool down();
 	void reset();
 	void clear();
-	void process();
+	bool process();
 	void start();
-	int getPoints(){return points_;}
+	int getPoints(){return body_len_;}
 private:
 	enum Direction { UP, RIGHT, DOWN, LEFT};
 
@@ -31,10 +31,8 @@ private:
 	int body_len_;
 
 	void render();
-	void eat();
+	bool eat();
 	bool validate(Pos &pos);
 	bool isValid(Pos &pos);
 	Pos * getBodyPos(int pos);
-
-	int points_;
 };
