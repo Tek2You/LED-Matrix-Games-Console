@@ -1,11 +1,25 @@
-#ifndef SNAKE_H
-#define SNAKE_H
+#pragma once
+#include "game.h"
 
-
-class Snake
+class Snake : public Game
 {
 public:
-    Snake();
-};
+	 Snake(Display * display);
+	 ~Snake();
+	 bool up(); // rotate
+	 bool right();
+	 bool left();
+	 bool down(); // makes a step
+	 void reset();
+	 void clear();
+	 void process();
+	 void start();
+	 int getPoints(){return points_;}
+private:
+	 enum Direction { UP, RIGHT, DOWN, LEFT};
 
-#endif // SNAKE_H
+	 Direction direction_;
+
+	 void render();
+	 int points_;
+};
