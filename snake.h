@@ -21,14 +21,15 @@ private:
 
 	Direction direction_;
 	Pos head_pos_;
-	Pos * body_buffer_;
-	Pos * body_buffer_end_;
-
-	Pos * body_start_;
-//	Pos * body_end_;
 	Pos eat_pos_;
+
 	const int body_buffer_len_ = 80;
+	Pos body_buffer_[80];
+	int body_start_;
+	int body_end_;
+
 	int body_len_;
+//	Pos * body_end_;
 
 	void render();
 	bool eat();

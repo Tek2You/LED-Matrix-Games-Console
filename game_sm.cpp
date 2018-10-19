@@ -244,8 +244,8 @@ void GameSM::stateSnake(byte event)
 		}
 	}
 	if(event & TIMEOUT1){
+		process_timer1_ = millis() + 400;
 		if(game_->process()){ // game ends
-			process_timer1_ = millis() + 400;
 			finished = true;
 		}
 	}
