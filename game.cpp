@@ -1,6 +1,14 @@
 #include "game.h"
+#include "operators.h"
 
-game::game()
+Game::Game(Display *display) : display_(display)
 {
 
 }
+
+Game::~Game()
+{
+
+}
+
+extern "C" void __cxa_pure_virtual() { while (1); }
