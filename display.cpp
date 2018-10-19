@@ -30,6 +30,7 @@ void Display::loadMenuConfiguration()
 	text1_->setOperationRows(0,15);
 	text1_->setShiftStartCol(3);
 	text1_->clear();
+	clear();
 }
 
 // shift text, depending on shift_mode_ and shift_speed_

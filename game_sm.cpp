@@ -9,24 +9,33 @@
 	}
 
 GameSM::GameSM(Display *display, byte speed)
-   :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), speed_(speed), process_timer_process_time_ (0)
+   :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), speed_(speed), process_timer1_ (0), process_timer2_(0)
 {
 	process(ON_ENTRY);
+	display_->text1_->setShiftSpeed(5);
+	display_->text2_->setShiftSpeed(5);
 }
 
 void GameSM::processStateMaschine(byte event)
 {
+	bool process = false;
 	if((process_criterium_ & EVER) || (process_criterium_ & ProcessCriterum::PCINT && event & CHANGE)){
-		this->process(event);
+		process = true;
+	}
+	unsigned long now = millis();
+	if (process_criterium_ & ProcessCriterum::TIMER1 && process_timer1_ && process_timer1_ <= now){
+		event |= TIMEOUT1;
+		process_timer1_ = 0;
+		process = true;
 	}
 
-	else if (process_criterium_ & ProcessCriterum::TIMER && process_timer_process_time_ && process_timer_process_time_ < millis()){
-		event |= TIMEOUT;
-		process_timer_process_time_ = 0;
-		this->process(event);
+	if (process_criterium_ & ProcessCriterum::TIMER2 && process_timer2_ && process_timer2_ <= now){
+		event |= TIMEOUT2;
+		process_timer2_ = 0;
+		process = true;
 	}
-	display_->text1_->setShiftSpeed(5);
-	display_->text2_->setShiftSpeed(5);
+	if(process)
+		this->process(event);
 }
 
 byte GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
@@ -52,11 +61,11 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 void GameSM::stateDefault(byte event)
 {
 
-	const char * texts[2][2] = {{"Tetris","Setting"}, {"Tetris","Einstellungen"}};
+	const char * texts[2][3] = {{"Tetris", "Snake", "Setting"}, {"Tetris","Snake","Einstellungen"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
 		process_criterium_ |= PCINT;
-		item.init(2,0);
+		item.init(3,0);
 		display_->loadMenuConfiguration();
 	}
 
@@ -66,11 +75,13 @@ void GameSM::stateDefault(byte event)
 		if(advance_output == 1){
 			switch(item.value_){
 			case 0:
-				TRANSITION(stateTetris);
-				break;
+				TRANSITION(stateTetris)
+				      break;
 			case 1:
-				TRANSITION(stateSettingsMenu);
+				TRANSITION(stateSnake);
 				break;
+			case 2:
+				TRANSITION(stateSettingsMenu);
 			}
 			return;
 		}
@@ -86,6 +97,118 @@ void GameSM::stateDefault(byte event)
 void GameSM::stateTetris(byte event)
 {
 	static bool btn_down_state	= false;
+	static bool btn_left_state = false;
+	static bool btn_right_state = false;
+	static unsigned long step_interval;
+	unsigned long now = millis();
+	if(event & ON_ENTRY){
+		display_->text1_->clear();
+		display_->text2_->clear();
+		if(game_ != nullptr){
+			delete game_ ;
+			game_ = nullptr;
+		}
+		game_ = new Tetris(display_);
+		game_->reset();
+		game_->start();
+		btn_down_state = false;
+		process_criterium_ |= PCINT | TIMER1 | TIMER2;
+		step_interval = 1000;
+		process_timer1_ = now + step_interval;
+		return;
+	}
+
+	if(event & CHANGE){
+		if(event & INPUT_MASK){
+			if(event & BTN_ROTATE){
+				game_->up();
+			}
+
+			// btn down
+			if(event & BTN_DOWN){
+				if(btn_down_state == false){
+					step_interval = 100;
+					process_timer1_ = step_interval + now;
+					btn_down_state = true;
+					goto step;
+				}
+			}
+			else if(btn_down_state){
+				step_interval = 1000;
+				process_timer1_ = step_interval + now;
+				btn_down_state = false;
+			}
+		}
+
+		// btn left
+		if(event & BTN_LEFT) {
+			if(!btn_left_state) {
+				if(!btn_right_state) {
+					game_->left();
+					btn_left_state =	true;
+					process_timer2_ = now + 300;
+				}
+			}
+		}
+		else{
+			if(btn_left_state)
+				process_timer2_ = 0;
+			btn_left_state = false;
+		}
+
+		// btn right
+		if(event & BTN_RIGHT){
+			if(! btn_right_state){
+				if(!btn_left_state){
+					game_->right();
+					btn_right_state =	true;
+					process_timer2_ = now + 300;
+				}
+			}
+		}
+		else{
+			if(btn_right_state)
+				process_timer2_ = 0;
+			btn_right_state = false;
+		}
+
+	}
+	if(event & TIMEOUT2){
+		if(btn_left_state)
+			if(event & BTN_LEFT){
+				game_->left();
+				process_timer2_ = now + 120;
+			}
+			else{
+				btn_left_state = false;
+			}
+		else if(btn_right_state){
+			if(event & BTN_RIGHT){
+				game_->right();
+				process_timer2_ = now + 120;
+			}
+			else{
+				btn_right_state = false;
+			}
+		}
+	}
+	if(event & TIMEOUT1){
+step:
+		if(game_->down()){ // game ends
+			TRANSITION(stateShowResult);
+			return;
+		}
+		if(!(event & BTN_DOWN))
+			step_interval = 1000;
+		else if(event & BTN_DOWN)
+			step_interval = 100;
+		process_timer1_ =	now + step_interval;
+	}
+}
+
+void GameSM::stateSnake(byte event)
+{
+	static bool btn_down_state	= false;
 	static unsigned long step_interval;
 	if(event & ON_ENTRY){
 		display_->text1_->clear();
@@ -94,20 +217,20 @@ void GameSM::stateTetris(byte event)
 			delete game_ ;
 			game_ = nullptr;
 		}
-		game_ = new Game(display_);
+		game_ = new Snake(display_);
 		game_->reset();
-		game_->begin();
+		game_->start();
 		btn_down_state = false;
-		process_criterium_ |= PCINT | TIMER;
+		process_criterium_ |= PCINT | TIMER1;
 		step_interval = 1000;
-		process_timer_process_time_ = millis() + step_interval;
+		process_timer1_ = millis() + step_interval;
 		return;
 	}
 
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
 			if(event & BTN_ROTATE){
-				game_->rotate();
+				game_->up();
 			}
 
 			if(event & BTN_LEFT){
@@ -120,20 +243,20 @@ void GameSM::stateTetris(byte event)
 
 			if(event & BTN_DOWN){
 				if(btn_down_state == false){
-					process_timer_process_time_ = step_interval = 100;
+					process_timer1_ = step_interval = 100;
 					btn_down_state = true;
 					goto step;
 				}
 			}
 		}
 		if(btn_down_state == true && !(event % BTN_DOWN)){
-			process_timer_process_time_ = step_interval = 1000;
+			process_timer1_ = step_interval = 1000;
 			btn_down_state = false;
 		}
 	}
-	if(event & TIMEOUT){
+	if(event & TIMEOUT1){
 step:
-		if(game_->step()){ // game ends
+		if(game_->down()){ // game ends
 			TRANSITION(stateShowResult);
 			return;
 		}
@@ -141,9 +264,10 @@ step:
 			step_interval = 1000;
 		else if(event & BTN_DOWN)
 			step_interval = 100;
-		process_timer_process_time_ =	millis() + step_interval;
+		process_timer1_ =	millis() + step_interval;
 	}
 }
+
 
 void GameSM::stateShowResult(byte event){
 	if(event & ON_ENTRY){
@@ -158,7 +282,7 @@ void GameSM::stateShowResult(byte event){
 			display_->text2_->setOffset(0);
 			display_->text2_->setOperationCols(1,6);
 			display_->text2_->setOperationRows(1,7);
-			display_->text2_->setNumber(points);
+			display_->text2_->setText("points");
 			display_->text1_->setOperationRows(9,15);
 			display_->text1_->setOperationCols(0,7);
 			display_->text1_->setOffset(8);
@@ -195,3 +319,4 @@ byte GameSM::MenuItem::advance(byte event)
 {
 	advance(event,value_,num_);
 }
+
