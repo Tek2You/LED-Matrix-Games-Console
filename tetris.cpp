@@ -160,7 +160,7 @@ void Tetris::clear()
 	}
 }
 
-void Tetris::process()
+bool Tetris::process()
 {
 
 }

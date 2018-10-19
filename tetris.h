@@ -16,7 +16,7 @@ public:
 	bool down();
 	void reset();
 	void clear();
-	void process();
+	bool process();
 	void start();
 	int getPoints(){return points_;}
 

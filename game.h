@@ -8,7 +8,7 @@ public:
     Game(Display * display);
     virtual ~Game();
     virtual void start() = 0;
-    virtual void process()=0;
+	 virtual bool process()=0;
     virtual void clear()=0;
     virtual void reset()=0;
 
