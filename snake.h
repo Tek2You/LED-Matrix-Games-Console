@@ -16,8 +16,9 @@ public:
 	bool process();
 	void start();
 	int getPoints(){return body_len_;}
+
+	enum Direction { UP, RIGHT, DOWN, LEFT, START};
 private:
-	enum Direction { UP, RIGHT, DOWN, LEFT};
 
 	Direction direction_;
 	Pos head_pos_;

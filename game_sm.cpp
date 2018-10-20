@@ -208,6 +208,7 @@ step:
 
 void GameSM::stateSnake(byte event)
 {
+	static Snake::Direction dir;
 	if(event & ON_ENTRY){
 		display_->text1_->clear();
 		display_->text2_->clear();
@@ -219,28 +220,47 @@ void GameSM::stateSnake(byte event)
 		game_->start();
 		process_criterium_ |= PCINT | TIMER1;
 		process_timer1_ = millis() + 400;
+		dir = Snake::START;
 		return;
 	}
+
 
 	bool finished = false;
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
+			bool button_set = false;
 			if(event & BTN_ROTATE){
-				finished = game_->up();
+				if(dir != Snake::UP && dir != Snake::DOWN){
+					dir = Snake::UP;
+					button_set = true;
+					finished = game_->up();
+				}
 			}
-
 			else if(event & BTN_LEFT){
-				finished = game_->left();
+				if(dir != Snake::LEFT && dir != Snake::RIGHT){
+					dir = Snake::LEFT;
+					button_set = true;
+					finished = game_->left();
+				}
 			}
 
 			else if(event & BTN_RIGHT){
-				finished = game_->right();
+				if(dir != Snake::LEFT && dir != Snake::RIGHT){
+					dir = Snake::RIGHT;
+					button_set = true;
+					finished = game_->right();
+				}
 			}
 
 			else if(event & BTN_DOWN){
-				finished = game_->down();
+				if(dir != Snake::DOWN && dir != Snake::UP){
+					dir = Snake::DOWN;
+					button_set = true;
+					finished = game_->down();
+				}
 			}
-			process_timer1_ = millis() + 400;
+			if(button_set)
+				process_timer1_ = millis() + 400;
 		}
 	}
 	if(event & TIMEOUT1){

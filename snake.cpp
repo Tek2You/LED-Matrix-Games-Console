@@ -7,6 +7,7 @@ Snake::Snake(Display *display):
 {
 	body_len_ = 0;
 	body_buffer_len_;
+	direction_ = START;
 	//	body_buffer_ = static_cast<Pos*>(malloc(body_buffer_len_* sizeof(Pos))); // malloc maximum of possible range for the body
 	//	body_buffer_end_ = body_buffer_len_ + body_buffer_;
 }
@@ -63,6 +64,8 @@ void Snake::reset()
 	body_buffer_[0].pos_y = 7;
 	//	body_buffer_[1] = Pos(1,7);
 	eat_pos_ = Pos(5,7);
+	direction_ = START;
+	render();
 }
 
 void Snake::clear()
@@ -90,6 +93,8 @@ bool Snake::process()
 		move_x = -1;
 		move_y = 0;
 		break;
+	case START:
+		return false;
 	default:
 		move_x = 0;
 		move_y = 0;
@@ -139,8 +144,6 @@ void Snake::render()
 bool Snake::eat()
 {
 	if(head_pos_.pos_x == eat_pos_.pos_x && head_pos_.pos_y == eat_pos_.pos_y){
-		bitToggle(PORTB,1);
-
 		Pos p(0,0);
 		do{
 			p.pos_x = random() % 8;
@@ -186,7 +189,7 @@ Pos *Snake::getBodyPos(int pos)
 		return nullptr;
 	}
 	if(body_start_ + pos > body_buffer_len_){
-		return (body_buffer_ + (pos + body_start_ + (body_len_ - 1) - ((body_buffer_len_-1) - body_start_)));
+//		return body_buffer_[pos + body_start_ + (body_len_ - 1) - ((body_buffer_len_-1) - body_start_)];
 	}
 	else{
 		return body_buffer_ + body_start_ + pos;
