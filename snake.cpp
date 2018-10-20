@@ -60,9 +60,8 @@ void Snake::reset()
 	display_->clear();
 	body_len_ = 2;
 	body_start_ = 1;
-	body_buffer_[0].pos_x = 2;
-	body_buffer_[0].pos_y = 7;
-	body_buffer_[1] = Pos(1,7);
+	body_buffer_[0] = Pos(1,7);
+	body_buffer_[1] = Pos(2,7);
 	eat_pos_ = Pos(5,7);
 	direction_ = START;
 	render();
@@ -106,7 +105,7 @@ bool Snake::process()
 	if(validate(new_pos)){
 		return true;
 	}
-	if(++body_start_ > body_buffer_len_-1){
+	if(++body_start_ >= body_buffer_len_){
 		body_start_ = 0;
 	}
 
@@ -190,7 +189,7 @@ Pos *Snake::getBodyPos(int pos)
 		return nullptr;
 	}
 	if(body_start_ - pos < 0){
-		return body_buffer_ + (body_buffer_len_-1) - (pos - body_start_);
+		return body_buffer_ + body_buffer_len_ - (pos - body_start_);
 	}
 	else{
 		return body_buffer_ + body_start_ - pos;
