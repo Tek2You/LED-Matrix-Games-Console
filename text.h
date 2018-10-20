@@ -54,5 +54,5 @@ private:
     byte offset_;
     char curser_pos_;
     byte start_col_, end_col_, start_row_, end_row_;
-    char number_buffer_[8];
+	 char number_buffer_[10];
 };

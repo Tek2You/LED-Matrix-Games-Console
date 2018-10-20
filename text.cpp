@@ -49,7 +49,7 @@ void Text::setText(const char* text)
 
 void Text::setNumber(int value)
 {
-	setText(display_->formatInt(number_buffer_,8,value));
+	setText(display_->formatInt(number_buffer_,10,value));
 }
 
 void Text::computeShiftMode()

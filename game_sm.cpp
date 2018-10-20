@@ -195,7 +195,7 @@ void GameSM::stateTetris(byte event)
 	if(event & TIMEOUT1){
 step:
 		if(game_->down()){ // game ends
-			TRANSITION(stateShowResult);
+			TRANSITION(stateGameOver);
 			return;
 		}
 		if(!(event & BTN_DOWN))
@@ -270,13 +270,13 @@ void GameSM::stateSnake(byte event)
 		}
 	}
 	if(finished){
-		TRANSITION(stateShowResult);
+		TRANSITION(stateGameOver);
 		return;
 	}
 }
 
 
-void GameSM::stateShowResult(byte event){
+void GameSM::stateGameOver(byte event){
 	if(event & ON_ENTRY){
 		display_->clear();
 		process_criterium_ |= PCINT;
@@ -287,17 +287,11 @@ void GameSM::stateShowResult(byte event){
 			game_ = nullptr;
 
 			display_->text2_->setOffset(0);
-			display_->text2_->setOperationCols(1,6);
-			display_->text2_->setOperationRows(1,7);
-			display_->text2_->setText("points");
-			display_->text1_->setOperationRows(9,15);
-			display_->text1_->setOperationCols(0,7);
+			display_->text2_->setOperationRows(0,7);
 			display_->text1_->setOffset(8);
+			display_->text1_->setOperationRows(8,15);
 			display_->text1_->setText("Game Over");
-			display_->setRow(0,0xFF);
-			display_->setRow(8,0xFF);
-			display_->setColumn(0,0xFF);
-			display_->setColumn(7,0xFF);
+			display_->text2_->setNumber(points);
 		}
 	}
 	if(event & CHANGE && event & INPUT_MASK){

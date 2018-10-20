@@ -44,7 +44,7 @@ private: // states
 	void stateTetris(byte event);
 	void stateSnake(byte event);
 	void stateSettingsMenu(byte event);
-	void stateShowResult(byte event);
+	void stateGameOver(byte event);
 
 	enum ProcessCriterum{
 		EVER = 1 << 0,
