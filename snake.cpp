@@ -58,11 +58,11 @@ void Snake::reset()
 	head_pos_.pos_x = 3;
 	head_pos_.pos_y = 7;
 	display_->clear();
-	body_len_ = 1;
-	body_start_ = 0;
+	body_len_ = 2;
+	body_start_ = 1;
 	body_buffer_[0].pos_x = 2;
 	body_buffer_[0].pos_y = 7;
-	//	body_buffer_[1] = Pos(1,7);
+	body_buffer_[1] = Pos(1,7);
 	eat_pos_ = Pos(5,7);
 	direction_ = START;
 	render();
@@ -103,8 +103,8 @@ bool Snake::process()
 	Pos new_pos = head_pos_;
 	new_pos.pos_x += move_x;
 	new_pos.pos_y += move_y;
-	if(!validate(new_pos)){
-		//		return true;
+	if(validate(new_pos)){
+		return true;
 	}
 	if(++body_start_ > body_buffer_len_-1){
 		body_start_ = 0;
@@ -117,9 +117,9 @@ bool Snake::process()
 		body_len_++;
 	}
 	else{
-		if(++body_end_ > body_buffer_len_-1){
-			body_end_ = 0;
-		}
+//		if(++body_end_ > body_buffer_len_-1){
+//			body_end_ = 0;
+//		}
 	}
 	render();
 	return false;
@@ -151,6 +151,7 @@ bool Snake::eat()
 		}
 		while(isValid(p));
 		eat_pos_= p;
+//		bitToggle(PORTB,1);
 		return true;
 	}
 	return false;
@@ -177,21 +178,21 @@ bool Snake::isValid(Pos &pos)
 	for(int i = 0; i < body_len_; i++){
 		Pos * p = getBodyPos(i);
 		if(pos.pos_x == p->pos_x && pos.pos_y == p->pos_y){
-			return false;
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 Pos *Snake::getBodyPos(int pos)
 {
-	if(pos > body_len_-1 || pos < 0){
+	if(pos >= body_len_ || pos < 0){
 		return nullptr;
 	}
-	if(body_start_ + pos > body_buffer_len_){
-//		return body_buffer_[pos + body_start_ + (body_len_ - 1) - ((body_buffer_len_-1) - body_start_)];
+	if(body_start_ - pos < 0){
+		return body_buffer_ + (body_buffer_len_-1) - (pos - body_start_);
 	}
 	else{
-		return body_buffer_ + body_start_ + pos;
+		return body_buffer_ + body_start_ - pos;
 	}
 }
