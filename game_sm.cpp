@@ -277,24 +277,42 @@ void GameSM::stateSnake(byte event)
 
 
 void GameSM::stateGameOver(byte event){
+	static int i = 0;
+	static unsigned int points;
 	if(event & ON_ENTRY){
-		display_->clear();
-		process_criterium_ |= PCINT;
+		display_->text1_->clear();
+		display_->text2_->clear();
+		i  = 0;
+		process_criterium_ = TIMER1;
+		process_timer1_ = millis() + 50;
 		if(game_ != nullptr){
-			int points;
 			points = game_->getPoints();
 			delete game_;
 			game_ = nullptr;
 
-			display_->text2_->setOffset(0);
-			display_->text2_->setOperationRows(0,7);
-			display_->text1_->setOffset(8);
-			display_->text1_->setOperationRows(8,15);
-			display_->text1_->setText("Game Over");
-			display_->text2_->setNumber(points);
+
 		}
+		return;
 	}
-	if(event & CHANGE && event & INPUT_MASK){
+	if(event & TIMEOUT1){
+		if(i < 15){
+			display_->setRow(i,0xFF);
+			process_timer1_ = millis() + 50;
+			i++;
+			return;
+		}
+		process_criterium_ = PCINT;
+		display_->clear();
+		display_->text2_->setOffset(0);
+		display_->text2_->setOperationRows(0,7);
+		display_->text1_->setOffset(8);
+		display_->text1_->setOperationRows(8,15);
+		display_->text1_->setText("Game Over");
+		static char number_buffer[10];
+		display_->text2_->setText(display_->formatInt(number_buffer,10,points));
+	}
+
+	if(process_criterium_ & PCINT && event & CHANGE && event & INPUT_MASK){
 		TRANSITION(stateDefault);
 		return;
 	}

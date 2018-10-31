@@ -17,7 +17,7 @@ public:
     virtual bool up()=0;
     virtual bool down()=0;
 
-    virtual int getPoints()=0;
+	 virtual unsigned int getPoints()=0;
 
 protected:
     virtual void render()=0;

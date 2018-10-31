@@ -15,7 +15,7 @@ public:
 	void clear();
 	bool process();
 	void start();
-	int getPoints(){return body_len_;}
+	unsigned int getPoints(){return body_len_;}
 
 	enum Direction { UP, RIGHT, DOWN, LEFT, START};
 private:
@@ -29,7 +29,7 @@ private:
 	int body_start_;
 	int body_end_;
 
-	int body_len_;
+	unsigned int body_len_;
 //	Pos * body_end_;
 
 	void render();

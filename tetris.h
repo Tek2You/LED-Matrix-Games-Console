@@ -18,7 +18,7 @@ public:
 	void clear();
 	bool process();
 	void start();
-	int getPoints(){return points_;}
+	unsigned int getPoints(){return points_;}
 
 
 private:
@@ -30,7 +30,7 @@ private:
 
 	byte * field_; // field without current tetromino
 	Tetromino * tetromino_;
-	int points_;
+	unsigned int points_;
 
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
