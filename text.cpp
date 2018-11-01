@@ -1,7 +1,7 @@
 #include "text.h"
 
 Text::Text(MatrixDisplay *display) : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0)
- , start_col_(0), end_col_(display->cols()), start_row_(0), end_row_(display_->rows()-1)
+ , start_col_(0), end_col_(7), start_row_(0), end_row_(15), shift_start_col_(3)
 {
 	setShiftSpeed(5);
 }
@@ -29,7 +29,7 @@ void Text::shift()
 	--current_shift_start_col_;
 	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_-first_ , 1, offset_) <= 0) {
 		first_ = text_;
-		current_shift_start_col_ = 3;
+		current_shift_start_col_ = shift_start_col_;
 	} else { // should we advance to next start char?
 		byte w = display_->width(*first_);
 		if (current_shift_start_col_ + w < 0) {

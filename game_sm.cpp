@@ -323,6 +323,8 @@ void GameSM::stateGameOver(byte event){
 		}
 		process_criterium_ = PCINT;
 		display_->clear();
+		display_->text1_->clear();
+		display_->text2_->clear();
 		display_->text2_->setOffset(0);
 		display_->text2_->setOperationRows(0,7);
 		display_->text1_->setOffset(8);

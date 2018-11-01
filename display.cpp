@@ -4,6 +4,8 @@
 Display::Display (byte height, byte width)
    : MatrixDisplay(height,width)
 {
+	text1_ = nullptr;
+	text2_ = nullptr;
 	text1_ = new Text(this);
 	text2_ = new Text(this);
 	loadMenuConfiguration();
@@ -38,6 +40,7 @@ void Display::loadMenuConfiguration()
 	text1_->setOperationCols(0,7);
 	text1_->setOperationRows(0,15);
 	text1_->setShiftStartCol(3);
+	text2_->setShiftStartCol(3);
 	text1_->clear();
 	clear();
 }
