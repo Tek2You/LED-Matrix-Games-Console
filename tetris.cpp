@@ -16,6 +16,8 @@ Tetris::~Tetris()
 		delete tetromino_;
 	}
 	free(field_);
+
+	points_ = 0;
 }
 
 void Tetris::render()
@@ -151,6 +153,8 @@ void Tetris::reset()
 	}
 	this->clear();
 	display_->clear();
+	points_ = 0;
+
 }
 
 void Tetris::clear()

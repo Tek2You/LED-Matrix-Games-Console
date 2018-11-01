@@ -30,7 +30,7 @@ private:
 
 	byte * field_; // field without current tetromino
 	Tetromino * tetromino_;
-	unsigned int points_;
+	unsigned int points_ = 0;
 
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
