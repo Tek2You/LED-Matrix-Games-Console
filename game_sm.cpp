@@ -64,9 +64,14 @@ void GameSM::stateDefault(byte event)
 	const char * texts[2][3] = {{"Tetris", "Snake", "Setting"}, {"Tetris","Snake","Einstellungen"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
+		item.init(3);
 		process_criterium_ |= PCINT;
-		item.init(3,0);
 		display_->loadMenuConfiguration();
+		display_->text1_->setOffset(8);
+		display_->text1_->setOperationRows(8,16);
+		display_->text1_->clear();
+		display_->text2_->clear();
+		display_->clear();
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
@@ -89,6 +94,20 @@ void GameSM::stateDefault(byte event)
 			display_->update();
 			return;
 		}
+	}
+
+	switch(item.value_){
+	case 0:
+		display_->setIcon(0xfffff7e300081c00);
+		break;
+	case 1:
+		display_->setIcon(0x3c20203c04045c00);
+		break;
+	case 2:
+		display_->setIcon(0x00003c3c3c3c0000);
+		break;
+	default:
+		break;
 	}
 
 	display_->text1_->setText(texts[language_][item.value_]);
@@ -283,6 +302,7 @@ void GameSM::stateGameOver(byte event){
 		display_->text1_->clear();
 		display_->text2_->clear();
 		i  = 0;
+		points = 0;
 		process_criterium_ = TIMER1;
 		process_timer1_ = millis() + 50;
 		if(game_ != nullptr){
@@ -321,17 +341,18 @@ void GameSM::stateGameOver(byte event){
 void GameSM::stateSettingsMenu(byte event)
 {
 	static MenuItem item;
-	const byte menu_text[2][2] = {
-
-	};
+	const char *menu_text[2][2] = {{"speed"},{"Geschwindigkeit"}};
 	if(event & ON_ENTRY){
+		display_->loadMenuConfiguration();
 		item.init(2,0);
+		process_criterium_ = PCINT;
 	}
 	else if(event & ON_ENTRY && event & INPUT_MASK){
 		if(item.advance(event)){
 
 		}
 	}
+	display_->text1_->setText(menu_text[language_][item.value_]);
 }
 
 byte GameSM::MenuItem::advance(byte event)

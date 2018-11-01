@@ -32,6 +32,9 @@ private: // states
 			num_ = num;
 			value_ = initial;
 		}
+		void init(byte num){
+			num_ = num;
+		}
 		byte advance(byte event);
 		static byte advance(byte event, char &item, const char num, const char min = 0);
 		char value_;

@@ -15,6 +15,15 @@ Display::~Display()
 	free(text2_);
 }
 
+void Display::setIcon(uint64_t icon, byte offset)
+{
+	Icon i;
+	i.i64 = icon;
+	for(int r = offset; r < 8 + offset; r++){
+		setRow(r, i.array[7-r]);
+	}
+}
+
 
 void Display::update()
 {
