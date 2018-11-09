@@ -343,15 +343,72 @@ void GameSM::stateGameOver(byte event){
 void GameSM::stateSettingsMenu(byte event)
 {
 	static MenuItem item;
-	const char *menu_text[2][2] = {{"speed"},{"Geschwindigkeit"}};
+	const char *menu_text[2][3] = {{"speed", "language", "return"},{"Geschwindigkeit", "Sprache", "Zurueck"}};
 	if(event & ON_ENTRY){
 		display_->loadMenuConfiguration();
-		item.init(2,0);
+		item.init(3,0);
 		process_criterium_ = PCINT;
 	}
-	else if(event & ON_ENTRY && event & INPUT_MASK){
+	else if(event & CHANGE && event & INPUT_MASK){
 		if(item.advance(event)){
+			switch (item.value_) {
+			case 0:
+				TRANSITION(stateSpeedMenu);
+				break;
+			case 1:
+				TRANSITION(stateLanguageMenu);
+				break;
+			case 2:
+				TRANSITION(stateDefault);
+			default:
+				break;
+			}
+		}
+	}
+	display_->text1_->setText(menu_text[language_][item.value_]);
+}
 
+void GameSM::stateSpeedMenu(byte event)
+{
+	const char * menu_text[2] = {"return","Zuruck"};
+	static MenuItem item;
+	if(event & ON_ENTRY){
+		item.init(6,speed_);
+		process_criterium_ = PCINT;
+		return;
+	}
+
+	else if(event & CHANGE & event & INPUT_MASK){
+		if(item.advance(event)){ // enter pressed
+			if(item.value_ != 5){
+				speed_ = item.value_;
+			}
+			TRANSITION(stateSettingsMenu);
+			return;
+		}
+	}
+	if(item.value_ == 5)
+		display_->text1_->setText(menu_text[item.value_]);
+	else
+		display_->text1_->setNumber(item.value_);
+}
+
+void GameSM::stateLanguageMenu(byte event)
+{
+	static MenuItem item;
+	const char *menu_text[2][3] = {{"Deutsch", "english", "return"},{"Deutsch", "english", "Zurueck"}};
+	if(event & ON_ENTRY){
+		display_->loadMenuConfiguration();
+		item.init(3,0);
+		process_criterium_ = PCINT;
+	}
+	else if(event & CHANGE && event & INPUT_MASK){
+		if(item.advance(event)){
+			if(item.value_ != 2){
+				language_ = (item.value_ == 0 ? DE : EN);
+			}
+			TRANSITION(stateSettingsMenu);
+			return;
 		}
 	}
 	display_->text1_->setText(menu_text[language_][item.value_]);

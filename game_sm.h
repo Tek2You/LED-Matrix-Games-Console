@@ -48,6 +48,8 @@ private: // states
 	void stateSnake(byte event);
 	void stateSettingsMenu(byte event);
 	void stateGameOver(byte event);
+	void stateSpeedMenu(byte event);
+	void stateLanguageMenu(byte event);
 
 	enum ProcessCriterum{
 		EVER = 1 << 0,
@@ -65,7 +67,12 @@ private: // states
 	Display * display_;
 	Game * game_;
 
-	char language_ = 0;
+	enum Language{
+		EN = 0,
+		DE = 1,
+	};
+
+	Language language_ = EN;
 	char speed_;
 	char step_counter_ = 0;
 };
