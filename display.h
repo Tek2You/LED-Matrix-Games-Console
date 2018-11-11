@@ -15,7 +15,7 @@ public:
 	void update();
 	void loadMenuConfiguration();
 
-	Text *text1_, *text2_;
+	Text text1_, text2_;
 private:
 	union Icon{
 		uint64_t i64;

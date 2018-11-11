@@ -17,6 +17,9 @@
 // mask of all input pins
 #define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_ROTATE)
 
+#define EN 0
+#define DE 1
+
 class Display;
 class GameSM : public StateMachine
 {
@@ -25,7 +28,8 @@ public:
 	void processStateMaschine(byte event);
 
 
-private: // states
+private:
+	// states
 	class MenuItem{
 	public:
 		void init(byte num, byte initial){
@@ -67,12 +71,9 @@ private: // states
 	Display * display_;
 	Game * game_;
 
-	enum Language{
-		EN = 0,
-		DE = 1,
-	};
 
-	Language language_ = EN;
-	char speed_;
+	byte language_ = EN;
+	byte speed_ = 0;
 	char step_counter_ = 0;
+	char number_buffer_[8];
 };

@@ -9,11 +9,11 @@
 	}
 
 GameSM::GameSM(Display *display, byte speed)
-   :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), speed_(speed), process_timer1_ (0), process_timer2_(0)
+   :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), speed_(speed), process_timer1_ (0), process_timer2_(0), language_(EN)
 {
 	process(ON_ENTRY);
-	display_->text1_->setShiftSpeed(5);
-	display_->text2_->setShiftSpeed(5);
+	display_->text1_.setShiftSpeed(5);
+	display_->text2_.setShiftSpeed(5);
 }
 
 void GameSM::processStateMaschine(byte event)
@@ -57,7 +57,6 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 	return 0;
 }
 
-
 void GameSM::stateDefault(byte event)
 {
 
@@ -67,10 +66,10 @@ void GameSM::stateDefault(byte event)
 		item.init(3);
 		process_criterium_ |= PCINT;
 		display_->loadMenuConfiguration();
-		display_->text1_->setOffset(8);
-		display_->text1_->setOperationRows(8,16);
-		display_->text1_->clear();
-		display_->text2_->clear();
+		display_->text1_.setOffset(8);
+		display_->text1_.setOperationRows(8,16);
+		display_->text1_.clear();
+		display_->text2_.clear();
 		display_->clear();
 	}
 
@@ -90,10 +89,10 @@ void GameSM::stateDefault(byte event)
 			}
 			return;
 		}
-		else if(advance_output == 0){
-			display_->update();
-			return;
-		}
+		//		else if(advance_output == 0){
+		//			display_->update();
+		//			return;
+		//		}
 	}
 
 	switch(item.value_){
@@ -110,8 +109,9 @@ void GameSM::stateDefault(byte event)
 		break;
 	}
 
-	display_->text1_->setText(texts[language_][item.value_]);
+	display_->text1_.setText(texts[language_][item.value_]);
 }
+
 
 void GameSM::stateTetris(byte event)
 {
@@ -121,8 +121,8 @@ void GameSM::stateTetris(byte event)
 	static unsigned long step_interval;
 	unsigned long now = millis();
 	if(event & ON_ENTRY){
-		display_->text1_->clear();
-		display_->text2_->clear();
+		display_->text1_.clear();
+		display_->text2_.clear();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
@@ -229,8 +229,8 @@ void GameSM::stateSnake(byte event)
 {
 	static Snake::Direction dir;
 	if(event & ON_ENTRY){
-		display_->text1_->clear();
-		display_->text2_->clear();
+		display_->text1_.clear();
+		display_->text2_.clear();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
@@ -299,8 +299,8 @@ void GameSM::stateGameOver(byte event){
 	static int i = 0;
 	static unsigned int points;
 	if(event & ON_ENTRY){
-		display_->text1_->clear();
-		display_->text2_->clear();
+		display_->text1_.clear();
+		display_->text2_.clear();
 		i  = 0;
 		points = 0;
 		process_criterium_ = TIMER1;
@@ -323,15 +323,15 @@ void GameSM::stateGameOver(byte event){
 		}
 		process_criterium_ = PCINT;
 		display_->clear();
-		display_->text1_->clear();
-		display_->text2_->clear();
-		display_->text2_->setOffset(0);
-		display_->text2_->setOperationRows(0,7);
-		display_->text1_->setOffset(8);
-		display_->text1_->setOperationRows(8,15);
-		display_->text1_->setText("Game Over");
+		display_->text1_.clear();
+		display_->text2_.clear();
+		display_->text2_.setOffset(0);
+		display_->text2_.setOperationRows(0,7);
+		display_->text1_.setOffset(8);
+		display_->text1_.setOperationRows(8,15);
+		display_->text1_.setText("Game Over");
 		static char number_buffer[10];
-		display_->text2_->setText(display_->formatInt(number_buffer,10,points));
+		display_->text2_.setText(display_->formatInt(number_buffer,10,points));
 	}
 
 	if(process_criterium_ & PCINT && event & CHANGE && event & INPUT_MASK){
@@ -363,9 +363,10 @@ void GameSM::stateSettingsMenu(byte event)
 			default:
 				break;
 			}
+			return;
 		}
 	}
-	display_->text1_->setText(menu_text[language_][item.value_]);
+	display_->text1_.setText(menu_text[language_][item.value_]);
 }
 
 void GameSM::stateSpeedMenu(byte event)
@@ -373,12 +374,13 @@ void GameSM::stateSpeedMenu(byte event)
 	const char * menu_text[2] = {"return","Zuruck"};
 	static MenuItem item;
 	if(event & ON_ENTRY){
-		item.init(6,speed_);
+		display_->loadMenuConfiguration();
+		display_->text1_.setOffset(0);
+		item.init(6,speed_+1);
 		process_criterium_ = PCINT;
-		return;
 	}
 
-	else if(event & CHANGE & event & INPUT_MASK){
+	else if(event & CHANGE && event & INPUT_MASK){
 		if(item.advance(event)){ // enter pressed
 			if(item.value_ != 5){
 				speed_ = item.value_;
@@ -388,30 +390,31 @@ void GameSM::stateSpeedMenu(byte event)
 		}
 	}
 	if(item.value_ == 5)
-		display_->text1_->setText(menu_text[item.value_]);
+		display_->text1_.setText(menu_text[language_]);
 	else
-		display_->text1_->setNumber(item.value_);
+		display_->text1_.setText(display_->formatInt(number_buffer_,8,item.value_+1));
 }
 
 void GameSM::stateLanguageMenu(byte event)
 {
+	const char * menu_text[3][3] = {{"english","Deutsch","return"},{"English","Deutsch", "Zuruck"}};
 	static MenuItem item;
-	const char *menu_text[2][3] = {{"Deutsch", "english", "return"},{"Deutsch", "english", "Zurueck"}};
 	if(event & ON_ENTRY){
 		display_->loadMenuConfiguration();
-		item.init(3,0);
+		item.init(3,language_);
 		process_criterium_ = PCINT;
 	}
 	else if(event & CHANGE && event & INPUT_MASK){
-		if(item.advance(event)){
+		if(item.advance(event)){ // enter pressed
 			if(item.value_ != 2){
-				language_ = (item.value_ == 0 ? DE : EN);
+				language_ = item.value_;
 			}
 			TRANSITION(stateSettingsMenu);
 			return;
 		}
 	}
-	display_->text1_->setText(menu_text[language_][item.value_]);
+
+	display_->text1_.setText(menu_text[language_][item.value_]);
 }
 
 byte GameSM::MenuItem::advance(byte event)

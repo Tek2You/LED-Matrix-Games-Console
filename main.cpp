@@ -33,11 +33,17 @@ void initGame(){
 	sei(); // enable global interrupts
 }
 
+int freeRam () {
+	extern int __heap_start, *__brkval;
+	int v;
+	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
+
 int main(void)
 {
 	bitSet(DDRB,1);
 	initGame();
-	wdt_enable(WDTO_120MS);
+	wdt_enable(WDTO_15MS);
 	while(1){
 		wdt_reset();
 		dp.show();
