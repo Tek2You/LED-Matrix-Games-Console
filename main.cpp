@@ -9,7 +9,7 @@ FUSES = {
 };
 
 Display dp(16,8);
-GameSM sm(&dp,255);
+GameSM sm(&dp);
 
 byte button_event;
 int counter = 0;

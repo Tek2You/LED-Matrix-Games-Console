@@ -17,14 +17,11 @@
 // mask of all input pins
 #define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_ROTATE)
 
-#define EN 0
-#define DE 1
-
 class Display;
 class GameSM : public StateMachine
 {
 public:
-	GameSM(Display * display, byte speed);
+	GameSM(Display * display);
 	void processStateMaschine(byte event);
 
 
@@ -54,6 +51,8 @@ private:
 	void stateGameOver(byte event);
 	void stateSpeedMenu(byte event);
 	void stateLanguageMenu(byte event);
+	void stateLoadEffect(byte event);
+	void stateHighscoreMenu(byte event);
 
 	enum ProcessCriterum{
 		EVER = 1 << 0,
@@ -71,9 +70,15 @@ private:
 	Display * display_;
 	Game * game_;
 
+	enum Language{
+		EN = 0,
+		DE = 1,
+	};
 
-	byte language_ = EN;
+	Language language_ = EN;
 	byte speed_ = 0;
 	char step_counter_ = 0;
 	char number_buffer_[8];
+//	void (GameSM::*load_following_state_)(byte);
+	State load_following_state_;
 };
