@@ -26,7 +26,11 @@ void Text::clear()
 // shift text by one column and start over if nothing is shown anymore
 void Text::shift()
 {
+	if(current_shift_start_col_ == 1)
+		return;
 	--current_shift_start_col_;
+
+
 	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_-first_ , 1, offset_) <= 0) {
 		first_ = text_;
 		current_shift_start_col_ = shift_start_col_;
@@ -62,7 +66,7 @@ void Text::computeShiftMode()
 		shift_next_time_ = millis() + speed_time_;
 	}
 	else // otherwise, start in first column + setString once
-		display_->setString(text_, current_shift_start_col_ = 0, curser_pos_,offset_);
+		display_->setString(text_, current_shift_start_col_ = 0, curser_pos_,1,offset_);
 }
 
 void Text::setShiftSpeed(int speed) {

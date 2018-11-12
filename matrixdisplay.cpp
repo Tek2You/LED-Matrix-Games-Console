@@ -244,8 +244,7 @@ MatrixDisplay::MatrixDisplay(byte height, byte width)
 {
 	// allocate memory for (columnwi0,se) display content
 	rows_ = static_cast<byte*>(malloc(height_));
-	//	latch_.setPins(PortPin::B,2);
-	//	latch_.output();
+
 
 	//	// declare selected pins of Port C as OUTPUT
 	//	// set all eight pins of PortD as output
@@ -274,9 +273,6 @@ void MatrixDisplay::show(){
 	for(byte *col = rows_ + row, *end = rows_ + height_ + row; col != end; col+=8){
 		SPI_SendByte(~*col);
 	}
-	//	SPI_SendByte(*(rows_+row));
-	//	SPI_SendByte(*(rows_+row+8));
-
 	PORTD = 0; // avoid glowing of prev/next row
 	bitSet(PORTB, 2); // set latch
 	PORTD = _BV(row_order[row]);
@@ -377,13 +373,13 @@ const byte MatrixDisplay::letterWidth(char ch){
 // write a sing-le char, starting at column
 byte MatrixDisplay::setChar(char ch, int column, byte offset)
 {
-
 	const byte *end;
 	const byte *start = letterStart(ch);
 	int width = letterWidth(ch);
 	end = start + width;
-	for (; start != end; ++start, ++column)
+	for (; start != end; ++start, ++column){
 		setColumn(column, pgm_read_byte(start),offset);
+	}
 	return width;
 }
 
@@ -393,7 +389,7 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char sp
 		byte char_width = setChar(*s, column, offset);
 		if (char_pos++ == cursor_pos){
 			for (byte col = column, end = col + char_width; col != end; ++col){
-				setPixel(7, col, 1);
+				setPixel(offset, col, 1);
 			}
 		}
 		column += char_width;

@@ -35,11 +35,11 @@ int EE_snake_high_score EEMEM = 0;
 GameSM::GameSM(Display *display)
    :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), process_timer1_ (0), process_timer2_(0), language_(EN)
 {
-	process(ON_ENTRY);
 	display_->text1_.setShiftSpeed(5);
 	display_->text2_.setShiftSpeed(5);
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
+	process(ON_ENTRY);
 }
 
 void GameSM::processStateMaschine(byte event)
@@ -86,14 +86,14 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 void GameSM::stateDefault(byte event)
 {
 
-	const char * texts[2][3] = {{"Tetris", "Snake", /*"Highscore", */"Setting"}, {"Tetris","Snake",/*"Highscore",*/"Einstellungen"}};
+	const char * texts[4][4] = {{"Tetris", "Snake", "Highscore", "Setting"}, {"Tetris","Snake","Highscore","Einstellungen"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
-		item.init(4);
+		item.init(4,0);
 		process_criterium_ |= PCINT;
 		display_->loadMenuConfiguration();
 		display_->text1_.setOffset(8);
-		display_->text1_.setOperationRows(8,15);
+		display_->text1_.setOperationRows(8,16);
 //		display_->text2_.setOffset(0);
 //		display_->text2_.setOperationRows(0,7);
 //		display_->text2_.setShiftStartCol(1);
@@ -130,20 +130,24 @@ void GameSM::stateDefault(byte event)
 		break;
 	case 1:
 		display_->setIcon(0x3c20203c04045c00);
-		display_->text2_.clear();
 		break;
-//	case 2:
-//		display_->text2_.setText("$");
-//		break;
+	case 2:
+		display_->text2_.setText("$");
+		break;
 	case 3:
-		display_->text2_.clear();
 		display_->setIcon(0x00003c3c3c3c0000);
 		break;
 	default:
 		break;
 	}
 
-	display_->text1_.setText(texts[language_][item.value_]);
+	byte value = item.value_;
+	if(item.value_ > 3)
+		value = 3;
+
+	item.value_ = value;
+	language_ = EN;
+	display_->text1_.setText(texts[byte(language_)][item.value_]);
 }
 
 
