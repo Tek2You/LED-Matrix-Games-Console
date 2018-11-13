@@ -324,7 +324,7 @@ byte MatrixDisplay::mapCol(byte row){
 
 void MatrixDisplay::setColumn(byte column, byte value,byte offset)
 {
-	if(column > width_)
+	if(column >= width_)
 		return;;
 	for(int r = 0; r < 8; r++){
 		setPixel(column,r+offset,bitRead(value,7-r));
@@ -384,14 +384,8 @@ byte MatrixDisplay::setChar(char ch, int column, byte offset)
 }
 
 int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char spacing, byte offset) {
-	int char_pos = 0;
 	while (*s != 0 && column < width_) {
 		byte char_width = setChar(*s, column, offset);
-		if (char_pos++ == cursor_pos){
-			for (byte col = column, end = col + char_width; col != end; ++col){
-				setPixel(offset, col, 1);
-			}
-		}
 		column += char_width;
 		clearColumns(column, column+spacing, offset);
 		column += spacing;
