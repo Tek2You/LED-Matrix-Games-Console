@@ -21,6 +21,7 @@
 	load_passed = false;\
 	}\
 	else{\
+	load_passed = true;\
 	LOAD_EFFECT_STANDART(s);\
 	}\
 	}
@@ -66,7 +67,7 @@ void GameSM::processStateMaschine(byte event)
 		this->process(event);
 }
 
-byte GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
+GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
 
 	switch (event & INPUT_MASK) {
 	case BTN_LEFT:
@@ -78,11 +79,11 @@ byte GameSM::MenuItem::advance(byte event, char& item, const char num, const cha
 			item = min;
 		break;
 	case BTN_DOWN:
-		return 1;
-	case BTN_ROTATE:
-		return 2;
+		return DOWN_BTN;
+	case BTN_UP:
+		return UP_BTN;
 	}
-	return 0;
+	return NO_BTN;
 }
 
 void GameSM::stateDefault(byte event)
@@ -97,8 +98,7 @@ void GameSM::stateDefault(byte event)
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
-		byte advance_output = item.advance(event);
-		if(advance_output == 1){
+		if(item.advance(event) == MenuItem::DOWN_BTN){
 			switch(item.value_){
 			case 0:
 				TRANSITION(stateTetris);
@@ -205,7 +205,7 @@ void GameSM::stateTetris(byte event)
 	}
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
-			if(event & BTN_ROTATE){
+			if(event & BTN_UP){
 				game_->up();
 			}
 
@@ -331,7 +331,7 @@ void GameSM::stateSnake(byte event)
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
 			bool button_set = false;
-			if(event & BTN_ROTATE){
+			if(event & BTN_UP){
 				if(dir != Snake::UP && dir != Snake::DOWN){
 					dir = Snake::UP;
 					button_set = true;
@@ -410,14 +410,15 @@ void GameSM::stateGameOver(byte event){
 void GameSM::stateSettingsMenu(byte event)
 {
 	static MenuItem item;
-	const char *menu_text[2][3] = {{"speed", "language", "return"},{"Geschwindigkeit", "Sprache", "Zurueck"}};
+	const char *menu_text[2][2] = {{"speed", "language"},{"Geschwindigkeit", "Sprache"}};
 	if(event & ON_ENTRY){
 		display_->loadMenuConfiguration();
-		item.init(3,0);
+		item.init(2);
 		process_criterium_ = PCINT;
 	}
 	else if(event & CHANGE && event & INPUT_MASK){
-		if(item.advance(event)){
+		switch(item.advance(event)){
+		case MenuItem::DOWN_BTN:
 			switch (item.value_) {
 			case 0:
 				TRANSITION(stateSpeedMenu);
@@ -425,12 +426,15 @@ void GameSM::stateSettingsMenu(byte event)
 			case 1:
 				TRANSITION(stateLanguageMenu);
 				break;
-			case 2:
-				TRANSITION(stateDefault);
 			default:
 				break;
 			}
 			return;
+		case MenuItem::UP_BTN:
+			TRANSITION(stateDefault);
+			return;
+		default:
+			break;
 		}
 	}
 
@@ -441,9 +445,6 @@ void GameSM::stateSettingsMenu(byte event)
 	case 1:
 		display_->setIcon(0x2060ff818181ff00);
 		break;
-	case 2:
-		display_->setIcon(0x202028243e040800);
-		break;
 	default:
 		break;
 	}
@@ -452,42 +453,37 @@ void GameSM::stateSettingsMenu(byte event)
 
 void GameSM::stateSpeedMenu(byte event)
 {
-	const char * menu_text[2] = {"return","Zuruck"};
 	static MenuItem item;
 	if(event & ON_ENTRY){
 		display_->loadMenuConfiguration();
-		item.init(6,speed_);
+		item.init(5,speed_);
 		process_criterium_ = PCINT;
 	}
 
 	else if(event & CHANGE && event & INPUT_MASK){
-		if(item.advance(event)){ // enter pressed
-			if(item.value_ != 5){
-				speed_ = item.value_;
-				eeprom_write_byte(&EE_speed,speed_);
-				LOAD_EFFECT_STANDART(stateSettingsMenu);
-			}
+		switch(item.advance(event)){
+		case MenuItem::DOWN_BTN:
+			speed_ = item.value_;
+			eeprom_write_byte(&EE_speed,speed_);
+			LOAD_EFFECT_STANDART(stateSettingsMenu);
+		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu);
 			return;
+		default:
+			break;
 		}
 	}
-	if(item.value_ == 5){
-		display_->text1_.setText(menu_text[language_]);
-		display_->setIcon(0x202028243e040800);
-	}
-	else{
-		display_->clear();
-		display_->text1_.setText(display_->formatInt(number_buffer_,8,item.value_+1));
-		byte cols = display_->cols() / 5.0 * item.value_;
-		for(int col = 0; col < cols; col++){
-			display_->setColumn(col,0xFF);
-		}
+	display_->clear();
+	display_->text1_.setText(display_->formatInt(number_buffer_,8,item.value_+1));
+	byte cols = display_->cols() / 5.0 * (item.value_+1);
+	for(int col = 0; col < cols; col++){
+		display_->setColumn(col,0xFF);
 	}
 }
 
 void GameSM::stateLanguageMenu(byte event)
 {
-	const char * menu_text[2][3] = {{"english","Deutsch","return"},{"english","Deutsch", "Zuruck"}};
+	const char * menu_text[2][2] = {{"english","Deutsch"},{"english","Deutsch"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
 		display_->loadMenuConfiguration();
@@ -495,16 +491,20 @@ void GameSM::stateLanguageMenu(byte event)
 		process_criterium_ = PCINT;
 	}
 	else if(event & CHANGE && event & INPUT_MASK){
-		if(item.advance(event)){ // enter pressed
-			if(item.value_ != 2){
-				language_ = (item.value_ == 0?EN:DE);
-				eeprom_write_byte(&EE_language,byte(language_));
-				LOAD_EFFECT_STANDART(stateSettingsMenu);
-			}
+		switch(item.advance(event)){ // enter pressed
+		case MenuItem::DOWN_BTN:
+			language_ = (item.value_ == 0?EN:DE);
+			eeprom_write_byte(&EE_language,byte(language_));
+			LOAD_EFFECT_STANDART(stateSettingsMenu);
+			return;
+		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu);
 			return;
+		default:
+			break;
 		}
 	}
+
 	switch (item.value_) {
 	case 0:
 		display_->text2_.setText("E");
@@ -553,10 +553,10 @@ void GameSM::stateLoadEffect(byte event)
 
 void GameSM::stateHighscoreMenu(byte event)
 {
-	MenuItem item;
+	static MenuItem item;
 	if(event & ON_ENTRY){
-		item.init(3);
-		process_criterium_ = PCINT;
+		item.init(2,0);
+		process_criterium_ |= PCINT;
 	}
 	else if(event & CHANGE && event & INPUT_MASK){
 		if(item.advance(event)){
@@ -573,16 +573,12 @@ void GameSM::stateHighscoreMenu(byte event)
 		display_->setIcon(0x3c20203c04045c00);
 		display_->text1_.setNumber(Snake::highscore());
 		break;
-	case 2:
-		display_->setIcon(0x202028243e040800);
-		display_->text1_.setText((language_ == DE ? "Zuruck" : "return"));
-		break;
 	default:
 		break;
 	}
 }
 
-byte GameSM::MenuItem::advance(byte event)
+GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event)
 {
 	advance(event,value_,num_);
 }

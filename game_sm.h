@@ -9,13 +9,13 @@
 // these are the actual input pins (of PINC)
 #define BTN_LEFT bit(0)
 #define BTN_DOWN bit(1)
-#define BTN_ROTATE  bit(2)
+#define BTN_UP  bit(2)
 #define BTN_RIGHT bit(3)
 
 #define TIMEOUT1 bit(4)
 #define TIMEOUT2 bit(5)
 // mask of all input pins
-#define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_ROTATE)
+#define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP)
 
 class Display;
 class GameSM : public StateMachine
@@ -36,9 +36,17 @@ private:
 		void init(char num){
 			num_ = num;
 		}
-		byte advance(byte event);
-		static byte advance(byte event, char &item, const char num, const char min = 0);
+
+		enum Button{
+			NO_BTN = 0,
+			UP_BTN = 1,
+			DOWN_BTN = 2,
+		};
+
+		Button advance(byte event);
+		static Button advance(byte event, char &item, const char num, const char min = 0);
 		char value_ = 0;
+
 	private:
 		char num_ = 0;
 	};

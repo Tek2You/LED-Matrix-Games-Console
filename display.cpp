@@ -34,7 +34,7 @@ void Display::loadMenuConfiguration()
 	text1_.clear();
 	text2_.clear();
 	text1_.setOffset(8);
-	text1_.setOperationRows(9,16);
+	text1_.setOperationRows(8,16);
 	text1_.setOperationCols(0,7);
 	text1_.setShiftStartCol(3);
 
