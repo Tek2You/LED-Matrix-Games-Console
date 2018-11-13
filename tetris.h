@@ -18,8 +18,8 @@ public:
 	void clear();
 	bool process();
 	void start();
-	unsigned int getPoints(){return points_;}
-
+	unsigned int points(){return points_;}
+	static unsigned int highscore();
 
 private:
 	void render();
@@ -31,6 +31,7 @@ private:
 	byte * field_; // field without current tetromino
 	Tetromino * tetromino_;
 	unsigned int points_ = 0;
+	static unsigned int highscore_;
 
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);

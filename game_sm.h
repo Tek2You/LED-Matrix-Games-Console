@@ -79,6 +79,9 @@ private:
 	byte speed_ = 0;
 	char step_counter_ = 0;
 	char number_buffer_[8];
-//	void (GameSM::*load_following_state_)(byte);
+	//	void (GameSM::*load_following_state_)(byte);
 	State load_following_state_;
+
+	unsigned int tetris_high_score_;
+	unsigned int snake_high_score_;
 };

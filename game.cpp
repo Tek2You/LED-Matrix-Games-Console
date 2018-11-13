@@ -1,7 +1,8 @@
 #include "game.h"
 #include "operators.h"
 
-Game::Game(Display *display) : display_(display)
+
+Game::Game(Display *display) : display_(display), is_new_highscore_(false)
 {
 
 }

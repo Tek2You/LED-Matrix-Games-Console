@@ -1,6 +1,9 @@
 ﻿#include "tetris.h"
 #include "string.h"
 
+static unsigned int EE_highscore EEMEM = 0;
+unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
+
 Tetris::Tetris(Display *display)
    : Game(display)
 {
@@ -174,6 +177,11 @@ void Tetris::start()
 	newTetromino();
 }
 
+unsigned int Tetris::highscore()
+{
+	return highscore_;
+}
+
 bool Tetris::newTetromino()
 {
 	if(tetromino_ != nullptr){
@@ -197,7 +205,6 @@ bool Tetris::newTetromino()
 	render();
 	if(tetromino_->isValid() & COLLIDE){ // not valid
 		return true;
-
 	}
 	return false;
 }
@@ -224,6 +231,11 @@ void Tetris::checkRowsFinished()
 		}
 	}
 	render();
+	if(points_ > highscore_){
+		highscore_ = points_;
+		eeprom_write_word(&EE_highscore,highscore_);
+		is_new_highscore_ = true;
+	}
 }
 
 tetromino::SHAPE Tetris::randomTetrominoShape()

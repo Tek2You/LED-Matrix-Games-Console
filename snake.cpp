@@ -1,16 +1,8 @@
 #include "snake.h"
 #include "operators.h"
 
-Snake::Snake(Display *display):
-   Game(display),
-   body_end_(0), body_start_(0)
-{
-	body_len_ = 0;
-	body_buffer_len_;
-	direction_ = START;
-	//	body_buffer_ = static_cast<Pos*>(malloc(body_buffer_len_* sizeof(Pos))); // malloc maximum of possible range for the body
-	//	body_buffer_end_ = body_buffer_len_ + body_buffer_;
-}
+static unsigned int EE_highscore EEMEM = 0;
+unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
 Snake::~Snake()
 {
@@ -102,7 +94,13 @@ bool Snake::process()
 	Pos new_pos = head_pos_;
 	new_pos.pos_x += move_x;
 	new_pos.pos_y += move_y;
-	if(validate(new_pos)){
+	// check if highscore is broken. Directly save to avoid a not save in case of reset or poweroff.
+	if(body_len_ - 2 > highscore_){
+		highscore_ = body_len_-2;
+		eeprom_write_word(&EE_highscore,highscore_);
+		is_new_highscore_	= true;
+	}
+	if(validate(new_pos)){ // game end
 		return true;
 	}
 	if(++body_start_ >= body_buffer_len_){
@@ -115,11 +113,6 @@ bool Snake::process()
 	if(eat()){
 		body_len_++;
 	}
-	else{
-//		if(++body_end_ > body_buffer_len_-1){
-//			body_end_ = 0;
-//		}
-	}
 	render();
 	return false;
 }
@@ -127,6 +120,11 @@ bool Snake::process()
 void Snake::start()
 {
 	reset();
+}
+
+unsigned int Snake::highscore()
+{
+	return highscore_ = eeprom_read_word(&EE_highscore);
 }
 
 void Snake::render()

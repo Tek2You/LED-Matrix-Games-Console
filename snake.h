@@ -5,7 +5,14 @@
 class Snake : public Game
 {
 public:
-	Snake(Display * display);
+	Snake(Display * display):
+	   Game(display),
+	   body_end_(0), body_start_(0)
+	{
+		body_len_ = 0;
+		body_buffer_len_;
+		direction_ = START;
+	}
 	~Snake();
 	bool up();
 	bool right();
@@ -15,7 +22,8 @@ public:
 	void clear();
 	bool process();
 	void start();
-	unsigned int getPoints(){return body_len_-2;}
+	unsigned int points(){return body_len_-2;}
+	static unsigned int highscore();
 
 	enum Direction { UP, RIGHT, DOWN, LEFT, START};
 private:
@@ -30,11 +38,11 @@ private:
 	int body_end_;
 
 	unsigned int body_len_;
-//	Pos * body_end_;
-
 	void render();
 	bool eat();
 	bool validate(Pos &pos);
 	bool isValid(Pos &pos);
 	Pos * getBodyPos(int pos);
+
+	static unsigned int highscore_;
 };
