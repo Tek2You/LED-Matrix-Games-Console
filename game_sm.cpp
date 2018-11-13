@@ -29,9 +29,6 @@
 
 byte EE_speed EEMEM = DEFAULT_SPEED;
 byte EE_language EEMEM = DEFAULT_LANGUAGE;
-unsigned int EE_tetris_high_score EEMEM = 0;
-unsigned int EE_snake_high_score EEMEM = 0;
-
 
 GameSM::GameSM(Display *display)
    :StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), process_timer1_ (0), process_timer2_(0), language_(EN)
@@ -40,8 +37,6 @@ GameSM::GameSM(Display *display)
 	display_->text2_.setShiftSpeed(5);
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
-	tetris_high_score_ = eeprom_read_word(&EE_tetris_high_score);
-	snake_high_score_ = eeprom_read_word(&EE_snake_high_score);
 	process(ON_ENTRY);
 }
 
@@ -89,7 +84,7 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event, char& item, const
 void GameSM::stateDefault(byte event)
 {
 
-	const char * texts[2][4] = {{"Tetris", "Snake", "Highscore", "Setting"}, {"Tetris","Snake","Highscore","Einstellungen"}};
+	const char * texts[2][4] = {{"Tetris", "Snake", "highscore", "setting"}, {"Tetris","Snake","Highscore","Einstellungen"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
 		item.init(4);
@@ -388,7 +383,7 @@ void GameSM::stateGameOver(byte event){
 			process_criterium_ = PCINT;
 			display_->loadMenuConfiguration();
 			if(game_->isNewHighscore()){
-				display_->text1_.setText((language_ == EN ? "new Highscore!" : "Neuer Highscore!"));
+				display_->text1_.setText((language_ == EN ? "new highscore!" : "neuer Highscore!"));
 			}
 			else {
 				display_->text1_.setText("Game Over");
@@ -555,13 +550,25 @@ void GameSM::stateHighscoreMenu(byte event)
 {
 	static MenuItem item;
 	if(event & ON_ENTRY){
-		item.init(2,0);
+		item.init(3,0);
 		process_criterium_ |= PCINT;
 	}
 	else if(event & CHANGE && event & INPUT_MASK){
-		if(item.advance(event)){
-			TRANSITION(stateDefault);
-			return;
+		byte advanced = item.advance(event);
+		if(advanced){
+			if(item.value_ == 2){
+				if(advanced == MenuItem::DOWN_BTN){
+					TRANSITION(stateResetMenu);
+				}
+				else{
+					TRANSITION(stateDefault);
+				}
+				return;
+			}
+			else{
+				TRANSITION(stateDefault);
+				return;
+			}
 		}
 	}
 	switch (item.value_) {
@@ -573,9 +580,37 @@ void GameSM::stateHighscoreMenu(byte event)
 		display_->setIcon(0x3c20203c04045c00);
 		display_->text1_.setNumber(Snake::highscore());
 		break;
+	case 2:
+		display_->setIcon(0xbd42a59999a542bd);
+		display_->text1_.setText(language_ == EN ? "reset" : "Zur\x1ccksetzen");
 	default:
 		break;
 	}
+}
+
+void GameSM::stateResetMenu(byte event){
+	if(event & ON_ENTRY){
+		display_->loadMenuConfiguration();
+		process_criterium_ = PCINT;
+	}
+
+	else if(event & CHANGE && event & INPUT_MASK){
+		switch (event & INPUT_MASK) {
+		case BTN_DOWN: // reset
+			Tetris::resetHighscore();
+			Snake::resetHighscore();
+			LOAD_EFFECT_STANDART(stateDefault);
+			return;
+		break;
+		case BTN_UP:
+			TRANSITION(stateHighscoreMenu);
+			return;
+		default:
+			break;
+		}
+	}
+	display_->text1_.setText((language_ == EN ? "reset scores" : "Highscores zur\x1ccksetzen"));
+	display_->setIcon(0x00040a1120408000);
 }
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event)

@@ -23,8 +23,6 @@ class GameSM : public StateMachine
 public:
 	GameSM(Display * display);
 	void processStateMaschine(byte event);
-
-
 private:
 	// states
 	class MenuItem{
@@ -61,6 +59,7 @@ private:
 	void stateLanguageMenu(byte event);
 	void stateLoadEffect(byte event);
 	void stateHighscoreMenu(byte event);
+	void stateResetMenu(byte event);
 
 	enum ProcessCriterum{
 		EVER = 1 << 0,
@@ -89,7 +88,4 @@ private:
 	char number_buffer_[8];
 	//	void (GameSM::*load_following_state_)(byte);
 	State load_following_state_;
-
-	unsigned int tetris_high_score_;
-	unsigned int snake_high_score_;
 };

@@ -21,6 +21,8 @@ public:
 	unsigned int points(){return points_;}
 	static unsigned int highscore();
 
+	static void resetHighscore();
+
 private:
 	void render();
 

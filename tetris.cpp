@@ -219,6 +219,11 @@ void Tetris::takeOverTetromino()
 	render();
 }
 
+void Tetris::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore,highscore_ = 0);
+}
+
 void Tetris::checkRowsFinished()
 {
 	for(int i = 0; i < display_->rows(); i++){

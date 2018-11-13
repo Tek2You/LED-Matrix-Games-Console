@@ -26,6 +26,8 @@ public:
 	static unsigned int highscore();
 
 	enum Direction { UP, RIGHT, DOWN, LEFT, START};
+	static void resetHighscore();
+
 private:
 
 	Direction direction_;

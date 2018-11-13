@@ -193,3 +193,8 @@ Pos *Snake::getBodyPos(int pos)
 		return body_buffer_ + body_start_ - pos;
 	}
 }
+
+void Snake::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore,highscore_ = 0);
+}
