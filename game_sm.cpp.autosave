@@ -389,7 +389,7 @@ void GameSM::stateRunningMan(byte event)
 			delete game_ ;
 			game_ = nullptr;
 		}
-		game_ = new Snake(display_);
+		game_ = new RunningMan(display_);
 		game_->start();
 		process_criterium_ |= PCINT | TIMER1;
 		switch (speed_) {
@@ -411,7 +411,6 @@ void GameSM::stateRunningMan(byte event)
 			break;
 		}
 		process_timer1_ = millis() + interval;
-		dir = Snake::START;
 		return;
 	}
 }
