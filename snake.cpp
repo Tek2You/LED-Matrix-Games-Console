@@ -141,14 +141,13 @@ void Snake::render()
 bool Snake::eat()
 {
 	if(head_pos_.pos_x == eat_pos_.pos_x && head_pos_.pos_y == eat_pos_.pos_y){
-		Pos p(0,0);
+		Pos p;
 		do{
 			p.pos_x = random() % 8;
 			p.pos_y = random() % 16;
 		}
 		while(isValid(p));
 		eat_pos_= p;
-//		bitToggle(PORTB,1);
 		return true;
 	}
 	return false;
@@ -174,7 +173,7 @@ bool Snake::isValid(Pos &pos)
 	//  if colides, return true
 	for(int i = 0; i < body_len_; i++){
 		Pos * p = getBodyPos(i);
-		if(pos.pos_x == p->pos_x && pos.pos_y == p->pos_y){
+		if(pos == *p){
 			return true;
 		}
 	}

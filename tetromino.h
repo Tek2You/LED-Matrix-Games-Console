@@ -21,49 +21,30 @@ enum VALIDATION_ERROR : byte{
 	COLLIDE = (1 << 4),
 };
 
-inline byte getX(byte xy){
-	return (xy & 0xF0) >> 4;
-}
-
-inline byte getY(byte xy){
-	return xy & 0x0F;
-}
-
-inline byte setXy(byte x, byte y){
-	return (y & 0x0F) | ((x & 0x0F) << 4);
-}
-
-inline Pos getPos(byte xy){
-	Pos pos;
-	pos.pos_x = byte((xy & 0xF0) >> 4);
-	pos.pos_y = byte(xy & 0x0F);
-	return pos;
-}
-
 struct SPECIFICATIONS{
 	byte directions;
-	byte shape[4];
+	SmartPos shape[4];
 
 };
 #define BV_(bit) 1 << bit
 
 //const PROGMEM SPECIFICATIONS tetrominos[7] = {
-//   {TOP | RIGHT                ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
-//   {TOP | RIGHT | BOTTOM | LEFT,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
-//   {TOP | RIGHT | BOTTOM | LEFT,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
-//   {TOP                        ,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
-//   {TOP | RIGHT                ,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
-//   {TOP | RIGHT| BOTTOM | LEFT ,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,1)}},
-//   {TOP | RIGHT                ,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
+//   {TOP | RIGHT                ,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(0,3)}},
+//   {TOP | RIGHT | BOTTOM | LEFT,{SmartPos(1,1),SmartPos(1,0),SmartPos(1,2),SmartPos(0,2)}},
+//   {TOP | RIGHT | BOTTOM | LEFT,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(1,2)}},
+//   {TOP                        ,{SmartPos(0,0),SmartPos(0,1),SmartPos(1,0),SmartPos(1,1)}},
+//   {TOP | RIGHT                ,{SmartPos(1,0),SmartPos(1,1),SmartPos(0,1),SmartPos(2,0)}},
+//   {TOP | RIGHT| BOTTOM | LEFT ,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(1,1)}},
+//   {TOP | RIGHT                ,{SmartPos(1,0),SmartPos(0,0),SmartPos(1,1),SmartPos(2,1)}},
 //};
 const SPECIFICATIONS tetrominos[7] = {
-   {BV_(TOP) | BV_(RIGHT)										,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(0,3)}},
-   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(1,1),setXy(1,0),setXy(1,2),setXy(0,2)}},
-   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(0,1),setXy(0,0),setXy(0,2),setXy(1,2)}},
-   {BV_(TOP)														,{setXy(0,0),setXy(0,1),setXy(1,0),setXy(1,1)}},
-   {BV_(TOP) | BV_(RIGHT)										,{setXy(1,0),setXy(1,1),setXy(0,1),setXy(2,0)}},
-   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,0)}},
-   {BV_(TOP) | BV_(RIGHT)										,{setXy(1,0),setXy(0,0),setXy(1,1),setXy(2,1)}},
+   {BV_(TOP) | BV_(RIGHT)										,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(0,3)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{SmartPos(1,1),SmartPos(1,0),SmartPos(1,2),SmartPos(0,2)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(1,2)}},
+   {BV_(TOP)														,{SmartPos(0,0),SmartPos(0,1),SmartPos(1,0),SmartPos(1,1)}},
+   {BV_(TOP) | BV_(RIGHT)										,{SmartPos(1,0),SmartPos(1,1),SmartPos(0,1),SmartPos(2,0)}},
+   {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{SmartPos(1,0),SmartPos(0,0),SmartPos(1,1),SmartPos(2,0)}},
+   {BV_(TOP) | BV_(RIGHT)										,{SmartPos(1,0),SmartPos(0,0),SmartPos(1,1),SmartPos(2,1)}},
 };
 }
 
@@ -76,13 +57,13 @@ public:
 
 	Tetromino(tetromino::SHAPE shape, byte heigth, byte *field, tetromino::DIRECTION direction, Pos pos);
 
-	void setPos(Pos pos) {pos_ = pos;}
-	Pos getPos() {return pos_;}
+	void setPos(const Pos& pos) {pos_ = pos;}
+	Pos& pos() {return pos_;}
 
 	void setDirection(tetromino::DIRECTION direction){direction_ = direction;}
-	tetromino::DIRECTION getDirection() {return direction_;}
+	tetromino::DIRECTION& direction() {return direction_;}
 
-	tetromino::SHAPE getShape() {return shape_;}
+	tetromino::SHAPE shape() {return shape_;}
 
 	bool getPositions(Pos(&positions)[4]);
 	static bool getPositions(Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos);

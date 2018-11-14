@@ -16,13 +16,12 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 	tetromino::SPECIFICATIONS brick = tetrominos[shape];
 	if(!brick.directions & BV_(direction))
 		return false;
-	Pos pos_rotate = tetromino::getPos(brick.shape[0]);
+	Pos pos_rotate = brick.shape[0].pos();
 	for(int i = 0; i < 4; i++)
 	{
 		Pos rotated_brick_part_pos, brick_position;
 
-		brick_position.pos_x = tetromino::getPos(brick.shape[i]).pos_x - pos_rotate.pos_x;
-		brick_position.pos_y = tetromino::getPos(brick.shape[i]).pos_y - pos_rotate.pos_y;
+		brick_position = brick.shape[i].pos() - pos_rotate;
 
 		if(direction == tetromino::BOTTOM){
 			rotated_brick_part_pos = brick_position;
@@ -39,8 +38,7 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 			rotated_brick_part_pos.pos_x = -brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = brick_position.pos_x;
 		}
-		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
-		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
+		positions[i] = pos + rotated_brick_part_pos;
 	}
 	return true;
 }

@@ -48,11 +48,11 @@ bool Tetris::up()
 	*/
 	if(tetromino_ == nullptr)
 		return false;
-	tetromino::DIRECTION direction = tetromino_->getDirection();
+	tetromino::DIRECTION direction = tetromino_->direction();
 	tetromino::DIRECTION new_direction;
-	Pos position = tetromino_->getPos();
+	Pos position = tetromino_->pos();
 	Pos new_position = position;
-	tetromino::SHAPE shape = tetromino_->getShape();
+	tetromino::SHAPE shape = tetromino_->shape();
 
 	byte possible_directions = tetromino_->getPossibleDirections();
 	new_direction = Tetromino::rotate(direction,shape);
@@ -105,9 +105,9 @@ bool Tetris::right()
 {
 	if(tetromino_ == nullptr)
 		return false;
-	Pos pos = tetromino_->getPos();
+	Pos pos = tetromino_->pos();
 	pos.pos_x++;
-	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
+	if(tetromino_->isValid(tetromino_->shape(),tetromino_->direction(),pos)){  // not valid
 		return false;
 	}
 	tetromino_->setPos(pos);
@@ -119,9 +119,9 @@ bool Tetris::left()
 {
 	if(tetromino_ == nullptr)
 		return false;
-	Pos pos = tetromino_->getPos();
+	Pos pos = tetromino_->pos();
 	pos.pos_x--;
-	if(tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos)){  // not valid
+	if(tetromino_->isValid(tetromino_->shape(),tetromino_->direction(),pos)){  // not valid
 		return false;
 	}
 	tetromino_->setPos(pos);
@@ -133,9 +133,9 @@ bool Tetris::down()
 {
 	if(tetromino_ == nullptr)
 		return false;
-	Pos pos = tetromino_->getPos();
+	Pos pos = tetromino_->pos();
 	pos.pos_y--;
-	byte valid_output = tetromino_->isValid(tetromino_->getShape(),tetromino_->getDirection(),pos);
+	byte valid_output = tetromino_->isValid(tetromino_->shape(),tetromino_->direction(),pos);
 	if(valid_output){  // not valid
 		takeOverTetromino();
 		checkRowsFinished();
@@ -196,7 +196,7 @@ bool Tetris::newTetromino()
 	tetromino_->getPositions(points);
 	for(Pos p : points){
 		if(p.pos_y > display_->rows() - 1){
-			Pos pos = tetromino_->getPos();
+			Pos pos = tetromino_->pos();
 			pos.pos_y -= (p.pos_y - (display_->rows()-1));
 			tetromino_->setPos(pos);
 			tetromino_->getPositions(points);
