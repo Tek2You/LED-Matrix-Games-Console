@@ -7,6 +7,7 @@ class RunningMan : public Game
 {
 public:
     RunningMan(Display *display);
+    ~RunningMan();
 
     // Game interface
 public:
@@ -25,8 +26,8 @@ private:
     void newHind();
     bool isValid(Pos pos);
 protected:
-    static unsigned int highscore_;
     void render() override;
+    static unsigned int highscore_;
     bool man_state_;
     Pos man_pos_;
     byte next_hind_;

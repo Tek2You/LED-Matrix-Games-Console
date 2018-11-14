@@ -16,7 +16,7 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 	tetromino::SPECIFICATIONS brick = tetrominos[shape];
 	if(!brick.directions & BV_(direction))
 		return false;
-	Pos pos_rotate = brick.shape[0].pos();
+	Pos pos_rotate = brick.shape[0];
 	for(int i = 0; i < 4; i++)
 	{
 		Pos rotated_brick_part_pos, brick_position;

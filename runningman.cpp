@@ -7,6 +7,11 @@ RunningMan::RunningMan(Display * display) : Game(display)
 	current_field_start_ = 0;
 }
 
+RunningMan::~RunningMan()
+{
+
+}
+
 void RunningMan::start()
 {
 	man_pos_ = Pos(0,0);
@@ -83,7 +88,7 @@ void RunningMan::newHind()
 	int hind_shape = random() % 7;
 	for(Pos p : hinds_[hind_shape]){
 		p += Pos(0,display_->rows());
-		bitSet(row(p.pos_x),p.pos_y);
+//		bitSet(*row(p.pos_x),p.pos_y);
 	}
 }
 

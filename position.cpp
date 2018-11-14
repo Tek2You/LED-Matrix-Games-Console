@@ -4,6 +4,12 @@ Pos::Pos(char x, char y) : pos_x(x), pos_y(y){
 
 }
 
+Pos::Pos(const SmartPos &pos)
+{
+	pos_x = pos.x();
+	pos_y = pos.y();
+}
+
 Pos Pos::operator + (const Pos& pos)
 {
 
@@ -32,7 +38,7 @@ bool Pos::operator==(const Pos& pos){
 	return(pos_x == pos.pos_x && pos_y == pos.pos_y);
 }
 
-Pos& Pos::operator=(SmartPos &pos)
+Pos& Pos::operator=(const SmartPos &pos)
 {
 	pos_x = pos.x();
 	pos_y = pos.y();
@@ -49,11 +55,11 @@ Pos SmartPos::pos(){
 	return Pos(x(),y());
 }
 
-unsigned char SmartPos::x(){
+unsigned char SmartPos::x() const {
 	return (compact_pos_ & 0xF0) >> 4;
 }
 
-unsigned char SmartPos::y(){
+unsigned char SmartPos::y() const{
 	return compact_pos_ & 0x0F;
 }
 
