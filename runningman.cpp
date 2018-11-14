@@ -1,5 +1,6 @@
 #include "runningman.h"
 #include "position.h"
+#include "operators.h"
 
 RunningMan::RunningMan(Display * display) : Game(display)
 {
@@ -9,7 +10,7 @@ RunningMan::RunningMan(Display * display) : Game(display)
 
 RunningMan::~RunningMan()
 {
-
+	free(field_);
 }
 
 void RunningMan::start()
