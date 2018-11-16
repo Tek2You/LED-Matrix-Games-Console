@@ -2,13 +2,12 @@
 #include "avr.h"
 #include "display.h"
 #include "tetromino.h"
-#include "operators.h"
 #include "game.h"
 
 class Tetris : public Game
 {
 public:
-	Tetris(Display * display);
+	Tetris(Display * display, unsigned long *t1, unsigned long *t2);
 	~Tetris();
 	void start();
 	bool process(byte& event) override;
@@ -26,6 +25,14 @@ public:
 	static void resetHighscore();
 
 private:
+	unsigned long *down_timer_, *move_timer_;
+	int down_period_, move_period_;
+
+	int general_step_interval = 1800;
+	int general_down_interval = 180;
+	int general_first_move_interval = 550;
+	int general_move_interval = 200;
+
 	void render();
 
 	void checkRowsFinished();

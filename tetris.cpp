@@ -1,16 +1,36 @@
 ﻿#include "tetris.h"
 #include "string.h"
+#include "operators.h"
+#include "avr/eeprom.h"
+
+#define ON_ENTRY bit(7)
+#define CHANGE   bit(6)
+// these are the actual input pins (of PINC)
+#define BTN_LEFT bit(0)
+#define BTN_DOWN bit(1)
+#define BTN_UP  bit(2)
+#define BTN_RIGHT bit(3)
+
+#define INPUT_MASK BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP
+
+#define TIMEOUT1 bit(4)
+#define TIMEOUT2 bit(5)
 
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display)
-   : Game(display)
+Tetris::Tetris(Display *display, unsigned long *t1, unsigned long *t2)
+   : Game(display), down_timer_(t1), move_timer_(t2)
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
 	tetromino_ = nullptr;
 	//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
+	general_step_interval = 1800;
+	general_down_interval = 180;
+	general_first_move_interval = 550;
+	general_move_interval = 200;
+	reset();
 }
 
 Tetris::~Tetris()
@@ -30,7 +50,108 @@ void Tetris::start()
 
 bool Tetris::process(byte &event)
 {
+	static bool btn_down_state	= false;
+	static bool btn_left_state = false;
+	static bool btn_right_state = false;
+	static unsigned long step_interval;
 
+	static int general_step_interval;
+	static int general_down_interval;
+	static int general_first_move_interval;
+	static int general_move_interval;
+
+	unsigned long now = millis();
+	if(event & ON_ENTRY){
+		step_interval = general_step_interval;
+		*down_timer_ = now + step_interval;
+		return false;
+	}
+	if(event & CHANGE){
+		if(event & INPUT_MASK){
+			if(event & BTN_UP){
+				 up();
+			}
+
+			// btn down
+			if(event & BTN_DOWN){
+				if(btn_down_state == false){
+					step_interval = general_down_interval;
+					*down_timer_ = step_interval + now;
+					btn_down_state = true;
+					goto step;
+				}
+			}
+			else if(btn_down_state){
+				step_interval = general_step_interval;
+				*down_timer_ = step_interval + now;
+				btn_down_state = false;
+			}
+		}
+
+		// btn left
+		if(event & BTN_LEFT) {
+			if(!btn_left_state) {
+				if(!btn_right_state) {
+					 left();
+					btn_left_state =	true;
+					 *move_timer_ = now + general_first_move_interval;
+				}
+			}
+		}
+		else{
+			if(btn_left_state)
+				 *move_timer_ = 0;
+			btn_left_state = false;
+		}
+
+		// btn right
+		if(event & BTN_RIGHT){
+			if(! btn_right_state){
+				if(!btn_left_state){
+					 right();
+					btn_right_state =	true;
+					 *move_timer_ = now + general_first_move_interval;
+				}
+			}
+		}
+		else{
+			if(btn_right_state)
+				 *move_timer_ = 0;
+			btn_right_state = false;
+		}
+
+	}
+	if(event & TIMEOUT2){
+		if(btn_left_state)
+			if(event & BTN_LEFT){
+				 left();
+				 *move_timer_ = now + general_move_interval;
+			}
+			else{
+				btn_left_state = false;
+			}
+		else if(btn_right_state){
+			if(event & BTN_RIGHT){
+				 right();
+				 *move_timer_ = now + general_move_interval;
+			}
+			else{
+				btn_right_state = false;
+			}
+		}
+	}
+	if(event & TIMEOUT1){
+step:
+		if( down()){ // game ends
+//			return true;
+		}
+		if(!(event & BTN_DOWN))
+			step_interval = general_step_interval;
+		else if(event & BTN_DOWN)
+			step_interval = general_down_interval;
+		*down_timer_ =	now + step_interval;
+	}
+	return false;
 }
 
 void Tetris::render()
@@ -160,11 +281,11 @@ bool Tetris::down()
 
 void Tetris::reset()
 {
-	if(tetromino_ != nullptr){
+	if(tetromino_){
 		delete(tetromino_);
 		tetromino_ = nullptr;
 	}
-	this->clear();
+	clear();
 	display_->clear();
 	points_ = 0;
 
@@ -179,7 +300,40 @@ void Tetris::clear()
 
 void Tetris::setSpeed(byte v)
 {
-
+	switch (v) {
+	case 0:
+		general_step_interval = 1800;
+		general_down_interval = 180;
+		general_first_move_interval = 550;
+		general_move_interval = 200;
+		break;
+	case 1:
+		general_step_interval = 1400;
+		general_down_interval = 140;
+		general_first_move_interval = 380;
+		general_move_interval = 160;
+		break;
+	case 3:
+		general_step_interval = 800;
+		general_down_interval = 80;
+		general_first_move_interval = 240;
+		general_move_interval = 100;
+		break;
+	case 4:
+		general_step_interval = 500;
+		general_down_interval = 50;
+		general_first_move_interval = 150;
+		general_move_interval = 60;
+		break;
+	case 2:
+		general_step_interval = 1000;
+		general_down_interval = 100;
+		general_first_move_interval = 300;
+		general_move_interval = 120;
+		break;
+	default:
+		break;
+	}
 }
 
 unsigned int Tetris::highscore()

@@ -1,6 +1,7 @@
 ﻿#include "game_sm.h"
 #include "avr/eeprom.h"
 #include "defaults.h"
+#include "operators.h"
 
 #undef TRANSITION
 #define TRANSITION(s) {\
@@ -142,152 +143,37 @@ void GameSM::stateDefault(byte event)
 
 void GameSM::stateTetris(byte event)
 {
-	static bool btn_down_state	= false;
-	static bool btn_left_state = false;
-	static bool btn_right_state = false;
-	static unsigned long step_interval;
+//	static bool btn_down_state	= false;
+//	static bool btn_left_state = false;
+//	static bool btn_right_state = false;
+//	static unsigned long step_interval;
 
-	static int general_step_interval;
-	static int general_down_interval;
-	static int general_first_move_interval;
-	static int general_move_interval;
+//	static int general_step_interval;
+//	static int general_down_interval;
+//	static int general_first_move_interval;
+//	static int general_move_interval;
 
-	unsigned long now = millis();
+//	unsigned long now = millis();
 	if(event & ON_ENTRY){
 		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
 		}
-		game_ = new Tetris(display_);
-		game_->reset();
+		game_ = new Tetris(display_,&process_timer1_,&process_timer2_);
+		game_->setSpeed(speed_);
+//		game_->reset();
 		game_->start();
-		btn_down_state = false;
+//		btn_down_state = false;
 		process_criterium_ |= PCINT | TIMER1 | TIMER2;
-		// general speeds;
-		switch (speed_) {
-		case 0:
-			general_step_interval = 1800;
-			general_down_interval = 180;
-			general_first_move_interval = 550;
-			general_move_interval = 200;
-			break;
-		case 1:
-			general_step_interval = 1400;
-			general_down_interval = 140;
-			general_first_move_interval = 380;
-			general_move_interval = 160;
-			break;
-		case 3:
-			general_step_interval = 800;
-			general_down_interval = 80;
-			general_first_move_interval = 240;
-			general_move_interval = 100;
-			break;
-		case 4:
-			general_step_interval = 500;
-			general_down_interval = 50;
-			general_first_move_interval = 150;
-			general_move_interval = 60;
-			break;
-		case 2:
-			general_step_interval = 1000;
-			general_down_interval = 100;
-			general_first_move_interval = 300;
-			general_move_interval = 120;
-			break;
-		default:
-			break;
-		}
-		step_interval = general_step_interval;
-		process_timer1_ = now + step_interval;
+//		step_interval = general_step_interval;
+//		process_timer1_ = now + step_interval;
+//		return;
+	}
+
+	if(game_->process(event)){
+		TRANSITION(stateGameOver);
 		return;
-	}
-	if(event & CHANGE){
-		if(event & INPUT_MASK){
-			if(event & BTN_UP){
-				game_->up();
-			}
-
-			// btn down
-			if(event & BTN_DOWN){
-				if(btn_down_state == false){
-					step_interval = general_down_interval;
-					process_timer1_ = step_interval + now;
-					btn_down_state = true;
-					goto step;
-				}
-			}
-			else if(btn_down_state){
-				step_interval = general_step_interval;
-				process_timer1_ = step_interval + now;
-				btn_down_state = false;
-			}
-		}
-
-		// btn left
-		if(event & BTN_LEFT) {
-			if(!btn_left_state) {
-				if(!btn_right_state) {
-					game_->left();
-					btn_left_state =	true;
-					process_timer2_ = now + general_first_move_interval;
-				}
-			}
-		}
-		else{
-			if(btn_left_state)
-				process_timer2_ = 0;
-			btn_left_state = false;
-		}
-
-		// btn right
-		if(event & BTN_RIGHT){
-			if(! btn_right_state){
-				if(!btn_left_state){
-					game_->right();
-					btn_right_state =	true;
-					process_timer2_ = now + general_first_move_interval;
-				}
-			}
-		}
-		else{
-			if(btn_right_state)
-				process_timer2_ = 0;
-			btn_right_state = false;
-		}
-
-	}
-	if(event & TIMEOUT2){
-		if(btn_left_state)
-			if(event & BTN_LEFT){
-				game_->left();
-				process_timer2_ = now + general_move_interval;
-			}
-			else{
-				btn_left_state = false;
-			}
-		else if(btn_right_state){
-			if(event & BTN_RIGHT){
-				game_->right();
-				process_timer2_ = now + general_move_interval;
-			}
-			else{
-				btn_right_state = false;
-			}
-		}
-	}
-	if(event & TIMEOUT1){
-step:
-		if(game_->down()){ // game ends
-			TRANSITION(stateGameOver);
-			return;
-		}
-		if(!(event & BTN_DOWN))
-			step_interval = general_step_interval;
-		else if(event & BTN_DOWN)
-			step_interval = general_down_interval;
-		process_timer1_ =	now + step_interval;
 	}
 }
 
@@ -385,6 +271,7 @@ void GameSM::stateRunningMan(byte event)
 			game_ = nullptr;
 		}
 		game_ = new RunningMan(display_,&process_timer1_, &process_timer2_);
+		game_->setSpeed(speed_);
 		game_->reset();
 		game_->start();
 		process_criterium_ |= PCINT | TIMER1 | TIMER2;
@@ -392,7 +279,7 @@ void GameSM::stateRunningMan(byte event)
 	}
 
 	if(game_->process(event)){
-		LOAD_EFFECT_STANDART(stateDefault);
+		TRANSITION(stateGameOver);
 	}
 }
 
