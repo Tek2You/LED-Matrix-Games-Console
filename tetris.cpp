@@ -26,10 +26,7 @@ Tetris::Tetris(Display *display, unsigned long *t1, unsigned long *t2)
 	field_ = static_cast<byte*>(malloc(display_->rows()));
 	tetromino_ = nullptr;
 	//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
-	general_step_interval = 1800;
-	general_down_interval = 180;
-	general_first_move_interval = 550;
-	general_move_interval = 200;
+	setSpeed(2);
 	reset();
 }
 
@@ -46,6 +43,8 @@ Tetris::~Tetris()
 void Tetris::start()
 {
 	newTetromino();
+	down_period_ = general_step_interval;
+	*down_timer_ = millis() + down_period_;
 }
 
 bool Tetris::process(byte &event)
@@ -55,15 +54,9 @@ bool Tetris::process(byte &event)
 	static bool btn_right_state = false;
 	static unsigned long step_interval;
 
-	static int general_step_interval;
-	static int general_down_interval;
-	static int general_first_move_interval;
-	static int general_move_interval;
-
 	unsigned long now = millis();
 	if(event & ON_ENTRY){
-		step_interval = general_step_interval;
-		*down_timer_ = now + step_interval;
+
 		return false;
 	}
 	if(event & CHANGE){

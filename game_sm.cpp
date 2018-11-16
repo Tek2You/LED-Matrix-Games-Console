@@ -162,13 +162,13 @@ void GameSM::stateTetris(byte event)
 		}
 		game_ = new Tetris(display_,&process_timer1_,&process_timer2_);
 		game_->setSpeed(speed_);
-//		game_->reset();
+		game_->reset();
 		game_->start();
 //		btn_down_state = false;
 		process_criterium_ |= PCINT | TIMER1 | TIMER2;
 //		step_interval = general_step_interval;
 //		process_timer1_ = now + step_interval;
-//		return;
+		return;
 	}
 
 	if(game_->process(event)){
