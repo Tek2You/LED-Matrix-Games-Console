@@ -25,7 +25,6 @@ Tetris::Tetris(Display *display, unsigned long *t1, unsigned long *t2)
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte*>(malloc(display_->rows()));
 	tetromino_ = nullptr;
-	//	tetromino_ = new Tetromino(tetromino::I, display_->rows(), field_, tetromino::LEFT,tetromino::Pos{2,5});
 	setSpeed(2);
 	reset();
 }
@@ -43,106 +42,96 @@ Tetris::~Tetris()
 void Tetris::start()
 {
 	newTetromino();
-	down_period_ = general_step_interval;
+	down_period_ = general_step_interval_;
 	*down_timer_ = millis() + down_period_;
 }
 
 bool Tetris::process(byte &event)
 {
-	static bool btn_down_state	= false;
-	static bool btn_left_state = false;
-	static bool btn_right_state = false;
-	static unsigned long step_interval;
-
 	unsigned long now = millis();
-	if(event & ON_ENTRY){
-
-		return false;
-	}
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
 			if(event & BTN_UP){
-				 up();
+				up();
 			}
-
 			// btn down
 			if(event & BTN_DOWN){
-				if(btn_down_state == false){
-					step_interval = general_down_interval;
-					*down_timer_ = step_interval + now;
-					btn_down_state = true;
+				if(btn_down_state_ == false){
+					down_period_ = general_down_interval_;
+					*down_timer_ = down_period_ + now;
+					btn_down_state_ = true;
 					goto step;
 				}
 			}
-			else if(btn_down_state){
-				step_interval = general_step_interval;
-				*down_timer_ = step_interval + now;
-				btn_down_state = false;
+			else if(btn_down_state_){
+				down_period_ = general_step_interval_;
+				*down_timer_ = down_period_ + now;
+				btn_down_state_ = false;
 			}
 		}
 
 		// btn left
 		if(event & BTN_LEFT) {
-			if(!btn_left_state) {
-				if(!btn_right_state) {
-					 left();
-					btn_left_state =	true;
-					 *move_timer_ = now + general_first_move_interval;
+			if(!btn_left_state_) {
+				if(!btn_right_state_) {
+					left();
+					btn_left_state_ =	true;
+					*move_timer_ = now + general_first_move_interval_;
 				}
 			}
 		}
 		else{
-			if(btn_left_state)
-				 *move_timer_ = 0;
-			btn_left_state = false;
+			if(btn_left_state_)
+				*move_timer_ = 0;
+			btn_left_state_ = false;
 		}
 
 		// btn right
 		if(event & BTN_RIGHT){
-			if(! btn_right_state){
-				if(!btn_left_state){
-					 right();
-					btn_right_state =	true;
-					 *move_timer_ = now + general_first_move_interval;
+			if(! btn_right_state_){
+				if(!btn_left_state_){
+					right();
+					btn_right_state_ =	true;
+					*move_timer_ = now + general_first_move_interval_;
 				}
 			}
 		}
 		else{
-			if(btn_right_state)
-				 *move_timer_ = 0;
-			btn_right_state = false;
+			if(btn_right_state_)
+				*move_timer_ = 0;
+			btn_right_state_ = false;
 		}
 
 	}
 	if(event & TIMEOUT2){
-		if(btn_left_state)
+		if(btn_left_state_)
 			if(event & BTN_LEFT){
-				 left();
-				 *move_timer_ = now + general_move_interval;
+				left();
+				*move_timer_ = now + general_move_interval_;
 			}
 			else{
-				btn_left_state = false;
+				btn_left_state_ = false;
 			}
-		else if(btn_right_state){
+		else if(btn_right_state_){
 			if(event & BTN_RIGHT){
-				 right();
-				 *move_timer_ = now + general_move_interval;
+				right();
+				*move_timer_ = now + general_move_interval_;
 			}
 			else{
-				btn_right_state = false;
+				btn_right_state_ = false;
 			}
 		}
 	}
 	if(event & TIMEOUT1){
 step:
-		if( down()){ // game ends
-//			return true;
+		if(down()){ // game ends
+			return true;
 		}
 		if(!(event & BTN_DOWN))
-			step_interval = general_step_interval;
+			down_period_ = general_step_interval_;
 		else if(event & BTN_DOWN)
-			step_interval = general_down_interval;
-		*down_timer_ =	now + step_interval;
+			down_period_ = general_down_interval_;
+		*down_timer_ =	now + down_period_;
 	}
 	return false;
 }
@@ -274,14 +263,13 @@ bool Tetris::down()
 
 void Tetris::reset()
 {
-	if(tetromino_){
+	if(tetromino_){ // make sure, a tetromino is exiting
 		delete(tetromino_);
 		tetromino_ = nullptr;
 	}
 	clear();
 	display_->clear();
 	points_ = 0;
-
 }
 
 void Tetris::clear()
@@ -295,34 +283,34 @@ void Tetris::setSpeed(byte v)
 {
 	switch (v) {
 	case 0:
-		general_step_interval = 1800;
-		general_down_interval = 180;
-		general_first_move_interval = 550;
-		general_move_interval = 200;
+		general_step_interval_ = 1800;
+		general_down_interval_ = 180;
+		general_first_move_interval_ = 550;
+		general_move_interval_ = 200;
 		break;
 	case 1:
-		general_step_interval = 1400;
-		general_down_interval = 140;
-		general_first_move_interval = 380;
-		general_move_interval = 160;
+		general_step_interval_ = 1400;
+		general_down_interval_ = 140;
+		general_first_move_interval_ = 380;
+		general_move_interval_ = 160;
 		break;
 	case 3:
-		general_step_interval = 800;
-		general_down_interval = 80;
-		general_first_move_interval = 240;
-		general_move_interval = 100;
+		general_step_interval_ = 800;
+		general_down_interval_ = 80;
+		general_first_move_interval_ = 240;
+		general_move_interval_ = 100;
 		break;
 	case 4:
-		general_step_interval = 500;
-		general_down_interval = 50;
-		general_first_move_interval = 150;
-		general_move_interval = 60;
+		general_step_interval_ = 500;
+		general_down_interval_ = 50;
+		general_first_move_interval_ = 150;
+		general_move_interval_ = 60;
 		break;
 	case 2:
-		general_step_interval = 1000;
-		general_down_interval = 100;
-		general_first_move_interval = 300;
-		general_move_interval = 120;
+		general_step_interval_ = 1000;
+		general_down_interval_ = 100;
+		general_first_move_interval_ = 300;
+		general_move_interval_ = 120;
 		break;
 	default:
 		break;
@@ -336,14 +324,12 @@ unsigned int Tetris::highscore()
 
 bool Tetris::newTetromino()
 {
-	if(tetromino_ != nullptr){
+	if(tetromino_){ // make sure, a tetromino exists before delete
 		delete tetromino_;
 		tetromino_ = nullptr;
 	}
-
 	tetromino::SHAPE shape = randomTetrominoShape();
 	tetromino_ = new Tetromino(shape, display_->rows(), field_,	randomTetrominoDirection(shape),Pos(4,display_->rows()-1));
-
 	Pos points[4];
 	tetromino_->getPositions(points);
 	for(Pos p : points){

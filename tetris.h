@@ -11,41 +11,47 @@ public:
 	~Tetris();
 	void start();
 	bool process(byte& event) override;
-	bool up();
-	bool right();
-	bool left();
-	bool down();
-	void reset();
-	void clear();
+	bool up() override;
+	bool right() override;
+	bool left() override;
+	bool down() override;
+	void reset() override;
+	void clear() override;
 	unsigned int points(){return points_;}
 	void setSpeed(byte v) override;
 
+	// highscore functions
 	static unsigned int highscore();
-
 	static void resetHighscore();
 
 private:
 	unsigned long *down_timer_, *move_timer_;
 	int down_period_, move_period_;
 
-	int general_step_interval = 1800;
-	int general_down_interval = 180;
-	int general_first_move_interval = 550;
-	int general_move_interval = 200;
+	// from speed calculated delay intervals
+	int general_step_interval_;
+	int general_down_interval_;
+	int general_first_move_interval_;
+	int general_move_interval_;
 
-	void render();
-
-	void checkRowsFinished();
-	bool newTetromino();
-	void takeOverTetromino();
+	// current button states
+	bool btn_down_state_;
+	bool btn_left_state_;
+	bool btn_right_state_;
 
 	byte * field_; // field without current tetromino
 	Tetromino * tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
 
+	// game interface
+	void render();
+
+	// private functions only for tetris
+	void checkRowsFinished();
+	bool newTetromino();
+	void takeOverTetromino();
+	// random tetromino data functions
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
-
-
 };

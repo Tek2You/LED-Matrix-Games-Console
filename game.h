@@ -17,6 +17,7 @@ public:
 	virtual bool left()=0;
 	virtual bool up()=0;
 	virtual bool down()=0;
+
 	virtual void setSpeed(byte v) = 0;
 
 	virtual unsigned int points()=0;
