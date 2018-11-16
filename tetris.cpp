@@ -23,6 +23,16 @@ Tetris::~Tetris()
 	points_ = 0;
 }
 
+void Tetris::start()
+{
+	newTetromino();
+}
+
+bool Tetris::process(byte &event)
+{
+
+}
+
 void Tetris::render()
 {
 	display_->clear();
@@ -167,14 +177,9 @@ void Tetris::clear()
 	}
 }
 
-bool Tetris::process()
+void Tetris::setSpeed(byte v)
 {
 
-}
-
-void Tetris::start()
-{
-	newTetromino();
 }
 
 unsigned int Tetris::highscore()

@@ -3,14 +3,27 @@
 #include "operators.h"
 #include "avr/eeprom.h"
 
+#define ON_ENTRY bit(7)
+#define CHANGE   bit(6)
+// these are the actual input pins (of PINC)
+#define BTN_LEFT bit(0)
+#define BTN_DOWN bit(1)
+#define BTN_UP  bit(2)
+#define BTN_RIGHT bit(3)
+
+#define TIMEOUT1 bit(4)
+#define TIMEOUT2 bit(5)
+
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int RunningMan::highscore_ = eeprom_read_word(&EE_highscore);
 
-RunningMan::RunningMan(Display * display) : Game(display)
+RunningMan::RunningMan(Display * display, unsigned long *t1, unsigned long *t2) : Game(display),
+   forward_timer_(t1), jump_timer_(t2)
 {
 	field_ = static_cast<byte*>(malloc(display_->rows()+3));
 	current_field_start_ = 0;
 	score_ = 0;
+	setSpeed(2);
 }
 
 RunningMan::~RunningMan()
@@ -30,30 +43,39 @@ void RunningMan::start()
 	is_jumping_ = false;
 	score_ = 0;
 	jump_height_ = 4;
-	jump_period_ = 5;
+	jump_lenght_ = 5;
+	*forward_timer_ = millis() + forward_period_;
 }
 
-bool RunningMan::process()
+bool RunningMan::process(byte& event)
 {
-	man_state_ = ! man_state_;
-	if(man_pos_.pos_x < 3){
-		man_pos_.pos_x++;
+	if(event & TIMEOUT1){
+		forward();
+		*forward_timer_ = millis() + forward_period_;
+	}
+	if(event & TIMEOUT2){
+		jump();
+	}
+	if(event & CHANGE){
+		if(event & BTN_RIGHT){
+			if(!jump_count_){
+				*jump_timer_ = millis() + jump_period_;
+				jump();
+			}
+		}
+		else if(jump_count_ && jump_count_ < 3){
+			jump_height_ = 3;
+			jump_lenght_ = 3;
+		}
 	}
 
-	if(next_hind_-- == 0){
-		next_hind_ = 12;
-		newHind();
-	}
-	*row(0) = 0;
-	if(++current_field_start_ ==  display_->rows()+3)
-		current_field_start_ = 0;
-	render();
-	score_++;
 	if(!isValid(man_pos_)){
 		if(score_ > highscore_){
 			highscore_ = score_;
 			is_new_highscore_ = true;
 			eeprom_write_word(&EE_highscore,highscore_);
+			*forward_timer_ = 0;
+			*jump_timer_ = 0;
 		}
 		return true;
 	}
@@ -72,31 +94,7 @@ void RunningMan::reset()
 
 bool RunningMan::right() // processes jump
 {
-	if(is_jumping_){
-		if(jump_count_ < jump_height_){
-			man_pos_.pos_y--;
-		}
-		else if(jump_count_ > jump_height_ + jump_period_){
-			man_pos_.pos_y++;
-			if(jump_count_ == jump_height_ * 2 + jump_period_){
-				jump_count_ = 0;
-				is_jumping_ = false;
-				jump_height_ = 4;
-				jump_period_ = 5;
-			}
-		}
-		jump_count_++;
-	}
-	render();
-	if(!isValid(man_pos_)){
-		if(score_ > highscore_){
-			highscore_ = score_;
-			is_new_highscore_ = true;
-			eeprom_write_word(&EE_highscore,highscore_);
-		}
-		return true;
-	}
-	return false;
+
 }
 
 bool RunningMan::left()
@@ -116,7 +114,7 @@ bool RunningMan::down()
 {
 	if(jump_count_ < 3){
 		jump_height_ = 3;
-		jump_period_ = 3;
+		jump_lenght_ = 3;
 	}
 }
 
@@ -125,14 +123,41 @@ unsigned int RunningMan::points()
 	return score_;
 }
 
+void RunningMan::setSpeed(byte v)
+{
+	switch (v) {
+	case 0:
+		forward_period_ = 450;
+		jump_period_ = 337;
+		break;
+	case 1:
+		forward_period_ = 375;
+		jump_period_ = 280;
+		return;
+	case 3:
+		forward_period_ = 225;
+		jump_period_ = 169;
+		break;
+	case 4:
+		forward_period_ = 150;
+		jump_period_ = 112;
+		break;
+	case 2:
+	default:
+		forward_period_ = 300;
+		jump_period_ = 225;
+		break;
+	}
+}
+
 byte *RunningMan::row(byte n)
 {
-//	if(current_field_start_ + n > display_->rows()+2){
-//		return field_ + n - (display_->rows()+2-current_field_start_);
-//	}
-//	else{
-//		return field_ + current_field_start_ + n;
-//	}
+	//	if(current_field_start_ + n > display_->rows()+2){
+	//		return field_ + n - (display_->rows()+2-current_field_start_);
+	//	}
+	//	else{
+	//		return field_ + current_field_start_ + n;
+	//	}
 	return field_ + ((current_field_start_ + n) % 19);
 }
 
@@ -144,6 +169,47 @@ unsigned int RunningMan::highscore()
 void RunningMan::resetHighscore()
 {
 	eeprom_write_word(&EE_highscore,highscore_ = 0);
+}
+
+void RunningMan::forward()
+{
+	man_state_ = ! man_state_;
+	if(man_pos_.pos_x < 3){
+		man_pos_.pos_x++;
+	}
+
+	if(next_hind_-- == 0){
+		next_hind_ = 12;
+		newHind();
+	}
+	*row(0) = 0;
+	if(++current_field_start_ ==  display_->rows()+3)
+		current_field_start_ = 0;
+	render();
+	score_++;
+}
+
+void RunningMan::jump()
+{
+	if(jump_count_ < jump_height_){
+		man_pos_.pos_y--;
+	}
+	else if(jump_count_ > jump_height_ + jump_lenght_){
+		man_pos_.pos_y++;
+		if(jump_count_ == jump_height_ * 2 + jump_lenght_){
+			jump_count_ = 0;
+			is_jumping_ = false;
+			jump_height_ = 4;
+			jump_lenght_ = 5;
+			*jump_timer_ = 0;
+			return;
+		}
+		else{
+		}
+	}
+	*jump_timer_ = millis() + jump_period_;
+	jump_count_++;
+	render();
 }
 
 void RunningMan::newHind()

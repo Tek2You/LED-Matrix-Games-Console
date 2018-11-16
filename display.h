@@ -13,7 +13,8 @@ public:
 
 	void setIcon(uint64_t icon, byte offset=0);
 	void update();
-	void loadMenuConfiguration();
+	void loadMenuConfig();
+	void loadsGameCofig();
 
 	Text text1_, text2_;
 private:

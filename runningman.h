@@ -6,29 +6,35 @@
 class RunningMan : public Game
 {
 public:
-	RunningMan(Display *display);
+	RunningMan(Display *display, unsigned long * t1, unsigned long * t2);
 	~RunningMan();
 
 	// Game interface
 public:
-	void start() override;
-	bool process() override;
-	void clear() override;
-	void reset() override;
-	bool right() override;
-	bool left() override;
-	bool up() override;
-	bool down() override;
-	unsigned int points() override;
+	void start();
+	bool process(byte &event);
+	void clear();
+	void reset();
+	bool right();
+	bool left();
+	bool up();
+	bool down();
+	unsigned int points();
+	void setSpeed(byte v);
 	byte *row(byte n);
 	static unsigned int highscore();
 	static void resetHighscore();
 
+	void forward();
+	void jump();
+
 private:
+	unsigned long *forward_timer_, *jump_timer_;
+	int forward_period_, jump_period_;
 	void newHind();
 	bool isValid(Pos pos);
 protected:
-	void render() override;
+	void render();
 	bool man_state_;
 	Pos man_pos_;
 	byte next_hind_;
@@ -38,8 +44,8 @@ protected:
 	byte jump_count_;
 	unsigned int score_ = 0;
 	static unsigned int highscore_;
-	byte jump_height_;
-	byte jump_period_;
+	int jump_height_;
+	int jump_lenght_;
 
 	const SmartPos man_points[6] = {SmartPos(0,7),SmartPos(0,5),SmartPos(1,6),SmartPos(1,5),SmartPos(1,4),SmartPos(2,5)};
 	const SmartPos man_moving_points[2] = {SmartPos(1,7),SmartPos(2,7)};
@@ -57,4 +63,5 @@ protected:
 	                        {{SmartPos(0,7), SmartPos(0,6),SmartPos(0,5), SmartPos(0,7)}},
 	                        {{SmartPos(0,7), SmartPos(0,7),SmartPos(0,7), SmartPos(0,7)}}
 	                       };
+
 };

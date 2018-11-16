@@ -9,7 +9,7 @@ public:
 	Game(Display * display);
 	virtual ~Game();
 	virtual void start() = 0;
-	virtual bool process()=0;
+	virtual bool process(byte& event)=0;
 	virtual void clear()=0;
 	virtual void reset()=0;
 
@@ -17,6 +17,7 @@ public:
 	virtual bool left()=0;
 	virtual bool up()=0;
 	virtual bool down()=0;
+	virtual void setSpeed(byte v) = 0;
 
 	virtual unsigned int points()=0;
 	virtual bool isNewHighscore(){

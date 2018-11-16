@@ -10,15 +10,17 @@ class Tetris : public Game
 public:
 	Tetris(Display * display);
 	~Tetris();
+	void start();
+	bool process(byte& event) override;
 	bool up();
 	bool right();
 	bool left();
 	bool down();
 	void reset();
 	void clear();
-	bool process();
-	void start();
 	unsigned int points(){return points_;}
+	void setSpeed(byte v) override;
+
 	static unsigned int highscore();
 
 	static void resetHighscore();
@@ -37,4 +39,6 @@ private:
 
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
+
+
 };

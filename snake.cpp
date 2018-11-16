@@ -13,7 +13,8 @@ bool Snake::up()
 {
 	if(direction_ != DOWN && direction_ != UP){
 		direction_ = UP;
-		return process();
+		byte dummy;
+		return process(dummy);
 	}
 	return false;
 }
@@ -22,7 +23,8 @@ bool Snake::right()
 {
 	if(direction_ != LEFT && direction_ != RIGHT){
 		direction_ = RIGHT;
-		return process();
+		byte dummy;
+		return process(dummy);
 	}
 	return false;
 }
@@ -31,7 +33,8 @@ bool Snake::left()
 {
 	if(direction_ != RIGHT && direction_ != LEFT){
 		direction_ = LEFT;
-		return process();
+		byte dummy;
+		return process(dummy);
 	}
 	return false;
 }
@@ -40,7 +43,8 @@ bool Snake::down()
 {
 	if(direction_ != UP && direction_ != DOWN){
 		direction_ = DOWN;
-		return process();
+		byte dummy;
+		return process(dummy);
 	}
 	return false;
 }
@@ -64,7 +68,12 @@ void Snake::clear()
 	display_->clear();
 }
 
-bool Snake::process()
+void Snake::setSpeed(byte v)
+{
+
+}
+
+bool Snake::process(byte &event)
 {
 	char move_x, move_y;
 	switch (direction_) {

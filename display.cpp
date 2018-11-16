@@ -4,7 +4,7 @@
 Display::Display (byte height, byte width)
    : MatrixDisplay(height,width), text1_(this), text2_(this)
 {
-	loadMenuConfiguration();
+	loadMenuConfig();
 }
 
 Display::~Display()
@@ -28,7 +28,7 @@ void Display::update()
 	text2_.update();
 }
 
-void Display::loadMenuConfiguration()
+void Display::loadMenuConfig()
 {
 	clear();
 	text1_.clear();
@@ -42,6 +42,13 @@ void Display::loadMenuConfiguration()
 	text2_.setOperationRows(0,8);
 	text2_.setOperationCols(0,7);
 	text2_.setShiftStartCol(3);
+}
+
+void Display::loadsGameCofig()
+{
+	text1_.clear();
+	text2_.clear();
+	clear();
 }
 
 // shift text, depending on shift_mode_ and shift_speed_

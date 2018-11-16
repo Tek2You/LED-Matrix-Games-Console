@@ -89,7 +89,7 @@ void GameSM::stateDefault(byte event)
 	if(event & ON_ENTRY){
 		item.init(5);
 		process_criterium_ |= PCINT;
-		display_->loadMenuConfiguration();
+		display_->loadMenuConfig();
 	}
 
 	else if(event & INPUT_MASK && event & CHANGE){
@@ -154,8 +154,7 @@ void GameSM::stateTetris(byte event)
 
 	unsigned long now = millis();
 	if(event & ON_ENTRY){
-		display_->text1_.clear();
-		display_->text2_.clear();
+		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
@@ -297,8 +296,7 @@ void GameSM::stateSnake(byte event)
 	static Snake::Direction dir;
 	static int interval;
 	if(event & ON_ENTRY){
-		display_->text1_.clear();
-		display_->text2_.clear();
+		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
@@ -368,7 +366,7 @@ void GameSM::stateSnake(byte event)
 	}
 	if(event & TIMEOUT1){
 		process_timer1_ = millis() + interval;
-		if(game_->process()){ // game ends
+		if(game_->process(event)){ // game ends
 			finished = true;
 		}
 	}
@@ -380,79 +378,21 @@ void GameSM::stateSnake(byte event)
 
 void GameSM::stateRunningMan(byte event)
 {
-	static int interval, jump_interval;
-	static byte jump_count = 0;
 	if(event & ON_ENTRY){
-		display_->clear();
-		display_->text1_.clear();
-		display_->text2_.clear();
+		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
 		}
-		game_ = new RunningMan(display_);
+		game_ = new RunningMan(display_,&process_timer1_, &process_timer2_);
 		game_->reset();
 		game_->start();
 		process_criterium_ |= PCINT | TIMER1 | TIMER2;
-		switch (speed_) {
-		case 0:
-			interval = 450;
-			jump_interval = 337;
-			break;
-		case 1:
-			interval = 375;
-			jump_interval = 280;
-			return;
-		case 3:
-			interval = 225;
-			jump_interval = 169;
-			break;
-		case 4:
-			interval = 150;
-			jump_interval = 112;
-			break;
-		case 2:
-		default:
-			interval = 300;
-			jump_interval = 225;
-			break;
-		}
-		process_timer1_ = millis() + interval;
-		process_timer2_ = millis() + jump_interval;
 		return;
 	}
 
-	bool lost = false;
-
-	if(event & TIMEOUT1){
-		if(game_->process()){
-			lost = true;
-		}
-		else{
-			process_timer1_ = millis() + interval;
-		}
-	}
-	if(event & TIMEOUT2){
-		if(jump_count && jump_count++ == 4)
-			jump_count = 0;
-		if(game_->right()){ // processes jump
-			lost = true;
-		}
-		else{
-			process_timer2_ = millis() + jump_interval;
-		}
-	}
-	if(event & CHANGE){
-		if(event & BTN_RIGHT){
-			jump_count = 1;
-			game_->up();
-		}
-		else if(jump_count) // its jumping
-			game_->down(); // interrupt long jump
-	}
-	if(lost){
-		TRANSITION(stateGameOver);
-		return;
+	if(game_->process(event)){
+		LOAD_EFFECT_STANDART(stateDefault);
 	}
 }
 
@@ -464,7 +404,7 @@ void GameSM::stateGameOver(byte event){
 		process_criterium_ = PCINT;
 		if(game_ != nullptr){
 			process_criterium_ = PCINT;
-			display_->loadMenuConfiguration();
+			display_->loadMenuConfig();
 			if(game_->isNewHighscore()){
 				display_->text1_.setText((language_ == EN ? "new highscore!" : "neuer Highscore!"));
 			}
@@ -490,7 +430,7 @@ void GameSM::stateSettingsMenu(byte event)
 	static MenuItem item;
 	const char *menu_text[2][2] = {{"speed", "language"},{"Geschwindigkeit", "Sprache"}};
 	if(event & ON_ENTRY){
-		display_->loadMenuConfiguration();
+		display_->loadMenuConfig();
 		item.init(2);
 		process_criterium_ = PCINT;
 	}
@@ -533,7 +473,7 @@ void GameSM::stateSpeedMenu(byte event)
 {
 	static MenuItem item;
 	if(event & ON_ENTRY){
-		display_->loadMenuConfiguration();
+		display_->loadMenuConfig();
 		item.init(5,speed_);
 		process_criterium_ = PCINT;
 	}
@@ -564,7 +504,7 @@ void GameSM::stateLanguageMenu(byte event)
 	const char * menu_text[2][2] = {{"english","Deutsch"},{"english","Deutsch"}};
 	static MenuItem item;
 	if(event & ON_ENTRY){
-		display_->loadMenuConfiguration();
+		display_->loadMenuConfig();
 		item.init(2,(language_==DE?0:1));
 		process_criterium_ = PCINT;
 	}
@@ -674,7 +614,7 @@ void GameSM::stateHighscoreMenu(byte event)
 
 void GameSM::stateResetMenu(byte event){
 	if(event & ON_ENTRY){
-		display_->loadMenuConfiguration();
+		display_->loadMenuConfig();
 		process_criterium_ = PCINT;
 	}
 

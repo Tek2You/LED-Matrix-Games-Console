@@ -14,15 +14,16 @@ public:
 		direction_ = START;
 	}
 	~Snake();
+	void start();
+	bool process(byte &event) override;
 	bool up();
 	bool right();
 	bool left();
 	bool down();
 	void reset();
 	void clear();
-	bool process();
-	void start();
 	unsigned int points(){return body_len_-2;}
+	void setSpeed(byte v) override;
 	static unsigned int highscore();
 
 	enum Direction { UP, RIGHT, DOWN, LEFT, START};
@@ -47,4 +48,7 @@ private:
 	Pos * getBodyPos(int pos);
 
 	static unsigned int highscore_;
+
+	// Game interface
+public:
 };
