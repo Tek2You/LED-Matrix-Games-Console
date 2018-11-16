@@ -52,7 +52,7 @@ bool Tetris::process(byte &event)
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
 			if(event & BTN_UP){
-				up();
+				rotate();
 			}
 			// btn down
 			if(event & BTN_DOWN){
@@ -149,7 +149,7 @@ void Tetris::render()
 	}
 }
 
-bool Tetris::up()
+bool Tetris::rotate()
 {
 	/*
 	 * function scheme:

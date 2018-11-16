@@ -9,17 +9,13 @@ public:
 	~Snake();
 	void start();
 	bool process(byte &event) override;
-	bool up();
-	bool right();
-	bool left();
-	bool down();
 	void reset();
 	void clear();
-	bool move(Pos vect);
+
 	unsigned int points(){return body_len_-2;}
 	void setSpeed(byte v) override;
-	static unsigned int highscore();
 
+	static unsigned int highscore();
 	enum Direction { UP, RIGHT, DOWN, LEFT, START};
 	static void resetHighscore();
 
@@ -41,13 +37,11 @@ private:
 	bool eat();
 	bool validate(Pos &pos);
 	bool isValid(Pos &pos);
-	Pos * getBodyPos(int pos);
+	Pos * getBodyPos(int& pos);
+	bool move(Pos& vect);
 
 
 	static unsigned int highscore_;
-
-	// Game interface
-public:
 };
 
 

@@ -11,10 +11,6 @@ public:
 	~Tetris();
 	void start();
 	bool process(byte& event) override;
-	bool up() override;
-	bool right() override;
-	bool left() override;
-	bool down() override;
 	void reset() override;
 	void clear() override;
 	unsigned int points(){return points_;}
@@ -48,6 +44,11 @@ private:
 	void render();
 
 	// private functions only for tetris
+	bool rotate();
+	bool right();
+	bool left();
+	bool down();
+
 	void checkRowsFinished();
 	bool newTetromino();
 	void takeOverTetromino();
