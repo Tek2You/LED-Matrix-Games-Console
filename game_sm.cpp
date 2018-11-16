@@ -1,4 +1,4 @@
-#include "game_sm.h"
+﻿#include "game_sm.h"
 #include "avr/eeprom.h"
 #include "defaults.h"
 
@@ -380,7 +380,8 @@ void GameSM::stateSnake(byte event)
 
 void GameSM::stateRunningMan(byte event)
 {
-	static int interval;
+	static int interval, jump_interval;
+	static byte jump_count = 0;
 	if(event & ON_ENTRY){
 		display_->clear();
 		display_->text1_.clear();
@@ -390,31 +391,70 @@ void GameSM::stateRunningMan(byte event)
 			game_ = nullptr;
 		}
 		game_ = new RunningMan(display_);
+		game_->reset();
 		game_->start();
-		process_criterium_ |= PCINT | TIMER1;
+		process_criterium_ |= PCINT | TIMER1 | TIMER2;
 		switch (speed_) {
 		case 0:
-			interval = 600;
+			interval = 450;
+			jump_interval = 337;
 			break;
 		case 1:
-			interval = 500;
+			interval = 375;
+			jump_interval = 280;
 			return;
 		case 3:
-			interval = 300;
+			interval = 225;
+			jump_interval = 169;
 			break;
 		case 4:
-			interval = 200;
+			interval = 150;
+			jump_interval = 112;
 			break;
 		case 2:
 		default:
-			interval = 400;
+			interval = 300;
+			jump_interval = 225;
 			break;
 		}
 		process_timer1_ = millis() + interval;
+		process_timer2_ = millis() + jump_interval;
+		return;
+	}
+
+	bool lost = false;
+
+	if(event & TIMEOUT1){
+		if(game_->process()){
+			lost = true;
+		}
+		else{
+			process_timer1_ = millis() + interval;
+		}
+	}
+	if(event & TIMEOUT2){
+		if(jump_count && jump_count++ == 4)
+			jump_count = 0;
+		if(game_->right()){ // processes jump
+			lost = true;
+		}
+		else{
+			process_timer2_ = millis() + jump_interval;
+		}
+	}
+	if(event & CHANGE){
+		if(event & BTN_RIGHT){
+			jump_count = 1;
+			game_->up();
+		}
+		else if(jump_count) // its jumping
+			game_->down(); // interrupt long jump
+	}
+	if(lost){
+		TRANSITION(stateGameOver);
 		return;
 	}
 }
-
 
 void GameSM::stateGameOver(byte event){
 	if(event & ON_ENTRY){
@@ -590,13 +630,13 @@ void GameSM::stateHighscoreMenu(byte event)
 {
 	static MenuItem item;
 	if(event & ON_ENTRY){
-		item.init(3,0);
+		item.init(4,0);
 		process_criterium_ |= PCINT;
 	}
 	else if(event & CHANGE && event & INPUT_MASK){
 		byte advanced = item.advance(event);
 		if(advanced){
-			if(item.value_ == 2){
+			if(item.value_ == 3){
 				if(advanced == MenuItem::DOWN_BTN){
 					TRANSITION(stateResetMenu);
 				}
@@ -621,6 +661,10 @@ void GameSM::stateHighscoreMenu(byte event)
 		display_->text1_.setNumber(Snake::highscore());
 		break;
 	case 2:
+		display_->setIcon(0x60600a040e040000);
+		display_->text1_.setNumber(RunningMan::highscore());
+		break;
+	case 3:
 		display_->setIcon(0xbd42a59999a542bd);
 		display_->text1_.setText(language_ == EN ? "reset" : "Zur""\x1c""cksetzen");
 	default:
@@ -639,9 +683,10 @@ void GameSM::stateResetMenu(byte event){
 		case BTN_DOWN: // reset
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
+			RunningMan::resetHighscore();
 			LOAD_EFFECT_STANDART(stateDefault);
 			return;
-		break;
+			break;
 		case BTN_UP:
 			TRANSITION(stateHighscoreMenu);
 			return;

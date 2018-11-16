@@ -49,7 +49,9 @@ bool Pos::operator !=(const Pos& pos){
 	return !operator ==(pos);
 }
 
-SmartPos::SmartPos(unsigned char x, unsigned char y) {setXy(x,y);}
+SmartPos::SmartPos(unsigned char x, unsigned char y) {
+	setXy(x,y);
+}
 
 Pos SmartPos::pos(){
 	return Pos(x(),y());
@@ -64,5 +66,5 @@ unsigned char SmartPos::y() const{
 }
 
 unsigned char SmartPos::setXy(unsigned char x, unsigned char y){
-	return (y & 0x0F) | ((x & 0x0F) << 4);
+	compact_pos_ = (y & 0x0F) | ((x & 0x0F) << 4);
 }

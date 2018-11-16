@@ -38,7 +38,8 @@ bool Tetromino::getPositions(Pos (&positions)[4], SHAPE shape, DIRECTION directi
 			rotated_brick_part_pos.pos_x = -brick_position.pos_y;
 			rotated_brick_part_pos.pos_y = brick_position.pos_x;
 		}
-		positions[i] = pos + rotated_brick_part_pos;
+		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
+		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
 	}
 	return true;
 }

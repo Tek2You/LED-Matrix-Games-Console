@@ -19,15 +19,13 @@ struct Pos {
 
 
 
-class SmartPos
+struct SmartPos
 {
-public:
 	SmartPos() { }
 	SmartPos(unsigned char x, unsigned char y);
 	Pos pos();
 	unsigned char x() const;
 	unsigned char y() const;
-private:
 	inline unsigned char setXy(unsigned char x, unsigned char y);
 	unsigned char compact_pos_;
 };

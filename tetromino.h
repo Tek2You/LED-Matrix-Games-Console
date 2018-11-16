@@ -21,10 +21,28 @@ enum VALIDATION_ERROR : byte{
 	COLLIDE = (1 << 4),
 };
 
+//inline byte getX(byte xy){
+//	return (xy & 0xF0) >> 4;
+//}
+
+//inline byte getY(byte xy){
+//	return xy & 0x0F;
+//}
+
+//inline byte SmartPos(byte x, byte y){
+//	return (y & 0x0F) | ((x & 0x0F) << 4);
+//}
+
+//inline Pos getPos(byte xy){
+//	Pos pos;
+//	pos.pos_x = byte((xy & 0xF0) >> 4);
+//	pos.pos_y = byte(xy & 0x0F);
+//	return pos;
+//}
+
 struct SPECIFICATIONS{
 	byte directions;
 	SmartPos shape[4];
-
 };
 #define BV_(bit) 1 << bit
 
