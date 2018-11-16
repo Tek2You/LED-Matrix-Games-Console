@@ -1,8 +1,31 @@
-#include "snake.h"
+﻿#include "snake.h"
 #include "operators.h"
+#include "avr/eeprom.h"
+
+#define ON_ENTRY bit(7)
+#define CHANGE   bit(6)
+// these are the actual input pins (of PINC)
+#define BTN_LEFT bit(0)
+#define BTN_DOWN bit(1)
+#define BTN_UP  bit(2)
+#define BTN_RIGHT bit(3)
+
+#define INPUT_MASK BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP
+
+#define TIMEOUT1 bit(4)
+#define TIMEOUT2 bit(5)
 
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
+
+Snake::Snake(Display *display, unsigned long *t)
+   :Game(display), timer_(t),
+     body_end_(0), body_start_(0)
+{
+	body_len_ = 0;
+	body_buffer_len_;
+	direction_ = START;
+}
 
 Snake::~Snake()
 {
@@ -68,48 +91,16 @@ void Snake::clear()
 	display_->clear();
 }
 
-void Snake::setSpeed(byte v)
+bool Snake::move(Pos vect)
 {
-
-}
-
-bool Snake::process(byte &event)
-{
-	char move_x, move_y;
-	switch (direction_) {
-	case UP:
-		move_x = 0;
-		move_y = 1;
-		break;
-	case DOWN:
-		move_x = 0;
-		move_y = -1;
-		break;
-	case RIGHT:
-		move_x = 1;
-		move_y = 0;
-		break;
-	case LEFT:
-		move_x = -1;
-		move_y = 0;
-		break;
-	case START:
-		return false;
-	default:
-		move_x = 0;
-		move_y = 0;
-		break;
-	}
-	Pos new_pos = head_pos_;
-	new_pos.pos_x += move_x;
-	new_pos.pos_y += move_y;
+	vect += head_pos_;
 	// check if highscore is broken. Directly save to avoid a not save in case of reset or poweroff.
 	if(body_len_ - 2 > highscore_){
 		highscore_ = body_len_-2;
 		eeprom_write_word(&EE_highscore,highscore_);
 		is_new_highscore_	= true;
 	}
-	if(validate(new_pos)){ // game end
+	if(validate(vect)){ // game end
 		return true;
 	}
 	if(++body_start_ >= body_buffer_len_){
@@ -117,18 +108,90 @@ bool Snake::process(byte &event)
 	}
 
 	body_buffer_[body_start_] = head_pos_;
-	head_pos_ = new_pos;
+	head_pos_ = vect;
 
 	if(eat()){
 		body_len_++;
 	}
 	render();
+}
+
+void Snake::setSpeed(byte v)
+{
+	switch (v) {
+	case 0:
+		period_ = 600;
+		break;
+	case 1:
+		period_ = 500;
+		return;
+	case 3:
+		period_ = 300;
+		break;
+	case 4:
+		period_ = 200;
+		break;
+	case 2:
+	default:
+		period_ = 400;
+		break;
+	}
+}
+
+bool Snake::process(byte &event)
+{
+	Pos move_vect;
+	bool button_set = true;
+	if(event & CHANGE){
+		if(event & INPUT_MASK){
+			if(event & BTN_UP){
+				// is not 180° rotation or no rotation(in this case the snake will make
+				// a additinal ste,  what we avoid with dont allow this)
+				if(direction_ != Snake::UP && direction_ != Snake::DOWN){
+					direction_ = Snake::UP;
+					move_vect = Pos(0,1);
+				}
+			}
+			else if(event & BTN_LEFT){
+				if(direction_ != Snake::LEFT && direction_ != Snake::RIGHT){
+					direction_ = Snake::LEFT;
+					move_vect = Pos(0,-1);
+				}
+			}
+
+			else if(event & BTN_RIGHT){
+				if(direction_ != Snake::LEFT && direction_ != Snake::RIGHT){
+					direction_ = Snake::RIGHT;
+					move_vect = Pos(1,0);
+				}
+			}
+
+			else if(event & BTN_DOWN){
+				if(direction_ != Snake::DOWN && direction_ != Snake::UP){
+					direction_= Snake::DOWN;
+					move_vect = Pos(-1,0);
+				}
+			}
+			else{
+				button_set = false;
+			}
+			if(button_set)
+				*timer_ = millis() + period_;
+		}
+	}
+	if(event & TIMEOUT1 || button_set){
+		*timer_ = millis() + period_;
+		if(move(move_vect)){ // game ends
+//			return true;
+		}
+	}
 	return false;
 }
 
 void Snake::start()
 {
-	reset();
+	*timer_ = millis() + period_;
+	direction_ = Snake::START;
 }
 
 unsigned int Snake::highscore()
@@ -149,11 +212,10 @@ void Snake::render()
 
 bool Snake::eat()
 {
-	if(head_pos_.pos_x == eat_pos_.pos_x && head_pos_.pos_y == eat_pos_.pos_y){
+	if(head_pos_ == eat_pos_){
 		Pos p;
 		do{
-			p.pos_x = random() % 8;
-			p.pos_y = random() % 16;
+			p = Pos(random() % 8,random() % 16);
 		}
 		while(isValid(p));
 		eat_pos_= p;
@@ -206,3 +268,4 @@ void Snake::resetHighscore()
 {
 	eeprom_write_word(&EE_highscore,highscore_ = 0);
 }
+

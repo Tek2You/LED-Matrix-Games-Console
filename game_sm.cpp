@@ -143,20 +143,9 @@ void GameSM::stateDefault(byte event)
 
 void GameSM::stateTetris(byte event)
 {
-//	static bool btn_down_state	= false;
-//	static bool btn_left_state = false;
-//	static bool btn_right_state = false;
-//	static unsigned long step_interval;
-
-//	static int general_step_interval;
-//	static int general_down_interval;
-//	static int general_first_move_interval;
-//	static int general_move_interval;
-
-//	unsigned long now = millis();
 	if(event & ON_ENTRY){
 		display_->loadsGameCofig();
-		if(game_ != nullptr){
+		if(game_){
 			delete game_ ;
 			game_ = nullptr;
 		}
@@ -164,10 +153,7 @@ void GameSM::stateTetris(byte event)
 		game_->setSpeed(speed_);
 		game_->reset();
 		game_->start();
-//		btn_down_state = false;
 		process_criterium_ |= PCINT | TIMER1 | TIMER2;
-//		step_interval = general_step_interval;
-//		process_timer1_ = now + step_interval;
 		return;
 	}
 
@@ -179,84 +165,20 @@ void GameSM::stateTetris(byte event)
 
 void GameSM::stateSnake(byte event)
 {
-	static Snake::Direction dir;
-	static int interval;
 	if(event & ON_ENTRY){
 		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
 			game_ = nullptr;
 		}
-		game_ = new Snake(display_);
+		game_ = new Snake(display_,&process_timer1_);
+		game_->reset();
 		game_->start();
 		process_criterium_ |= PCINT | TIMER1;
-		switch (speed_) {
-		case 0:
-			interval = 600;
-			break;
-		case 1:
-			interval = 500;
-			return;
-		case 3:
-			interval = 300;
-			break;
-		case 4:
-			interval = 200;
-			break;
-		case 2:
-		default:
-			interval = 400;
-			break;
-		}
-		process_timer1_ = millis() + interval;
-		dir = Snake::START;
 		return;
 	}
-	bool finished = false;
-	if(event & CHANGE){
-		if(event & INPUT_MASK){
-			bool button_set = false;
-			if(event & BTN_UP){
-				if(dir != Snake::UP && dir != Snake::DOWN){
-					dir = Snake::UP;
-					button_set = true;
-					finished = game_->up();
-				}
-			}
-			else if(event & BTN_LEFT){
-				if(dir != Snake::LEFT && dir != Snake::RIGHT){
-					dir = Snake::LEFT;
-					button_set = true;
-					finished = game_->left();
-				}
-			}
 
-			else if(event & BTN_RIGHT){
-				if(dir != Snake::LEFT && dir != Snake::RIGHT){
-					dir = Snake::RIGHT;
-					button_set = true;
-					finished = game_->right();
-				}
-			}
-
-			else if(event & BTN_DOWN){
-				if(dir != Snake::DOWN && dir != Snake::UP){
-					dir = Snake::DOWN;
-					button_set = true;
-					finished = game_->down();
-				}
-			}
-			if(button_set)
-				process_timer1_ = millis() + interval;
-		}
-	}
-	if(event & TIMEOUT1){
-		process_timer1_ = millis() + interval;
-		if(game_->process(event)){ // game ends
-			finished = true;
-		}
-	}
-	if(finished){
+	if(game_->process(event)){
 		TRANSITION(stateGameOver);
 		return;
 	}

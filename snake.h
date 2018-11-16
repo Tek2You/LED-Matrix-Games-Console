@@ -5,14 +5,7 @@
 class Snake : public Game
 {
 public:
-	Snake(Display * display):
-	   Game(display),
-	   body_end_(0), body_start_(0)
-	{
-		body_len_ = 0;
-		body_buffer_len_;
-		direction_ = START;
-	}
+	Snake(Display * display, unsigned long * t);
 	~Snake();
 	void start();
 	bool process(byte &event) override;
@@ -22,6 +15,7 @@ public:
 	bool down();
 	void reset();
 	void clear();
+	bool move(Pos vect);
 	unsigned int points(){return body_len_-2;}
 	void setSpeed(byte v) override;
 	static unsigned int highscore();
@@ -30,6 +24,8 @@ public:
 	static void resetHighscore();
 
 private:
+	unsigned long * timer_;
+	int period_;
 
 	Direction direction_;
 	Pos head_pos_;
@@ -47,8 +43,11 @@ private:
 	bool isValid(Pos &pos);
 	Pos * getBodyPos(int pos);
 
+
 	static unsigned int highscore_;
 
 	// Game interface
 public:
 };
+
+
