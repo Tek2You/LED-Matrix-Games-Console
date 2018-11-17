@@ -42,6 +42,7 @@ void RunningMan::start()
 	man_state_ = 1;
 	is_jumping_ = false;
 	score_ = 0;
+	jump_count_ = 0;
 	jump_height_ = 4;
 	jump_lenght_ = 5;
 	*forward_timer_ = millis() + forward_period_;
@@ -90,32 +91,6 @@ void RunningMan::clear()
 void RunningMan::reset()
 {
 
-}
-
-bool RunningMan::right() // processes jump
-{
-
-}
-
-bool RunningMan::left()
-{
-
-}
-
-bool RunningMan::up() // starts jump
-{
-	if(!is_jumping_){
-		is_jumping_ = true;
-		jump_count_ = 0;
-	}
-}
-
-bool RunningMan::down()
-{
-	if(jump_count_ < 3){
-		jump_height_ = 3;
-		jump_lenght_ = 3;
-	}
 }
 
 unsigned int RunningMan::points()

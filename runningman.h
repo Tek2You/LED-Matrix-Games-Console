@@ -15,24 +15,20 @@ public:
 	bool process(byte &event);
 	void clear();
 	void reset();
-	bool right();
-	bool left();
-	bool up();
-	bool down();
+
 	unsigned int points();
 	void setSpeed(byte v);
-	byte *row(byte n);
 	static unsigned int highscore();
 	static void resetHighscore();
-
-	void forward();
-	void jump();
 
 private:
 	unsigned long *forward_timer_, *jump_timer_;
 	int forward_period_, jump_period_;
 	void newHind();
 	bool isValid(Pos pos);
+	void forward();
+	void jump();
+	byte *row(byte n);
 protected:
 	void render();
 	bool man_state_;
