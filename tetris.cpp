@@ -216,7 +216,7 @@ bool Tetris::rotate()
 bool Tetris::right()
 
 {
-	if(tetromino_ == nullptr)
+	if(!tetromino_)
 		return false;
 	Pos pos = tetromino_->pos();
 	pos.pos_x++;

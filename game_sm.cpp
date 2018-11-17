@@ -301,7 +301,7 @@ void GameSM::stateSpeedMenu(byte event)
 		}
 	}
 	display_->clear();
-	display_->text1_.setText(display_->formatInt(number_buffer_,8,item.value_+1));
+	display_->text1_.setNumber(item.value_+1);
 	byte cols = display_->cols() / 5.0 * (item.value_+1);
 	for(int col = 0; col < cols; col++){
 		display_->setColumn(col,0xFF);

@@ -27,6 +27,18 @@ public:
 	void processStateMaschine(byte event);
 private:
 	// states
+	void stateDefault(byte event);
+	void stateTetris(byte event);
+	void stateSnake(byte event);
+	void stateRunningMan(byte event);
+	void stateSettingsMenu(byte event);
+	void stateGameOver(byte event);
+	void stateSpeedMenu(byte event);
+	void stateLanguageMenu(byte event);
+	void stateLoadEffect(byte event);
+	void stateHighscoreMenu(byte event);
+	void stateResetMenu(byte event);
+
 	class MenuItem{
 	public:
 		void init(char num, char initial){
@@ -51,19 +63,6 @@ private:
 		char num_ = 0;
 	};
 
-
-	void stateDefault(byte event);
-	void stateTetris(byte event);
-	void stateSnake(byte event);
-	void stateRunningMan(byte event);
-	void stateSettingsMenu(byte event);
-	void stateGameOver(byte event);
-	void stateSpeedMenu(byte event);
-	void stateLanguageMenu(byte event);
-	void stateLoadEffect(byte event);
-	void stateHighscoreMenu(byte event);
-	void stateResetMenu(byte event);
-
 	enum ProcessCriterum{
 		EVER = 1 << 0,
 		TIMER1 = 1 << 1,
@@ -71,24 +70,19 @@ private:
 		PCINT = 1 << 3
 	};
 
-
-	byte process_criterium_;
-	unsigned long process_timer1_;
-	unsigned long process_timer2_;
-
-
-	Display * display_;
-	Game * game_;
-
 	enum Language{
 		EN = 0,
 		DE = 1,
 	};
 
+	byte process_criterium_;
+	unsigned long process_timer1_;
+	unsigned long process_timer2_;
+
+	Display * display_;
+	Game * game_; // pointer to the current game
+
 	Language language_ = EN;
 	byte speed_ = 0;
-	char step_counter_ = 0;
-	char number_buffer_[8];
-	//	void (GameSM::*load_following_state_)(byte);
-	State load_following_state_;
+	State load_following_state_; // state load effect need a pointer to the state after its
 };

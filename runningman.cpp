@@ -214,7 +214,6 @@ bool RunningMan::isValid(Pos pos)
 void RunningMan::render()
 {
 	display_->clear();
-
 	for(int i = 0; i < 16; i++){
 		display_->setRow(i,*row(i));
 	}

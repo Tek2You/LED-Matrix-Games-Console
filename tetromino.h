@@ -79,7 +79,7 @@ public:
 	Pos& pos() {return pos_;}
 
 	void setDirection(tetromino::DIRECTION direction){direction_ = direction;}
-	tetromino::DIRECTION& direction() {return direction_;}
+	tetromino::DIRECTION direction() {return direction_;}
 
 	tetromino::SHAPE shape() {return shape_;}
 
