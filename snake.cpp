@@ -42,7 +42,7 @@ void Snake::reset()
 	body_buffer_[0] = Pos(1,7);
 	body_buffer_[1] = Pos(2,7);
 	eat_pos_ = Pos(5,7);
-	direction_ = RIGHT;
+	direction_ = START;
 	render();
 }
 
@@ -51,28 +51,44 @@ void Snake::clear()
 	display_->clear();
 }
 
-bool Snake::move(Pos &vect)
+bool Snake::move()
 {
-	Pos new_pos = vect + head_pos_;
+	Pos vect;
+	switch (direction_) {
+	case UP:
+		vect = Pos(0,1);
+		break;
+	case DOWN:
+		vect = Pos(0,-1);
+		break;
+	case RIGHT :
+		vect = Pos(1,0);
+		break;
+	case LEFT:
+		vect = Pos(-1,0);
+		break;
+	default:
+		return false;
+		break;
+	}
+
+	vect += head_pos_;
 	// check if highscore is broken. Directly save to avoid a not save in case of reset or poweroff.
 	if(body_len_ - 2 > highscore_){
 		highscore_ = body_len_-2;
 		eeprom_write_word(&EE_highscore,highscore_);
 		is_new_highscore_	= true;
 	}
-	if(!validate(new_pos)){ // game end
+	if(!validate(vect)){ // game end
 		return true;
 	}
 	if(++body_start_ >= body_buffer_len_){
 		body_start_ = 0;
 	}
 	body_buffer_[body_start_] = head_pos_;
-	head_pos_ = new_pos;
+	head_pos_ = vect;
 
-	if(eat()){
-		display_->text1_.setNumber(body_len_);
-		body_len_++;
-	}
+	eat();
 	render();
 	return false;
 }
@@ -101,7 +117,6 @@ void Snake::setSpeed(byte v)
 
 bool Snake::process(byte &event)
 {
-	Pos move_vect;
 	bool button_set = true;
 	if(event & CHANGE){
 		if(event & INPUT_MASK){
@@ -110,27 +125,23 @@ bool Snake::process(byte &event)
 				// a additinal ste,  what we avoid with dont allow this)
 				if(direction_ != Snake::UP && direction_ != Snake::DOWN){
 					direction_ = Snake::UP;
-					move_vect = Pos(0,1);
 				}
 			}
 			else if(event & BTN_LEFT){
 				if(direction_ != Snake::LEFT && direction_ != Snake::RIGHT){
 					direction_ = Snake::LEFT;
-					move_vect = Pos(-1,0);
 				}
 			}
 
 			else if(event & BTN_RIGHT){
 				if(direction_ != Snake::LEFT && direction_ != Snake::RIGHT){
 					direction_ = Snake::RIGHT;
-					move_vect = Pos(1,0);
 				}
 			}
 
 			else if(event & BTN_DOWN){
 				if(direction_ != Snake::DOWN && direction_ != Snake::UP){
 					direction_= Snake::DOWN;
-					move_vect = Pos(0,-1);
 				}
 			}
 			else{
@@ -140,7 +151,7 @@ bool Snake::process(byte &event)
 	}
 	if(event & TIMEOUT1 || button_set){
 		*timer_ = millis() + period_;
-		if(move(move_vect)){ // game ends
+		if(move()){ // game ends
 			return true;
 		}
 	}
@@ -178,7 +189,9 @@ bool Snake::eat()
 		}
 		while(!isValid(p));
 		eat_pos_= p;
+		body_len_++;
 		return true;
+
 	}
 	return false;
 }
@@ -222,6 +235,7 @@ Pos *Snake::getBodyPos(int& pos)
 	else{
 		return body_buffer_ + body_start_ - pos;
 	}
+	//	return body_buffer_ +(pos % body_buffer_len_);
 }
 
 void Snake::resetHighscore()

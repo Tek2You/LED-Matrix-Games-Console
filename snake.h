@@ -37,8 +37,8 @@ private:
 	bool eat();
 	bool validate(Pos &pos);
 	bool isValid(Pos &pos);
-	Pos * getBodyPos(int& pos);
-	bool move(Pos& vect);
+	Pos * getBodyPos(int &pos);
+	bool move();
 
 
 	static unsigned int highscore_;
