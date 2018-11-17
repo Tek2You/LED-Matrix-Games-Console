@@ -185,7 +185,7 @@ bool Snake::eat()
 	if(head_pos_ == eat_pos_){
 		Pos p;
 		do{
-			p = Pos(random() % 8,random() % 16);
+			p = Pos(millis() % 8,millis() % 16);
 		}
 		while(!isValid(p));
 		eat_pos_= p;

@@ -21,6 +21,20 @@ public:
 	static void resetHighscore();
 
 private:
+	// game interface
+	void render();
+	// private functions only for tetris
+	bool rotate();
+	bool right();
+	bool left();
+	bool down();
+
+	void checkRowsFinished();
+	bool newTetromino();
+	void takeOverTetromino();
+	// random tetromino data functions
+	tetromino::SHAPE randomTetrominoShape();
+	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
 	unsigned long *down_timer_, *move_timer_;
 	int down_period_, move_period_;
 
@@ -39,20 +53,4 @@ private:
 	Tetromino * tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
-
-	// game interface
-	void render();
-
-	// private functions only for tetris
-	bool rotate();
-	bool right();
-	bool left();
-	bool down();
-
-	void checkRowsFinished();
-	bool newTetromino();
-	void takeOverTetromino();
-	// random tetromino data functions
-	tetromino::SHAPE randomTetrominoShape();
-	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
 };

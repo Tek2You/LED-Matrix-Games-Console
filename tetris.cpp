@@ -297,14 +297,14 @@ void Tetris::setSpeed(byte v)
 	case 3:
 		general_step_interval_ = 800;
 		general_down_interval_ = 80;
-		general_first_move_interval_ = 240;
-		general_move_interval_ = 100;
+		general_first_move_interval_ = 270;
+		general_move_interval_ = 120;
 		break;
 	case 4:
 		general_step_interval_ = 500;
 		general_down_interval_ = 50;
-		general_first_move_interval_ = 150;
-		general_move_interval_ = 60;
+		general_first_move_interval_ = 250;
+		general_move_interval_ = 100;
 		break;
 	case 2:
 		general_step_interval_ = 1000;
@@ -383,7 +383,7 @@ void Tetris::checkRowsFinished()
 
 tetromino::SHAPE Tetris::randomTetrominoShape()
 {
-	return tetromino::SHAPE(micros() % 7);
+	return tetromino::SHAPE(millis() % 7);
 }
 
 tetromino::DIRECTION Tetris::randomTetrominoDirection(tetromino::SHAPE shape){

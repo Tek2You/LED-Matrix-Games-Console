@@ -189,7 +189,7 @@ void RunningMan::jump()
 
 void RunningMan::newHind()
 {
-	int hind_shape = micros() % 7;
+	int hind_shape = millis() % 7;
 	for(Pos p : hinds_[hind_shape].positions){
 		p.pos_x += display_->rows(); // go outside range
 		bitSet(*row(p.pos_x),p.pos_y);

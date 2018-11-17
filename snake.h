@@ -21,8 +21,8 @@ public:
 private:
 	void render();
 	bool eat();
-	bool validate(Pos &pos);
 	bool isValid(Pos &pos);
+	bool validate(Pos &pos);
 	Pos * getBodyPos(int &pos);
 	bool move();
 
