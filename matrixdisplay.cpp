@@ -4,6 +4,33 @@
 // class for driving display
 
 
+/*Sheme of work:
+ *
+ * SHOW DISPLAY
+ * The display is multiplexed, that means that the leds not all have their own connection to the
+ * controller, but each row and each column together connected to the controller.
+ * Because of that, we cant set all leds at the same time(we can, but only very all leds, not a text
+ * or something like we want. We only set one column the same time. And if this happens very quickly,
+ * you think, all leds together are activated and you cant see that only single columns are activated.
+ * So we need to reprint the data all the timer. To do this, this class provides the show() function.
+ * This function is called in the main.
+ *
+ *
+ * SET DISPLAY DATA
+ * the user sets a value into the field array,
+ * he can do that for example with the setString or the setArray functions.+
+ * each of these function breaks down the pixel and gives it into the setPixel or the setRow function.
+ * This is needed, because the display is'nt connected to the display pin by pin, but flipped,
+ * so we need to reflip them by software.
+ * There a two possibilities to do this:
+ * - reflip in every show process.
+ * - reflip only if data is set.
+ * This Software is using the second solution, because the filpping is taking some time, we try to avoid
+ * doing time critical operation to often. Se we flip the columns in the set Functions. The row flipping
+ * executes in the show function, because it is not taking much time.
+ * The Orders are set in the 2 Arrays row_order and col_order
+*/
+
 // ... X X X X
 //  3  X X X X
 //  2  X X X X
@@ -280,7 +307,6 @@ void MatrixDisplay::show(){
 	row++;
 	if(row >= 8){
 		row = 0;
-
 	}
 }
 

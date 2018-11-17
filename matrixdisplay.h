@@ -10,9 +10,7 @@ public:
 	 void show();
 	 void clear();
 	 void setPixel(byte col, byte row, bool value);
-//	 void setRow(byte row, int value, int column = 0, byte column_height = 8);
 	 void setArray(byte * array);
-//	 void setString(char * string, int start_column = 0, byte row = 0);
 	 const byte rows() {return 16;}
 	 const byte cols() {return width_;}
 	 int setString(const char *s, int column, char cursor_pos, char spacing = 1, byte offset = 0);
@@ -41,7 +39,4 @@ private:
 	 byte * rows_;
 	 const byte height_;
 	 const byte width_;
-
-	 PortPin latch_;
-	 PortPin clock_;
 };
