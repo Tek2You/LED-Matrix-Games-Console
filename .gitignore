@@ -2,4 +2,5 @@
 *CMake*
 Tetris.cbp
 cmake_install.cmake
-
+cmakeLists.txt.user
+Makefile
