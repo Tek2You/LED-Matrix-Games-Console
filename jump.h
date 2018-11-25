@@ -16,7 +16,7 @@ public:
 	void clear();
 	void reset();
 
-	unsigned int points();
+	unsigned int points() const;
 	void setSpeed(byte v);
 	static unsigned int highscore();
 	static void resetHighscore();

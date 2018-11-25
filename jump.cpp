@@ -93,7 +93,7 @@ void Jump::reset()
 
 }
 
-unsigned int Jump::points()
+unsigned int Jump::points() const
 {
 	return score_;
 }

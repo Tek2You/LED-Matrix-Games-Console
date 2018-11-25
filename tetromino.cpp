@@ -68,7 +68,7 @@ void Tetromino::rotate()
 
 
 
-byte Tetromino::getPossibleDirections(){
+byte Tetromino::getPossibleDirections() const{
 	return getPossibleDirections(shape_);
 }
 
@@ -88,18 +88,18 @@ byte Tetromino::possibleDirections(tetromino::SHAPE shape){
 	return num;
 }
 
-byte Tetromino::possibleDirections()
+byte Tetromino::possibleDirections() const
 {
 	possibleDirections(shape_);
 }
 
 
-byte Tetromino::isValid()
+byte Tetromino::isValid() const
 {
 	return isValid(shape_,direction_, pos_);
 }
 
-byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos)
+byte Tetromino::isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos) const
 {
 	Pos positions[4];
 	byte valid_errors = 0;

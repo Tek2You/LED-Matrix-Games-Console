@@ -13,7 +13,7 @@ public:
 	bool process(byte& event) override;
 	void reset() override;
 	void clear() override;
-	unsigned int points(){return points_;}
+	unsigned int points() const {return points_;}
 	void setSpeed(byte v) override;
 
 	// highscore functions

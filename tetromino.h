@@ -21,40 +21,13 @@ enum VALIDATION_ERROR : byte{
 	COLLIDE = (1 << 4),
 };
 
-//inline byte getX(byte xy){
-//	return (xy & 0xF0) >> 4;
-//}
-
-//inline byte getY(byte xy){
-//	return xy & 0x0F;
-//}
-
-//inline byte SmartPos(byte x, byte y){
-//	return (y & 0x0F) | ((x & 0x0F) << 4);
-//}
-
-//inline Pos getPos(byte xy){
-//	Pos pos;
-//	pos.pos_x = byte((xy & 0xF0) >> 4);
-//	pos.pos_y = byte(xy & 0x0F);
-//	return pos;
-//}
-
 struct SPECIFICATIONS{
 	byte directions;
 	SmartPos shape[4];
 };
+
 #define BV_(bit) 1 << bit
 
-//const PROGMEM SPECIFICATIONS tetrominos[7] = {
-//   {TOP | RIGHT                ,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(0,3)}},
-//   {TOP | RIGHT | BOTTOM | LEFT,{SmartPos(1,1),SmartPos(1,0),SmartPos(1,2),SmartPos(0,2)}},
-//   {TOP | RIGHT | BOTTOM | LEFT,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(1,2)}},
-//   {TOP                        ,{SmartPos(0,0),SmartPos(0,1),SmartPos(1,0),SmartPos(1,1)}},
-//   {TOP | RIGHT                ,{SmartPos(1,0),SmartPos(1,1),SmartPos(0,1),SmartPos(2,0)}},
-//   {TOP | RIGHT| BOTTOM | LEFT ,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(1,1)}},
-//   {TOP | RIGHT                ,{SmartPos(1,0),SmartPos(0,0),SmartPos(1,1),SmartPos(2,1)}},
-//};
 const SPECIFICATIONS tetrominos[7] = {
    {BV_(TOP) | BV_(RIGHT)										,{SmartPos(0,1),SmartPos(0,0),SmartPos(0,2),SmartPos(0,3)}},
    {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT)	,{SmartPos(1,1),SmartPos(1,0),SmartPos(1,2),SmartPos(0,2)}},
@@ -81,7 +54,7 @@ public:
 	void setDirection(tetromino::DIRECTION direction){direction_ = direction;}
 	tetromino::DIRECTION direction() {return direction_;}
 
-	tetromino::SHAPE shape() {return shape_;}
+	tetromino::SHAPE shape() const {return shape_;}
 
 	bool getPositions(Pos(&positions)[4]);
 	static bool getPositions(Pos(&positions)[4],tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos);
@@ -89,19 +62,19 @@ public:
 	static DIRECTION rotate(DIRECTION direction, SHAPE shape);
 	void rotate();
 
-	byte isValid();
-	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos);
+	byte isValid() const;
+	byte isValid(tetromino::SHAPE shape, tetromino::DIRECTION direction, Pos pos) const;
 
 
 	static byte getPossibleDirections(tetromino::SHAPE shape);
-	byte getPossibleDirections();
+	byte getPossibleDirections() const;
 	static byte possibleDirections(tetromino::SHAPE shape);
-	byte possibleDirections();
+	byte possibleDirections() const;
 private:
 	const tetromino::SHAPE shape_;
 	tetromino::DIRECTION direction_;
 	Pos pos_;
 	const byte heigth_;
-	byte * field_;
+	const byte * field_;
 };
 

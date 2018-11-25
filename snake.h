@@ -12,7 +12,7 @@ public:
 	void reset();
 	void clear();
 
-	unsigned int points(){return body_len_-2;}
+	unsigned int points() const {return body_len_-2;}
 	void setSpeed(byte v) override;
 
 	static unsigned int highscore();
