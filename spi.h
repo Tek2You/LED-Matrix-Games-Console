@@ -1,6 +1,5 @@
 // spi.h
-//
-// SPI master routines were pulled from the Atmel ATMega168 datasheet.
+
 
 #ifndef _SPI_CLARKDAWG
 #define _SPI_CLARKDAWG

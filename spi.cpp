@@ -5,7 +5,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "include/spi.h"
+#include "spi.h"
 
 // Initialize the SPI as master
 void SPI_Init()

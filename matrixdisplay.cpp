@@ -1,5 +1,5 @@
 #include "matrixdisplay.h"
-#include "ATmega-master/include/spi.h"
+#include "spi.h"
 
 // class for driving display
 
