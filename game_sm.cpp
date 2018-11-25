@@ -103,7 +103,7 @@ void GameSM::stateDefault(byte event)
 				TRANSITION(stateSnake);
 				break;
 			case 2:
-				TRANSITION(stateRunningMan);
+				TRANSITION(stateJump);
 				break;
 			case 3:
 				TRANSITION(stateHighscoreMenu);
@@ -184,7 +184,7 @@ void GameSM::stateSnake(byte event)
 	}
 }
 
-void GameSM::stateRunningMan(byte event)
+void GameSM::stateJump(byte event)
 {
 	if(event & ON_ENTRY){
 		display_->loadsGameCofig();
@@ -192,7 +192,7 @@ void GameSM::stateRunningMan(byte event)
 			delete game_ ;
 			game_ = nullptr;
 		}
-		game_ = new RunningMan(display_,&process_timer1_, &process_timer2_);
+		game_ = new Jump(display_,&process_timer1_, &process_timer2_);
 		game_->setSpeed(speed_);
 		game_->reset();
 		game_->start();
@@ -411,7 +411,7 @@ void GameSM::stateHighscoreMenu(byte event)
 		break;
 	case 2:
 		display_->setIcon(0x60600a040e040000);
-		display_->text1_.setNumber(RunningMan::highscore());
+		display_->text1_.setNumber(Jump::highscore());
 		break;
 	case 3:
 		display_->setIcon(0xbd42a59999a542bd);
@@ -432,7 +432,7 @@ void GameSM::stateResetMenu(byte event){
 		case BTN_DOWN: // reset
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
-			RunningMan::resetHighscore();
+			Jump::resetHighscore();
 			LOAD_EFFECT_STANDART(stateDefault);
 			return;
 			break;

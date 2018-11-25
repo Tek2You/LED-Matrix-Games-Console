@@ -1,4 +1,4 @@
-#include "runningman.h"
+#include "jump.h"
 #include "position.h"
 #include "operators.h"
 #include "avr/eeprom.h"
@@ -15,9 +15,9 @@
 #define TIMEOUT2 bit(5)
 
 static unsigned int EE_highscore EEMEM = 0;
-unsigned int RunningMan::highscore_ = eeprom_read_word(&EE_highscore);
+unsigned int Jump::highscore_ = eeprom_read_word(&EE_highscore);
 
-RunningMan::RunningMan(Display * display, unsigned long *t1, unsigned long *t2) : Game(display),
+Jump::Jump(Display * display, unsigned long *t1, unsigned long *t2) : Game(display),
    forward_timer_(t1), jump_timer_(t2)
 {
 	field_ = static_cast<byte*>(malloc(display_->rows()+3));
@@ -26,12 +26,12 @@ RunningMan::RunningMan(Display * display, unsigned long *t1, unsigned long *t2) 
 	setSpeed(2);
 }
 
-RunningMan::~RunningMan()
+Jump::~Jump()
 {
 	free(field_);
 }
 
-void RunningMan::start()
+void Jump::start()
 {
 	for(int i = 0; i < display_->rows() + 3; i++){
 		field_[i] = 0;
@@ -48,7 +48,7 @@ void RunningMan::start()
 	*forward_timer_ = millis() + forward_period_;
 }
 
-bool RunningMan::process(byte& event)
+bool Jump::process(byte& event)
 {
 	if(event & TIMEOUT1){
 		forward();
@@ -83,22 +83,22 @@ bool RunningMan::process(byte& event)
 	return false;
 }
 
-void RunningMan::clear()
+void Jump::clear()
 {
 
 }
 
-void RunningMan::reset()
+void Jump::reset()
 {
 
 }
 
-unsigned int RunningMan::points()
+unsigned int Jump::points()
 {
 	return score_;
 }
 
-void RunningMan::setSpeed(byte v)
+void Jump::setSpeed(byte v)
 {
 	switch (v) {
 	case 0:
@@ -125,7 +125,7 @@ void RunningMan::setSpeed(byte v)
 	}
 }
 
-byte *RunningMan::row(byte n)
+byte *Jump::row(byte n)
 {
 	//	if(current_field_start_ + n > display_->rows()+2){
 	//		return field_ + n - (display_->rows()+2-current_field_start_);
@@ -136,17 +136,17 @@ byte *RunningMan::row(byte n)
 	return field_ + ((current_field_start_ + n) % 19);
 }
 
-unsigned int RunningMan::highscore()
+unsigned int Jump::highscore()
 {
 	return highscore_;
 }
 
-void RunningMan::resetHighscore()
+void Jump::resetHighscore()
 {
 	eeprom_write_word(&EE_highscore,highscore_ = 0);
 }
 
-void RunningMan::forward()
+void Jump::forward()
 {
 	man_state_ = ! man_state_;
 	if(man_pos_.pos_x < 3){
@@ -164,7 +164,7 @@ void RunningMan::forward()
 	score_++;
 }
 
-void RunningMan::jump()
+void Jump::jump()
 {
 	if(jump_count_ < jump_height_){
 		man_pos_.pos_y--;
@@ -187,7 +187,7 @@ void RunningMan::jump()
 	render();
 }
 
-void RunningMan::newHind()
+void Jump::newHind()
 {
 	int hind_shape = millis() % 7;
 	for(Pos p : hinds_[hind_shape].positions){
@@ -196,7 +196,7 @@ void RunningMan::newHind()
 	}
 }
 
-bool RunningMan::isValid(Pos pos)
+bool Jump::isValid(Pos pos)
 {
 	for(Pos p: man_moving_points){
 		p += pos;
@@ -211,7 +211,7 @@ bool RunningMan::isValid(Pos pos)
 	return true;
 }
 
-void RunningMan::render()
+void Jump::render()
 {
 	display_->clear();
 	for(int i = 0; i < 16; i++){

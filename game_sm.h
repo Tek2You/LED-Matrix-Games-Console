@@ -3,7 +3,7 @@
 #include "display.h"
 #include "tetris.h"
 #include "snake.h"
-#include "runningman.h"
+#include "jump.h"
 
 
 #define ON_ENTRY bit(7)
@@ -30,7 +30,7 @@ private:
 	void stateDefault(byte event);
 	void stateTetris(byte event);
 	void stateSnake(byte event);
-	void stateRunningMan(byte event);
+	void stateJump(byte event);
 	void stateSettingsMenu(byte event);
 	void stateGameOver(byte event);
 	void stateSpeedMenu(byte event);

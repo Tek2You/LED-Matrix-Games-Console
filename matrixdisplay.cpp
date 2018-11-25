@@ -203,7 +203,6 @@ const int PTN_LETTERS[] PROGMEM{
 	186,
 	190,
 	194,
-	///////
 	198,
 	202,
 	205,

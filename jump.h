@@ -3,11 +3,11 @@
 #include "position.h"
 #include "tetromino.h" // only for combined position
 
-class RunningMan : public Game
+class Jump : public Game
 {
 public:
-	RunningMan(Display *display, unsigned long * t1, unsigned long * t2);
-	~RunningMan();
+    Jump(Display *display, unsigned long * t1, unsigned long * t2);
+    ~Jump();
 
 	// Game interface
 public:
