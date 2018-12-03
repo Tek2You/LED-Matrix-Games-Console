@@ -183,13 +183,12 @@ void Snake::render()
 bool Snake::eat()
 {
 	if(head_pos_ == eat_pos_){
-		Pos p;
-		do{
-			p = Pos(millis() % 8,millis() % 16);
+		Pos p = Pos(char(millis() % 8),char(millis() % 16));
+		while (!isValid(p)) {
+			p = Pos(char(millis() % 8),char(millis() % 16));
 		}
-		while(!isValid(p));
-		eat_pos_= p;
 		body_len_++;
+		eat_pos_= p;
 		return true;
 
 	}
@@ -235,7 +234,7 @@ Pos *Snake::getBodyPos(int& pos)
 	else{
 		return body_buffer_ + body_start_ - pos;
 	}
-	//	return body_buffer_ +(pos % body_buffer_len_);
+//	return body_buffer_ +(pos % body_buffer_len_);
 }
 
 void Snake::resetHighscore()
