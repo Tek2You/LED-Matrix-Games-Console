@@ -49,9 +49,9 @@ int main(void)
 		if(have_input || counter++ >= 0xFF){
 			dp.update();
 			dp.disable();
-			event.clear();
 			counter = 0;
 			sm.processStateMaschine(&event);
+			event.clear();
 			have_input = 0;
 		}
 	}

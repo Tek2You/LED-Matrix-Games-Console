@@ -37,8 +37,6 @@ void Event::setButtonLeftState(bool state)
 	}
 }
 
-
-
 void Event::clear()
 {
 	event_ &= ~(event_ & CHANGE);
