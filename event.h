@@ -1,4 +1,5 @@
 #include "avr.h"
+#include "list.h"
 #pragma once
 
 #define ON_ENTRY bit(8)
@@ -36,16 +37,18 @@ public:
     inline bool changed(){return event_ & CHANGE;}
     inline bool isPressed(){return event_ & INPUT_MASK;}
 
-    inline void setbuttonUpState(bool state);
-    inline void setbuttonDownState(bool state);
-    inline void setbuttonRightState(bool state);
-    inline void setbuttonLeftState(bool state);
+    void setButtonUpState(bool state);
+    void setButtonDownState(bool state);
+    void setButtonRightState(bool state);
+    void setButtonLeftState(bool state);
 
-    inline void clear();
+    void clear();
 
     inline bool onEntry(){return event_ & ON_ENTRY;}
     inline void setOnEntry(){event_ |= ON_ENTRY;}
     inline bool timeOut1(){return event_ & TIMEOUT1;}
     inline bool timeOut2(){return event_ & TIMEOUT2;}
     int event_;
+
+
 };

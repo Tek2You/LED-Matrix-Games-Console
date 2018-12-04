@@ -12,7 +12,7 @@ class GameSM : public StateMachine<Event*>
 {
 public:
 	GameSM(Display * display);
-	void processStateMaschine(byte event);
+	void processStateMaschine(Event *event);
 private:
 	// states
 	void stateDefault(Event* event);

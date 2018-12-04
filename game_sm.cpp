@@ -45,30 +45,26 @@ GameSM::GameSM(Display *display)
 	process(&e);
 }
 
-void GameSM::processStateMaschine(byte event)
+void GameSM::processStateMaschine(Event *event)
 {
-	Event new_event;
-	new_event.event_ = event & INPUT_MASK;
-	new_event.event_ |= event;
-
 	bool process = false;
-	if((process_criterium_ & EVER) || (process_criterium_ & ProcessCriterum::PCINT && new_event.changed())){
+	if((process_criterium_ & EVER) || (process_criterium_ & ProcessCriterum::PCINT && event->changed())){
 		process = true;
 	}
 	unsigned long now = millis();
 	if (process_criterium_ & ProcessCriterum::TIMER1 && process_timer1_ && process_timer1_ <= now){
-		new_event.event_ |= TIMEOUT1;
+		event->event_ |= TIMEOUT1;
 		process_timer1_ = 0;
 		process = true;
 	}
 
 	if (process_criterium_ & ProcessCriterum::TIMER2 && process_timer2_ && process_timer2_ <= now){
-		new_event.event_ |= TIMEOUT2;
+		event->event_ |= TIMEOUT2;
 		process_timer2_ = 0;
 		process = true;
 	}
 	if(process)
-		this->process(&new_event);
+		this->process(event);
 }
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event* event, char& item, const char num, const char min) {
@@ -438,19 +434,17 @@ void GameSM::stateResetMenu(Event *event){
 	}
 
 	else if(event->changed() && event->isPressed()){
-		switch (event->isPressed()) {
-		case BTN_DOWN: // reset
-			Tetris::resetHighscore();
-			Snake::resetHighscore();
-			Jump::resetHighscore();
-			LOAD_EFFECT_STANDART(stateDefault);
-			return;
-			break;
-		case BTN_UP:
-			TRANSITION(stateHighscoreMenu);
-			return;
-		default:
-			break;
+		if(event->isPressed()){
+			if(event->buttonDownState()){
+				Tetris::resetHighscore();
+				Snake::resetHighscore();
+				Jump::resetHighscore();
+				LOAD_EFFECT_STANDART(stateDefault);
+				return;
+			}
+			if(event->buttonUpState()){
+				TRANSITION(stateHighscoreMenu);
+			}
 		}
 	}
 	display_->text1_.setText((language_ == EN ? "reset scores" : "Highscores zur""\x1c""cksetzen"));
