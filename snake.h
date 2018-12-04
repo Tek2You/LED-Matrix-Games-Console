@@ -13,7 +13,7 @@ public:
 	void reset();
 	void clear();
 
-	unsigned int points() const {return body_len_-2;}
+	unsigned int points() const {return body_.size()-2;}
 	void setSpeed(byte v) override;
 
 	static unsigned int highscore();
@@ -24,7 +24,6 @@ private:
 	bool eat();
 	bool isValid(Pos &pos);
 	bool validate(Pos &pos);
-	Pos * getBodyPos(int &pos);
 	bool move();
 
 	enum Direction { UP, RIGHT, DOWN, LEFT, START};
@@ -35,13 +34,8 @@ private:
 
 	// snake values
 	Direction direction_;
-	Pos head_pos_;
+	List<Pos> body_;
 	Pos eat_pos_;
-	unsigned int body_len_;
-	const int body_buffer_len_ = 80;
-	Pos body_buffer_[80];
-	int body_start_;
-	int body_end_;
 	static unsigned int highscore_;
 };
 

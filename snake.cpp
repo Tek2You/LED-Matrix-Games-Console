@@ -6,28 +6,23 @@ static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
 Snake::Snake(Display *display, unsigned long *t)
-   :Game(display), timer_(t),
-     body_end_(0), body_start_(0)
+   :Game(display), timer_(t) //,
 {
-	body_len_ = 0;
-	body_buffer_len_;
 	direction_ = START;
 	setSpeed(2);
 }
 
 Snake::~Snake()
 {
-	free(body_buffer_);
+
 }
 
 void Snake::reset()
 {
-	head_pos_ = Pos(3,7);
 	display_->clear();
-	body_len_ = 2;
-	body_start_ = 1;
-	body_buffer_[0] = Pos(1,7);
-	body_buffer_[1] = Pos(2,7);
+	body_.append(Pos(1,7));
+	body_.append(Pos(2,7));
+	body_.append(Pos(3,7)); // head
 	eat_pos_ = Pos(5,7);
 	direction_ = START;
 	render();
@@ -59,23 +54,22 @@ bool Snake::move()
 		break;
 	}
 
-	vect += head_pos_;
+	vect += body_.last();
 	// check if highscore is broken. Directly save to avoid a not save in case of reset or poweroff.
-	if(body_len_ - 2 > highscore_){
-		highscore_ = body_len_-2;
+	if(body_.size() - 2 > highscore_){
+		highscore_ = body_.size()-2;
 		eeprom_write_word(&EE_highscore,highscore_);
 		is_new_highscore_	= true;
 	}
 	if(!validate(vect)){ // game end
 		return true;
 	}
-	if(++body_start_ >= body_buffer_len_){
-		body_start_ = 0;
-	}
-	body_buffer_[body_start_] = head_pos_;
-	head_pos_ = vect;
 
-	eat();
+	body_.append(vect);
+	if(!eat()){
+		body_.removeFirst();
+	}
+
 	render();
 	return false;
 }
@@ -159,22 +153,21 @@ unsigned int Snake::highscore()
 void Snake::render()
 {
 	display_->clear();
-	display_->setPixel(head_pos_.pos_x,head_pos_.pos_y,true);
 	display_->setPixel(eat_pos_.pos_x,eat_pos_.pos_y,true);
-	for(int i = 0; i < body_len_; i++){
-		Pos * p = getBodyPos(i);
-		display_->setPixel(p->pos_x,p->pos_y,true);
+	for(int i = 0; i < body_.size(); i++){
+		Pos p = body_.itemAt(i);
+		display_->setPixel(p.pos_x,p.pos_y,true);
 	}
 }
 
 bool Snake::eat()
 {
-	if(head_pos_ == eat_pos_){
+	if(body_.last() == eat_pos_){
 		Pos p = Pos(char(millis() % 8),char(millis() % 16));
 		while (!isValid(p)) {
 			p = Pos(char(millis() % 8),char(millis() % 16));
 		}
-		body_len_++;
+
 		eat_pos_= p;
 		return true;
 
@@ -200,29 +193,14 @@ bool Snake::validate(Pos &pos)
 bool Snake::isValid(Pos &pos)
 {
 	//  if colides, return true
-	for(int i = 0; i < body_len_; i++){
-		Pos * p = getBodyPos(i);
-		if(pos == *p){
+	for(int i = 0; i < body_.size(); i++){
+		if(body_.itemAt(i) == pos){
 			return false;
 		}
 	}
 	return true;
 }
 
-
-Pos *Snake::getBodyPos(int& pos)
-{
-	if(pos >= body_len_ || pos < 0){
-		return nullptr;
-	}
-	if(body_start_ - pos < 0){
-		return body_buffer_ + body_buffer_len_ - (pos - body_start_);
-	}
-	else{
-		return body_buffer_ + body_start_ - pos;
-	}
-//	return body_buffer_ +(pos % body_buffer_len_);
-}
 
 void Snake::resetHighscore()
 {
