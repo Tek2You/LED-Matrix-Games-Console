@@ -73,7 +73,7 @@ void GameSM::processStateMaschine(byte event)
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event* event, char& item, const char num, const char min) {
 
-	switch (event->isPressed()) {
+	switch (event->event_ & INPUT_MASK) {
 	case BTN_LEFT:
 		if (--item < min)
 			item = num-1;

@@ -1,6 +1,7 @@
 #pragma once
 #include "game.h"
 #include "position.h"
+#include "list.h"
 
 class Snake : public Game
 {
