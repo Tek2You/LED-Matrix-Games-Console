@@ -3,17 +3,6 @@
 #include "operators.h"
 #include "avr/eeprom.h"
 
-#define ON_ENTRY bit(7)
-#define CHANGE   bit(6)
-// these are the actual input pins (of PINC)
-#define BTN_LEFT bit(0)
-#define BTN_DOWN bit(1)
-#define BTN_UP  bit(2)
-#define BTN_RIGHT bit(3)
-
-#define TIMEOUT1 bit(4)
-#define TIMEOUT2 bit(5)
-
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Jump::highscore_ = eeprom_read_word(&EE_highscore);
 
@@ -48,17 +37,17 @@ void Jump::start()
 	*forward_timer_ = millis() + forward_period_;
 }
 
-bool Jump::process(byte& event)
+bool Jump::process(Event *event)
 {
-	if(event & TIMEOUT1){
+	if(event->timeOut1()){
 		forward();
 		*forward_timer_ = millis() + forward_period_;
 	}
-	if(event & TIMEOUT2){
+	if(event->timeOut2()){
 		jump();
 	}
-	if(event & CHANGE){
-		if(event & BTN_RIGHT){
+	if(event->changed()){
+		if(event->buttonRightState()){
 			if(!jump_count_){
 				*jump_timer_ = millis() + jump_period_;
 				jump();

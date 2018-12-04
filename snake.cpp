@@ -2,19 +2,6 @@
 #include "operators.h"
 #include "avr/eeprom.h"
 
-#define ON_ENTRY bit(7)
-#define CHANGE   bit(6)
-// these are the actual input pins (of PINC)
-#define BTN_LEFT bit(0)
-#define BTN_DOWN bit(1)
-#define BTN_UP  bit(2)
-#define BTN_RIGHT bit(3)
-
-#define INPUT_MASK BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP
-
-#define TIMEOUT1 bit(4)
-#define TIMEOUT2 bit(5)
-
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
@@ -115,31 +102,31 @@ void Snake::setSpeed(byte v)
 	}
 }
 
-bool Snake::process(byte &event)
+bool Snake::process(Event *event)
 {
 	bool button_set = true;
-	if(event & CHANGE){
-		if(event & INPUT_MASK){
-			if(event & BTN_UP){
+	if(event->changed()){
+		if(event->isPressed()){
+			if(event->buttonUpState()){
 				// is not 180° rotation or no rotation(in this case the snake will make
 				// a additinal ste,  what we avoid with dont allow this)
 				if(direction_ != Snake::UP && direction_ != Snake::DOWN){
 					direction_ = Snake::UP;
 				}
 			}
-			else if(event & BTN_LEFT){
+			else if(event->buttonLeftState()){
 				if(direction_ != Snake::LEFT && direction_ != Snake::RIGHT){
 					direction_ = Snake::LEFT;
 				}
 			}
 
-			else if(event & BTN_RIGHT){
+			else if(event->buttonRightState()){
 				if(direction_ != Snake::LEFT && direction_ != Snake::RIGHT){
 					direction_ = Snake::RIGHT;
 				}
 			}
 
-			else if(event & BTN_DOWN){
+			else if(event->buttonDownState()){
 				if(direction_ != Snake::DOWN && direction_ != Snake::UP){
 					direction_= Snake::DOWN;
 				}
@@ -149,7 +136,7 @@ bool Snake::process(byte &event)
 			}
 		}
 	}
-	if(event & TIMEOUT1 || button_set){
+	if(event->timeOut1() || button_set){
 		*timer_ = millis() + period_;
 		if(move()){ // game ends
 			return true;

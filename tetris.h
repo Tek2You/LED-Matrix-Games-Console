@@ -10,7 +10,7 @@ public:
 	Tetris(Display * display, unsigned long *t1, unsigned long *t2);
 	~Tetris();
 	void start();
-	bool process(byte& event) override;
+	bool process(Event * event) override;
 	void reset() override;
 	void clear() override;
 	unsigned int points() const {return points_;}

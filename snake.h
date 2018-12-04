@@ -8,7 +8,7 @@ public:
 	Snake(Display * display, unsigned long * t);
 	~Snake();
 	void start();
-	bool process(byte &event) override;
+	bool process(Event *event) override;
 	void reset();
 	void clear();
 

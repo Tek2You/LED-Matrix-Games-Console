@@ -18,6 +18,8 @@ byte have_input = 0;
 byte debounce_count[4] =  {0,0,0,0};
 byte button_states, button_transitional_states, prev_button_transitional_states;
 
+Event event;
+
 void initGame(){
 	// init pin change interrup for buttons
 	DDRC &= ~INPUT_MASK;

@@ -7,7 +7,9 @@
 #define TRANSITION(s) {\
 	setState(STATE_CAST(&GameSM::s)); \
 	process_criterium_ = 0;\
-	process(ON_ENTRY); \
+	Event e;\
+	e.setOnEntry();\
+	process(&e); \
 	}
 
 #define LOAD_EFFECT_STANDART(s) {\
@@ -38,34 +40,40 @@ GameSM::GameSM(Display *display)
 	display_->text2_.setShiftSpeed(5);
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
-	process(ON_ENTRY);
+	Event e;
+	e.setOnEntry();
+	process(&e);
 }
 
 void GameSM::processStateMaschine(byte event)
 {
+	Event new_event;
+	new_event.event_ = event & INPUT_MASK;
+	new_event.event_ |= event;
+
 	bool process = false;
-	if((process_criterium_ & EVER) || (process_criterium_ & ProcessCriterum::PCINT && event & CHANGE)){
+	if((process_criterium_ & EVER) || (process_criterium_ & ProcessCriterum::PCINT && new_event.changed())){
 		process = true;
 	}
 	unsigned long now = millis();
 	if (process_criterium_ & ProcessCriterum::TIMER1 && process_timer1_ && process_timer1_ <= now){
-		event |= TIMEOUT1;
+		new_event.event_ |= TIMEOUT1;
 		process_timer1_ = 0;
 		process = true;
 	}
 
 	if (process_criterium_ & ProcessCriterum::TIMER2 && process_timer2_ && process_timer2_ <= now){
-		event |= TIMEOUT2;
+		new_event.event_ |= TIMEOUT2;
 		process_timer2_ = 0;
 		process = true;
 	}
 	if(process)
-		this->process(event);
+		this->process(&new_event);
 }
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event, char& item, const char num, const char min) {
+GameSM::MenuItem::Button GameSM::MenuItem::advance(Event* event, char& item, const char num, const char min) {
 
-	switch (event & INPUT_MASK) {
+	switch (event->isPressed()) {
 	case BTN_LEFT:
 		if (--item < min)
 			item = num-1;
@@ -82,18 +90,18 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event, char& item, const
 	return NO_BTN;
 }
 
-void GameSM::stateDefault(byte event)
+void GameSM::stateDefault(Event* event)
 {
 
 	const char * texts[2][5] = {{"Tetris", "Snake", "Running Julian", "highscore", "setting"}, {"Tetris","Snake","Rennender Julian", "Highscore","Einstellungen"}};
 	static MenuItem item;
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		item.init(5);
 		process_criterium_ |= PCINT;
 		display_->loadMenuConfig();
 	}
 
-	else if(event & INPUT_MASK && event & CHANGE){
+	else if(event->changed() && event->isPressed()){
 		if(item.advance(event) == MenuItem::DOWN_BTN){
 			switch(item.value_){
 			case 0:
@@ -141,9 +149,9 @@ void GameSM::stateDefault(byte event)
 }
 
 
-void GameSM::stateTetris(byte event)
+void GameSM::stateTetris(Event *event)
 {
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		display_->loadsGameCofig();
 		if(game_){
 			delete game_ ;
@@ -163,9 +171,9 @@ void GameSM::stateTetris(byte event)
 	}
 }
 
-void GameSM::stateSnake(byte event)
+void GameSM::stateSnake(Event *event)
 {
-	if(event & ON_ENTRY){
+	if(event ->onEntry()){
 		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
@@ -184,9 +192,9 @@ void GameSM::stateSnake(byte event)
 	}
 }
 
-void GameSM::stateJump(byte event)
+void GameSM::stateJump(Event *event)
 {
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		display_->loadsGameCofig();
 		if(game_ != nullptr){
 			delete game_ ;
@@ -205,8 +213,8 @@ void GameSM::stateJump(byte event)
 	}
 }
 
-void GameSM::stateGameOver(byte event){
-	if(event & ON_ENTRY){
+void GameSM::stateGameOver(Event *event){
+	if(event->onEntry()){
 		LOAD_EFFECT_BEGIN(stateGameOver);
 		display_->text1_.clear();
 		display_->text2_.clear();
@@ -228,22 +236,22 @@ void GameSM::stateGameOver(byte event){
 		return;
 	}
 
-	if(event & CHANGE && event & INPUT_MASK){
+	if(event->changed() && event->isPressed()){
 		TRANSITION(stateDefault);
 		return;
 	}
 }
 
-void GameSM::stateSettingsMenu(byte event)
+void GameSM::stateSettingsMenu(Event *event)
 {
 	static MenuItem item;
 	const char *menu_text[2][2] = {{"speed", "language"},{"Geschwindigkeit", "Sprache"}};
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		display_->loadMenuConfig();
 		item.init(2);
 		process_criterium_ = PCINT;
 	}
-	else if(event & CHANGE && event & INPUT_MASK){
+	else if(event->changed() && event->isPressed()){
 		switch(item.advance(event)){
 		case MenuItem::DOWN_BTN:
 			switch (item.value_) {
@@ -278,16 +286,16 @@ void GameSM::stateSettingsMenu(byte event)
 	display_->text1_.setText(menu_text[language_][item.value_]);
 }
 
-void GameSM::stateSpeedMenu(byte event)
+void GameSM::stateSpeedMenu(Event *event)
 {
 	static MenuItem item;
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		display_->loadMenuConfig();
 		item.init(5,speed_);
 		process_criterium_ = PCINT;
 	}
 
-	else if(event & CHANGE && event & INPUT_MASK){
+	else if(event->changed() && event->isPressed()){
 		switch(item.advance(event)){
 		case MenuItem::DOWN_BTN:
 			speed_ = item.value_;
@@ -308,16 +316,16 @@ void GameSM::stateSpeedMenu(byte event)
 	}
 }
 
-void GameSM::stateLanguageMenu(byte event)
+void GameSM::stateLanguageMenu(Event *event)
 {
 	const char * menu_text[2][2] = {{"english","Deutsch"},{"english","Deutsch"}};
 	static MenuItem item;
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		display_->loadMenuConfig();
 		item.init(2,(language_==DE?0:1));
 		process_criterium_ = PCINT;
 	}
-	else if(event & CHANGE && event & INPUT_MASK){
+	else if(event->changed() && event->isPressed()){
 		switch(item.advance(event)){ // enter pressed
 		case MenuItem::DOWN_BTN:
 			language_ = (item.value_ == 0?EN:DE);
@@ -345,23 +353,25 @@ void GameSM::stateLanguageMenu(byte event)
 	display_->text1_.setText(menu_text[language_][item.value_]);
 }
 
-void GameSM::stateLoadEffect(byte event)
+void GameSM::stateLoadEffect(Event *event)
 {
 	static byte count = 0;
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		count = 0;
 		display_->text1_.clear();
 		display_->text2_.clear();
 		process_criterium_ = TIMER1;
 		process_timer1_ = millis() + 50;
 	}
-	if(event & TIMEOUT1){
+	if(event->timeOut1()){
 		if(count >= display_->rows()){
 			if(load_following_state_){
 				setState(load_following_state_);
 				load_following_state_ = nullptr;
 				process_criterium_ = 0;
-				process(ON_ENTRY);
+				Event e;
+				e.setOnEntry();
+				process(&e);
 			}
 			else{
 				TRANSITION(stateDefault);
@@ -375,14 +385,14 @@ void GameSM::stateLoadEffect(byte event)
 	}
 }
 
-void GameSM::stateHighscoreMenu(byte event)
+void GameSM::stateHighscoreMenu(Event *event)
 {
 	static MenuItem item;
-	if(event & ON_ENTRY){
+	if(event->onEntry()){
 		item.init(4,0);
 		process_criterium_ |= PCINT;
 	}
-	else if(event & CHANGE && event & INPUT_MASK){
+	else if(event->changed() && event->isPressed()){
 		byte advanced = item.advance(event);
 		if(advanced){
 			if(item.value_ == 3){
@@ -421,14 +431,14 @@ void GameSM::stateHighscoreMenu(byte event)
 	}
 }
 
-void GameSM::stateResetMenu(byte event){
-	if(event & ON_ENTRY){
+void GameSM::stateResetMenu(Event *event){
+	if(event->onEntry()){
 		display_->loadMenuConfig();
 		process_criterium_ = PCINT;
 	}
 
-	else if(event & CHANGE && event & INPUT_MASK){
-		switch (event & INPUT_MASK) {
+	else if(event->changed() && event->isPressed()){
+		switch (event->isPressed()) {
 		case BTN_DOWN: // reset
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
@@ -447,7 +457,7 @@ void GameSM::stateResetMenu(byte event){
 	display_->setIcon(0x00040a1120408000);
 }
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(byte event)
+GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event)
 {
 	advance(event,value_,num_);
 }

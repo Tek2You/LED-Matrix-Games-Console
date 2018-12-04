@@ -1,12 +1,14 @@
 #pragma once
 #include "avr.h"
+
+template <class t>
 class StateMachine
 {
 public:
-	typedef void (StateMachine::*State)(byte);
+	typedef void (StateMachine::*State)(t);
 	StateMachine(State initial) : current_state(initial) {}
 
-	inline void process(byte event) {
+	inline void process(t event) {
 		(this->*current_state)(event);
 	}
 	inline void setState(State state) {

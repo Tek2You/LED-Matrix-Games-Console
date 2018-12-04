@@ -12,7 +12,7 @@ public:
 	// Game interface
 public:
 	void start();
-	bool process(byte &event);
+	bool process(Event *event);
 	void clear();
 	void reset();
 

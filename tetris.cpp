@@ -3,19 +3,6 @@
 #include "operators.h"
 #include "avr/eeprom.h"
 
-#define ON_ENTRY bit(7)
-#define CHANGE   bit(6)
-// these are the actual input pins (of PINC)
-#define BTN_LEFT bit(0)
-#define BTN_DOWN bit(1)
-#define BTN_UP  bit(2)
-#define BTN_RIGHT bit(3)
-
-#define INPUT_MASK BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP
-
-#define TIMEOUT1 bit(4)
-#define TIMEOUT2 bit(5)
-
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
@@ -46,16 +33,16 @@ void Tetris::start()
 	*down_timer_ = millis() + down_period_;
 }
 
-bool Tetris::process(byte &event)
+bool Tetris::process(Event *event)
 {
 	unsigned long now = millis();
-	if(event & CHANGE){
-		if(event & INPUT_MASK){
-			if(event & BTN_UP){
+	if(event->changed()){
+		if(event->isPressed()){
+			if(event->buttonUpState()){
 				rotate();
 			}
 			// btn down
-			if(event & BTN_DOWN){
+			if(event->buttonDownState()){
 				if(btn_down_state_ == false){
 					down_period_ = general_down_interval_;
 					*down_timer_ = down_period_ + now;
@@ -71,7 +58,7 @@ bool Tetris::process(byte &event)
 		}
 
 		// btn left
-		if(event & BTN_LEFT) {
+		if(event->buttonLeftState()) {
 			if(!btn_left_state_) {
 				if(!btn_right_state_) {
 					left();
@@ -87,7 +74,7 @@ bool Tetris::process(byte &event)
 		}
 
 		// btn right
-		if(event & BTN_RIGHT){
+		if(event->buttonRightChanged()){
 			if(! btn_right_state_){
 				if(!btn_left_state_){
 					right();
@@ -103,9 +90,9 @@ bool Tetris::process(byte &event)
 		}
 
 	}
-	if(event & TIMEOUT2){
+	if(event->timeOut2()){
 		if(btn_left_state_)
-			if(event & BTN_LEFT){
+			if(event->buttonLeftState()){
 				left();
 				*move_timer_ = now + general_move_interval_;
 			}
@@ -113,7 +100,7 @@ bool Tetris::process(byte &event)
 				btn_left_state_ = false;
 			}
 		else if(btn_right_state_){
-			if(event & BTN_RIGHT){
+			if(event->buttonRightState()){
 				right();
 				*move_timer_ = now + general_move_interval_;
 			}
@@ -122,14 +109,14 @@ bool Tetris::process(byte &event)
 			}
 		}
 	}
-	if(event & TIMEOUT1){
+	if(event->timeOut1()){
 step:
 		if(down()){ // game ends
 			return true;
 		}
-		if(!(event & BTN_DOWN))
+		if(!(event->buttonDownState()))
 			down_period_ = general_step_interval_;
-		else if(event & BTN_DOWN)
+		else if(event->buttonDownState())
 			down_period_ = general_down_interval_;
 		*down_timer_ =	now + down_period_;
 	}

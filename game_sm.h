@@ -4,40 +4,28 @@
 #include "tetris.h"
 #include "snake.h"
 #include "jump.h"
+#include "event.h"
 
-
-#define ON_ENTRY bit(7)
-#define CHANGE   bit(6)
-// these are the actual input pins (of PINC)
-#define BTN_LEFT bit(0)
-#define BTN_DOWN bit(1)
-#define BTN_UP  bit(2)
-#define BTN_RIGHT bit(3)
-
-#define TIMEOUT1 bit(4)
-#define TIMEOUT2 bit(5)
-// mask of all input pins
-#define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP)
 
 class Display;
-class GameSM : public StateMachine
+class GameSM : public StateMachine<Event*>
 {
 public:
 	GameSM(Display * display);
 	void processStateMaschine(byte event);
 private:
 	// states
-	void stateDefault(byte event);
-	void stateTetris(byte event);
-	void stateSnake(byte event);
-	void stateJump(byte event);
-	void stateSettingsMenu(byte event);
-	void stateGameOver(byte event);
-	void stateSpeedMenu(byte event);
-	void stateLanguageMenu(byte event);
-	void stateLoadEffect(byte event);
-	void stateHighscoreMenu(byte event);
-	void stateResetMenu(byte event);
+	void stateDefault(Event* event);
+	void stateTetris(Event* event);
+	void stateSnake(Event* event);
+	void stateJump(Event* event);
+	void stateSettingsMenu(Event* event);
+	void stateGameOver(Event* event);
+	void stateSpeedMenu(Event* event);
+	void stateLanguageMenu(Event* event);
+	void stateLoadEffect(Event* event);
+	void stateHighscoreMenu(Event* event);
+	void stateResetMenu(Event*event);
 
 	class MenuItem{
 	public:
@@ -55,8 +43,8 @@ private:
 			DOWN_BTN = 2,
 		};
 
-		Button advance(byte event);
-		static Button advance(byte event, char &item, const char num, const char min = 0);
+		Button advance(Event* event);
+		static Button advance(Event *event, char &item, const char num, const char min = 0);
 		char value_ = 0;
 
 	private:
