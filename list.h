@@ -1,144 +1,209 @@
 #pragma once
 #include "operators.h"
-template<class t>
+template<class T>
 class List
 {
 private:
-	 template<class td>
-	 class ListNote;
+	template<class Td>
+	class ListNode;
 public:
-	 List();
-	 ~List();
-	 void append(const t &item);
-	 void insert(const unsigned int &i, const t &item);
-	 inline void prepent(const t &item);
-	 void remove(const unsigned int &i);
+	List();
+	~List();
+	void append(const T &item);
+	void insert(const unsigned int &index, const T &item);
+	void prepent(const T &item);
 
-	 inline bool &isEmpty() const {return size() == 0;}
-	 int &size() const {return size_;}
+	T &removeFirst();
+	T &remove(const unsigned int &index);
+	T &removeLast();
 
-	 t &itemAt(const unsigned int &i) const;
-	 t &first() const;
-	 t &last() const;
+	inline bool &isEmpty() const {return size() == 0;}
+	inline int &size() const {return size_;}
+
+	T &itemAt(const unsigned int &index) const;
+	T &first() const;
+	T &last() const;
+	T &operator[](const unsigned int &index);
 private:
-	 template <class TN>
-	 struct ListNote{
-		  TN data_;
-		  ListNote<TN> * next_ = nullptr;
-	 };
-	 ListNote<t> *dataAt(const unsigned int &i) const;
-	 ListNote<t> *lastData() const;
-	 ListNote<t> * root_ = nullptr;
-	 unsigned int size_;
+	template <class TN>
+	struct ListNode{
+		TN data_;
+		ListNode<TN> * next_ = nullptr;
+	};
+
+	ListNode<T> *nodeAt(const unsigned int &index) const;
+	ListNode<T> * root_ = nullptr;
+	ListNode<T> * last_ = nullptr;
+	unsigned int size_;
 };
 
-template<class t>
-List<t>::List()
+template<class T>
+List<T>::List()
 {
 	root_ = nullptr;
 	size_ = 0;
 }
 
-template<class t>
-List<t>::~List()
+template<class T>
+List<T>::~List()
 {
 	while(size_){
 		remove(size_-1);
 	}
 }
 
-template<class t>
-void List<t>::append(const t &item)
+template<class T>
+void List<T>::append(const T &item)
 {
-	 ListNote<t> * d = lastData();
-	 if(!d)
-		  return;
-	 d->next_ = new ListNote<t>;
-	 d->next_->data_ = item;
-	 size_++;
+	ListNode<T> *tmp = new ListNode<T>();
+	tmp->data_ = item;
+	tmp->next_ = nullptr;
+
+	if(root_){
+		// Already have elements inserted
+		last_->next_ = tmp;
+		last_ = tmp;
+	}else{
+		// First element being inserted
+		root_ = tmp;
+		last_ = tmp;
+	}
+
+	size_++;
 }
 
-template<class t>
-void List<t>::insert(const unsigned int &i,const t &item)
+template<class T>
+void List<T>::insert(const unsigned int &index,const T &item)
 {
-	 if(i == size()){
-		  append(i);
-		  return;
-	 }
-	 if(i > size())
-		  return;
-	 ListNote<t> * data = dataAt(i-1);
-	 if(!data)
-		  return;
-	 ListNote<t> * new_data = new ListNote<t>;
-	 new_data->next_ = data;
-	 data->data_ = item;
-	 data = new_data;
-	 size_++;
+	if(index >= size_)
+		return append(item);
+
+	if(index == 0)
+		return prepent(item);
+
+	ListNode<T> *tmp = new ListNode<T>(), *prev = nodeAt(index-1);
+	tmp->data_ = item;
+	tmp->next_ = prev->next_;
+	prev->next_ = tmp;
+
+	size_++;
 }
 
-template<class t>
-void List<t>::prepent(const t &item)
+template<class T>
+void List<T>::prepent(const T &item)
 {
-	 insert(0,item);
+	if(size_ == 0)
+		return append(item);
+
+	ListNode<T> *tmp = new ListNode<T>();
+	tmp->next_ = root_;
+	tmp->data_ = item;
+	root_ = tmp;
+
+	size_++;
 }
 
-template<class t>
-void List<t>::remove(const unsigned int &i)
-{
-	 ListNote<t> * data = dataAt(i);
-	 if(!data)
-		  return;
-	 ListNote<t> * next = data->next_;
-	 delete data;
-	 data = next;
-	 size_--;
+template<class T>
+T &List<T>::removeFirst(){
+	if(size_ == 0)
+		return T();
+
+	if(size_ > 1){
+		ListNode<T> *next = root_->next_;
+		T ret = root_->data_;
+		delete(root_);
+		root_ = next;
+		size_--;
+
+		return ret;
+	}else{
+		return removeLast();
+	}
 }
 
-template<class t>
-t& List<t>::itemAt(const unsigned int &i) const
-{
-	 ListNote<t> * d = dataAt(i);
-	 if(d){
-		  return d->data_;
-	 }
-	 return nullptr;
+template<typename T>
+T &List<T>::removeLast(){
+	if(size_ <= 0)
+		return T();
+
+	if(size_ > 1){
+		ListNode<T> *tmp = nodeAt(size_ - 2);
+		T ret = tmp->next_->data_;
+		delete(tmp->next_);
+		tmp->next_ = nullptr;
+		last_ = tmp;
+		size_--;
+		return ret;
+	}else{
+		// Only one element left on the list
+		T ret = root_->data_;
+		delete(root_);
+		root_ = nullptr;
+		last_ = nullptr;
+		size_ = 0;
+		return ret;
+	}
 }
 
-template<class t>
-t &List<t>::first() const
+template<class T>
+T &List<T>::remove(const unsigned int &index)
 {
-	 if(root_){
-		  return root_->data_;
-	 }
-	 return nullptr;
+	if (index < 0 || index >= size_)
+		return T();
+
+	if(index == 0)
+		return removeFirst();
+	if (index == size_-1)
+		return removeLast();
+
+	ListNode<T> *tmp = nodeAt(index - 1);
+	ListNode<T> *toDelete = tmp->next_;
+	T ret = toDelete->data_;
+	tmp->next_ = tmp->next_->next_;
+	delete(toDelete);
+	size_--;
+	return ret;
 }
 
-template<class t>
-t &List<t>::last() const
+template<class T>
+T &List<T>::itemAt(const unsigned int &index) const
 {
-	 ListNote<t> *d = lastData();
-	 if(d){
-		  return d;
-	 }
-	 return nullptr;
+	ListNode<T> * d = nodeAt(index);
+	return (d ? d : T());
 }
 
-template<class t>
-List<t>::ListNote<t> *List<t>::dataAt(const unsigned int &i) const
+template<class T>
+T &List<T>::operator[](const unsigned int &index)
 {
-	 if(i >= size() - 1)
-		  return nullptr;
-	 int count = 0;
-	 ListNote<t> *d = root_;
-	 while(count++ < i && d){
-		  d = d->next_;
-	 }
-	 return d;
+	return itemAt(index);
 }
 
-template<class t>
-List<t>::ListNote<t> *List<t>::lastData() const
+template<class T>
+T &List<T>::first() const
 {
-	 return dataAt(size()-1);
+	return itemAt(0);
+}
+
+template<class T>
+T &List<T>::last() const
+{
+	ListNode<T> tmp = last_;
+	return (tmp ? tmp.data_ : T());
+}
+
+template<class T>
+List<T>::ListNode<T> *List<T>::nodeAt(const unsigned int &index) const
+{
+	int pos = 0;
+	ListNode<T>* current = root_;
+
+	while(pos < index && current){
+		current = current->next_;
+		pos++;
+	}
+
+	if(pos == index){
+		return current;
+	}
+	return nullptr;
 }
