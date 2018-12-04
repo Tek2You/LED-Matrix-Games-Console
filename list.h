@@ -13,17 +13,17 @@ public:
 	void insert(const unsigned int &index, const T &item);
 	void prepent(const T &item);
 
-	T &removeFirst();
-	T &remove(const unsigned int &index);
-	T &removeLast();
+	T removeFirst();
+	T remove(const unsigned int &index);
+	T removeLast();
 
-	inline bool &isEmpty() const {return size() == 0;}
-	inline int &size() const {return size_;}
+	inline bool isEmpty() const {return size() == 0;}
+	inline unsigned int size() const {return size_;}
 
-	T &itemAt(const unsigned int &index) const;
-	T &first() const;
-	T &last() const;
-	T &operator[](const unsigned int &index);
+	T itemAt(const unsigned int &index) const;
+	T first() const;
+	T operator [](const unsigned int &index);
+	T last() const;
 private:
 	template <class TN>
 	struct ListNode{
@@ -104,7 +104,7 @@ void List<T>::prepent(const T &item)
 }
 
 template<class T>
-T &List<T>::removeFirst(){
+T List<T>::removeFirst(){
 	if(size_ == 0)
 		return T();
 
@@ -122,7 +122,7 @@ T &List<T>::removeFirst(){
 }
 
 template<typename T>
-T &List<T>::removeLast(){
+T List<T>::removeLast(){
 	if(size_ <= 0)
 		return T();
 
@@ -146,7 +146,7 @@ T &List<T>::removeLast(){
 }
 
 template<class T>
-T &List<T>::remove(const unsigned int &index)
+T List<T>::remove(const unsigned int &index)
 {
 	if (index < 0 || index >= size_)
 		return T();
@@ -166,29 +166,29 @@ T &List<T>::remove(const unsigned int &index)
 }
 
 template<class T>
-T &List<T>::itemAt(const unsigned int &index) const
+T List<T>::itemAt(const unsigned int &index) const
 {
 	ListNode<T> * d = nodeAt(index);
-	return (d ? d : T());
+	return (d ? d->data_ : T());
 }
 
 template<class T>
-T &List<T>::operator[](const unsigned int &index)
+T List<T>::operator[](const unsigned int &index)
 {
 	return itemAt(index);
 }
 
 template<class T>
-T &List<T>::first() const
+T List<T>::first() const
 {
 	return itemAt(0);
 }
 
 template<class T>
-T &List<T>::last() const
+T List<T>::last() const
 {
-	ListNode<T> tmp = last_;
-	return (tmp ? tmp.data_ : T());
+	ListNode<T> *tmp = last_;
+	return (tmp ? tmp->data_ : T());
 }
 
 template<class T>
