@@ -1,19 +1,19 @@
 ﻿#pragma once
 #include "avr.h"
 #include "display.h"
-#include "tetromino.h"
 #include "game.h"
+#include "tetromino.h"
 
 class Tetris : public Game
 {
 public:
-	Tetris(Display * display, unsigned long *t1, unsigned long *t2);
+	Tetris(Display *display, unsigned long *t1, unsigned long *t2);
 	~Tetris();
 	void start();
-	bool process(Event * event) override;
+	bool process(Event *event) override;
 	void reset() override;
 	void clear() override;
-	unsigned int points() const {return points_;}
+	unsigned int points() const { return points_; }
 	void setSpeed(byte v) override;
 
 	// highscore functions
@@ -49,8 +49,8 @@ private:
 	bool btn_left_state_;
 	bool btn_right_state_;
 
-	byte * field_; // field without current tetromino
-	Tetromino * tetromino_;
+	byte *field_; // field without current tetromino
+	Tetromino *tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
 };

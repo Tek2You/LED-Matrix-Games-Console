@@ -2,26 +2,25 @@
 
 class SmartPos;
 
-struct Pos {
-	Pos(){}
+struct Pos
+{
+	Pos() {}
 	Pos(char x, char y);
-	Pos(const SmartPos& pos);
-	Pos operator +(const Pos& pos);
-	Pos& operator+=(const Pos& pos);
-	Pos operator-(const Pos& pos);
-	Pos& operator-=(const Pos& pos);
-	bool operator==(const Pos& pos);
-	Pos& operator=(const SmartPos& pos);
-	bool operator!=(const Pos& pos);
+	Pos(const SmartPos &pos);
+	Pos operator+(const Pos &pos);
+	Pos &operator+=(const Pos &pos);
+	Pos operator-(const Pos &pos);
+	Pos &operator-=(const Pos &pos);
+	bool operator==(const Pos &pos);
+	Pos &operator=(const SmartPos &pos);
+	bool operator!=(const Pos &pos);
 	char pos_x = 0;
 	char pos_y = 0;
 };
 
-
-
 struct SmartPos
 {
-	SmartPos() { }
+	SmartPos() {}
 	SmartPos(unsigned char x, unsigned char y);
 	Pos pos();
 	unsigned char x() const;

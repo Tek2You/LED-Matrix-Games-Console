@@ -1,15 +1,20 @@
 #include "text.h"
 
-Text::Text(MatrixDisplay *display) : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0)
- , start_col_(0), end_col_(7), start_row_(0), end_row_(15), shift_start_col_(3)
+Text::Text(MatrixDisplay *display)
+    : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0),
+      start_col_(0), end_col_(7), start_row_(0), end_row_(15),
+      shift_start_col_(3)
 {
 	setShiftSpeed(5);
 }
 
-void Text::update() {
-	if (shift_mode_ == SHIFT) {
+void Text::update()
+{
+	if (shift_mode_ == SHIFT)
+	{
 		unsigned long now = millis();
-		if (shift_next_time_ <= now) {
+		if (shift_next_time_ <= now)
+		{
 			shift();
 			shift_next_time_ = now + speed_time_;
 		}
@@ -26,23 +31,28 @@ void Text::clear()
 // shift text by one column and start over if nothing is shown anymore
 void Text::shift()
 {
-//	if(current_shift_start_col_ == 1)
-//		return;
+	//	if(current_shift_start_col_ == 1)
+	//		return;
 	--current_shift_start_col_;
-	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_-first_ , 1, offset_) <= 0) {
+	if (display_->setString(first_, current_shift_start_col_,
+	                        curser_pos_ + text_ - first_, 1, offset_) <= 0)
+	{
 		first_ = text_;
 		current_shift_start_col_ = shift_start_col_;
-	} else { // should we advance to next start char?
+	}
+	else
+	{ // should we advance to next start char?
 		byte w = display_->width(*first_);
-		if (current_shift_start_col_ + w < 0) {
+		if (current_shift_start_col_ + w < 0)
+		{
 			++first_;
-			current_shift_start_col_ += w+1; // char width + 1 column spacing
+			current_shift_start_col_ += w + 1; // char width + 1 column spacing
 		}
 	}
 }
 
 // display (and remember) text (for future shifting)
-void Text::setText(const char* text)
+void Text::setText(const char *text)
 {
 	first_ = text_ = text;
 	display_->clearRows(start_row_, end_row_);
@@ -51,31 +61,32 @@ void Text::setText(const char* text)
 
 void Text::setNumber(int value)
 {
-	setText(display_->formatInt(number_buffer_,10,value));
+	setText(display_->formatInt(number_buffer_, 10, value));
 }
 
 void Text::computeShiftMode()
 {
 
-	shift_mode_ = (display_->width(text_) > end_col_ - start_col_ ? SHIFT : NO_SHIFT);
+	shift_mode_ =
+	    (display_->width(text_) > end_col_ - start_col_ ? SHIFT : NO_SHIFT);
 
-	if (shift_mode_ == SHIFT){ // when shifting, start in column 7
+	if (shift_mode_ == SHIFT)
+	{ // when shifting, start in column 7
 		current_shift_start_col_ = shift_start_col_;
 		shift_next_time_ = millis() + speed_time_;
 	}
 	else // otherwise, start in first column + setString once
-		display_->setString(text_, current_shift_start_col_ = 0, curser_pos_,1,offset_);
+		display_->setString(text_, current_shift_start_col_ = 0, curser_pos_, 1,
+		                    offset_);
 }
 
-void Text::setShiftSpeed(int speed) {
-	speed_ = speed;
-	speed_time_ = 1000/speed_; // from shifts per second to mseconds per shift
-}
-
-void Text::setCursor(char pos)
+void Text::setShiftSpeed(int speed)
 {
-	curser_pos_ = pos;
+	speed_ = speed;
+	speed_time_ = 1000 / speed_; // from shifts per second to mseconds per shift
 }
+
+void Text::setCursor(char pos) { curser_pos_ = pos; }
 
 void Text::setOperationRows(byte start, byte end)
 {
@@ -89,4 +100,3 @@ void Text::setOperationCols(byte start, byte end)
 	end_col_ = end;
 	setText(text_);
 }
-

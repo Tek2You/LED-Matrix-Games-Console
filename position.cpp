@@ -1,8 +1,6 @@
 #include "position.h"
 
-Pos::Pos(char x, char y) : pos_x(x), pos_y(y){
-
-}
+Pos::Pos(char x, char y) : pos_x(x), pos_y(y) {}
 
 Pos::Pos(const SmartPos &pos)
 {
@@ -10,61 +8,52 @@ Pos::Pos(const SmartPos &pos)
 	pos_y = pos.y();
 }
 
-Pos Pos::operator + (const Pos& pos)
+Pos Pos::operator+(const Pos &pos)
 {
 
-	return Pos(pos.pos_x+pos_x,pos.pos_y+pos_y);
-
+	return Pos(pos.pos_x + pos_x, pos.pos_y + pos_y);
 }
 
-Pos& Pos::operator += (const Pos& pos)
+Pos &Pos::operator+=(const Pos &pos)
 {
 	pos_x += pos.pos_x;
 	pos_y += pos.pos_y;
 }
 
-Pos Pos::operator- (const Pos& pos)
+Pos Pos::operator-(const Pos &pos)
 {
-	return Pos(pos_x-pos.pos_x,pos_y-pos.pos_y);
+	return Pos(pos_x - pos.pos_x, pos_y - pos.pos_y);
 }
 
-Pos& Pos::operator-= (const Pos& pos)
+Pos &Pos::operator-=(const Pos &pos)
 {
 	pos_x -= pos.pos_x;
 	pos_y -= pos.pos_y;
 }
 
-bool Pos::operator==(const Pos& pos){
-	return(pos_x == pos.pos_x && pos_y == pos.pos_y);
+bool Pos::operator==(const Pos &pos)
+{
+	return (pos_x == pos.pos_x && pos_y == pos.pos_y);
 }
 
-Pos& Pos::operator=(const SmartPos &pos)
+Pos &Pos::operator=(const SmartPos &pos)
 {
 	pos_x = pos.x();
 	pos_y = pos.y();
 	return *this;
 }
 
-bool Pos::operator !=(const Pos& pos){
-	return !operator ==(pos);
-}
+bool Pos::operator!=(const Pos &pos) { return !operator==(pos); }
 
-SmartPos::SmartPos(unsigned char x, unsigned char y) {
-	setXy(x,y);
-}
+SmartPos::SmartPos(unsigned char x, unsigned char y) { setXy(x, y); }
 
-Pos SmartPos::pos(){
-	return Pos(x(),y());
-}
+Pos SmartPos::pos() { return Pos(x(), y()); }
 
-unsigned char SmartPos::x() const {
-	return (compact_pos_ & 0xF0) >> 4;
-}
+unsigned char SmartPos::x() const { return (compact_pos_ & 0xF0) >> 4; }
 
-unsigned char SmartPos::y() const{
-	return compact_pos_ & 0x0F;
-}
+unsigned char SmartPos::y() const { return compact_pos_ & 0x0F; }
 
-unsigned char SmartPos::setXy(unsigned char x, unsigned char y){
+unsigned char SmartPos::setXy(unsigned char x, unsigned char y)
+{
 	compact_pos_ = (y & 0x0F) | ((x & 0x0F) << 4);
 }
