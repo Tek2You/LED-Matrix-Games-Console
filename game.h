@@ -9,7 +9,7 @@ class Game
 public:
 	Game(Display *display);
 	virtual ~Game();
-	virtual void start() = 0;
+	virtual void start(Event *event) = 0;
 	virtual bool process(Event *event) = 0;
 	virtual void clear() = 0;
 	virtual void reset() = 0;

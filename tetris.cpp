@@ -6,8 +6,8 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display, unsigned long *t1, unsigned long *t2)
-    : Game(display), down_timer_(t1), move_timer_(t2)
+Tetris::Tetris(Display *display)
+    : Game(display)
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte *>(malloc(display_->rows()));
@@ -27,16 +27,19 @@ Tetris::~Tetris()
 	points_ = 0;
 }
 
-void Tetris::start()
+void Tetris::start(Event *event)
 {
 	newTetromino();
-	down_period_ = general_step_interval_;
-	*down_timer_ = millis() + down_period_;
+
+	event->removeAllTimers();
+	event->addTimer(0, general_step_interval_);
+	event->addTimer(1);
 }
 
 bool Tetris::process(Event *event)
 {
 	unsigned long now = millis();
+	Timer &move_timer = event->getTimer(1);
 	if (event->changed())
 	{
 		if (event->isPressed())
@@ -46,101 +49,89 @@ bool Tetris::process(Event *event)
 				rotate();
 			}
 			// btn down
-			if (event->buttonDownState())
+			if (event->buttonDownChanged())
 			{
-				if (btn_down_state_ == false)
+				if (event->buttonDownState())
 				{
-					down_period_ = general_down_interval_;
-					*down_timer_ = down_period_ + now;
-					btn_down_state_ = true;
-					goto step;
+					event->getTimer(0).setInterval(general_down_interval_);
 				}
-			}
-			else if (btn_down_state_)
-			{
-				down_period_ = general_step_interval_;
-				*down_timer_ = down_period_ + now;
-				btn_down_state_ = false;
+				else
+				{
+					event->getTimer(0).setInterval(general_step_interval_);
+				}
 			}
 		}
 
 		// btn left
-		if (event->buttonLeftState())
+		if (event->buttonLeftChanged())
 		{
-			if (!btn_left_state_)
+			if (event->buttonLeftState())
 			{
-				if (!btn_right_state_)
+				if (!event->buttonRightState())
 				{
 					left();
-					btn_left_state_ = true;
-					*move_timer_ = now + general_first_move_interval_;
+					move_timer.setInterval(general_first_move_interval_);
+					move_timer.start();
 				}
 			}
-		}
-		else
-		{
-			if (btn_left_state_)
-				*move_timer_ = 0;
-			btn_left_state_ = false;
+			else
+			{
+				if (event->buttonLeftState())
+				{
+					move_timer.stop();
+					move_timer.clearOverflow();
+				}
+			}
 		}
 
 		// btn right
 		if (event->buttonRightChanged())
 		{
-			if (!btn_right_state_)
+			if (event->buttonRightState())
 			{
-				if (!btn_left_state_)
+				if (!event->buttonLeftState())
 				{
 					right();
-					btn_right_state_ = true;
-					*move_timer_ = now + general_first_move_interval_;
+					move_timer.setInterval(general_first_move_interval_);
+					move_timer.start();
+				}
+			}
+			else
+			{
+				if (event->buttonRightState())
+				{
+					move_timer.stop();
+					move_timer.clearOverflow();
 				}
 			}
 		}
-		else
+	}
+	if (move_timer.overflow())
+	{
+		if (event->buttonLeftState())
 		{
-			if (btn_right_state_)
-				*move_timer_ = 0;
-			btn_right_state_ = false;
+			left();
+			move_timer.setInterval(general_move_interval_);
+		}
+
+		else if (event->buttonRightState())
+		{
+			right();
+			move_timer.setInterval(general_move_interval_);
 		}
 	}
-	if (event->timeOut2())
+
+	Timer &down_timer = event->getTimer(0);
+	if (down_timer.overflow())
 	{
-		if (btn_left_state_)
-			if (event->buttonLeftState())
-			{
-				left();
-				*move_timer_ = now + general_move_interval_;
-			}
-			else
-			{
-				btn_left_state_ = false;
-			}
-		else if (btn_right_state_)
-		{
-			if (event->buttonRightState())
-			{
-				right();
-				*move_timer_ = now + general_move_interval_;
-			}
-			else
-			{
-				btn_right_state_ = false;
-			}
-		}
-	}
-	if (event->timeOut1())
-	{
-   step:
 		if (down())
-		{ // game ends
+		{
 			return true;
 		}
-		if (!(event->buttonDownState()))
-			down_period_ = general_step_interval_;
-		else if (event->buttonDownState())
-			down_period_ = general_down_interval_;
-		*down_timer_ = now + down_period_;
+		if (event->buttonDownState())
+			down_timer.setInterval(general_down_interval_);
+		else
+			down_timer.setInterval(general_step_interval_);
 	}
 	return false;
 }

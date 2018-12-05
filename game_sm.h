@@ -11,7 +11,7 @@ class GameSM : public StateMachine<Event *>
 {
 public:
 	GameSM(Display *display);
-	void processStateMaschine(Event *event);
+	//	void processStateMaschine(Event *event);
 
 private:
 	// states
@@ -53,23 +53,11 @@ private:
 		char num_ = 0;
 	};
 
-	enum ProcessCriterum
-	{
-		EVER = 1 << 0,
-		TIMER1 = 1 << 1,
-		TIMER2 = 1 << 2,
-		PCINT = 1 << 3
-	};
-
 	enum Language
 	{
 		EN = 0,
 		DE = 1,
 	};
-
-	byte process_criterium_;
-	unsigned long process_timer1_;
-	unsigned long process_timer2_;
 
 	Display *display_;
 	Game *game_; // pointer to the current game

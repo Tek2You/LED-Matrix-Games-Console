@@ -52,8 +52,11 @@ int main(void)
 			dp.update();
 			dp.disable();
 			counter = 0;
-			sm.processStateMaschine(&event);
-			event.clear();
+			if (event.process())
+			{
+				sm.process(&event);
+				event.clear();
+			}
 			have_input = 0;
 		}
 	}

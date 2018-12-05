@@ -7,9 +7,9 @@
 class Tetris : public Game
 {
 public:
-	Tetris(Display *display, unsigned long *t1, unsigned long *t2);
+	Tetris(Display *display);
 	~Tetris();
-	void start();
+	void start(Event *event);
 	bool process(Event *event) override;
 	void reset() override;
 	void clear() override;
@@ -35,8 +35,8 @@ private:
 	// random tetromino data functions
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
-	unsigned long *down_timer_, *move_timer_;
-	int down_period_, move_period_;
+
+	//	int down_period_, move_period_;
 
 	// from speed calculated delay intervals
 	int general_step_interval_;
@@ -45,9 +45,9 @@ private:
 	int general_move_interval_;
 
 	// current button states
-	bool btn_down_state_;
-	bool btn_left_state_;
-	bool btn_right_state_;
+	//	bool btn_down_state_;
+	//	bool btn_left_state_;
+	//	bool btn_right_state_;
 
 	byte *field_; // field without current tetromino
 	Tetromino *tetromino_;
