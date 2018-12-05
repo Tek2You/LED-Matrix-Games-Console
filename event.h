@@ -14,8 +14,8 @@
 #define BTN_UP_CHANGE bit(6)
 #define BTN_RIGHT_CHANGE bit(7)
 
-#define TIMEOUT1 bit(9)
-#define TIMEOUT2 bit(10)
+//#define TIMEOUT1 bit(9)
+//#define TIMEOUT2 bit(10)
 // mask of all input pins
 #define CHANGE \
 	(BTN_LEFT_CHANGE | BTN_DOWN_CHANGE | BTN_UP_CHANGE | BTN_RIGHT_CHANGE)
@@ -46,24 +46,31 @@ public:
 
 	inline bool onEntry() { return event_ & ON_ENTRY; }
 	inline void setOnEntry() { event_ |= ON_ENTRY; }
-	inline bool timeOut1() { return event_ & TIMEOUT1; }
-	inline bool timeOut2() { return event_ & TIMEOUT2; }
+	//	inline bool timeOut1() { return event_ & TIMEOUT1; }
+	//	inline bool timeOut2() { return event_ & TIMEOUT2; }
 
+	bool process();
 	bool processTimers();
-	void addTimer(byte &index, unsigned int interval);
-	Timer getTimer(byte &index);
-	bool takeOverflow(byte &index);
+	void addTimer(byte index, unsigned int interval = 0);
+	Timer &getTimer(byte index);
+	bool getOverflow(byte &index);
 	void removeTimer(byte &index);
 	void removeAllTimers();
 
 	int event_;
+	enum Flags
+	{
+		ProcessEveryCycle = (1 << 0),
+		ProcessPinChanges = (1 << 1),
+		ProcessTimerOverflows = (1 << 2),
+	};
+
+	inline void clearFlags();
+	inline void setFlag(Flags flag, bool set = true);
+	inline bool flag(Flags flag);
 
 private:
-	struct TimerItem : public Timer
-	{
-		TimerItem(const unsigned int &interval = 0) : Timer(interval) {}
-		Timer t;
-		bool overflow_ = false;
-	};
-	List<TimerItem> timers_;
+	List<Timer> timers_;
+	byte flags_;
+	bool overflow_ = false;
 };

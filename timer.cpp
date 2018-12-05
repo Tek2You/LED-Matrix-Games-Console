@@ -1,8 +1,11 @@
 #include "timer.h"
 
-Timer::Timer(unsigned int interval) : interval_(interval)
+Timer::Timer(unsigned int interval) : interval_(interval), overflow_(false)
 {
-	next_time_ = millis() + interval_;
+	if (interval_)
+	{
+		next_time_ = millis() + interval_;
+	}
 }
 
 bool Timer::process(const unsigned long &t)
@@ -11,6 +14,7 @@ bool Timer::process(const unsigned long &t)
 	if (next_time_ <= t)
 	{
 		next_time_ = t + interval_;
+		overflow_ = true;
 		return true;
 	}
 	return false;
@@ -25,11 +29,6 @@ bool Timer::process()
 void Timer::start()
 {
 	next_time_ = millis() + interval_;
-}
-
-void Timer::stop()
-{
-	next_time_ = 0xFFFFFFFF;
 }
 
 unsigned int Timer::interval() const

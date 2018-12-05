@@ -10,21 +10,26 @@ private:
 public:
 	List();
 	~List();
+
+	// expanding functions
 	void append(const T &item);
 	void insert(const unsigned int &index, const T &item);
 	void prepent(const T &item);
 
+	// decreasing functions
 	T removeFirst();
 	T remove(const unsigned int &index);
 	T removeLast();
 	void removeAll();
 
+	// checker functions
 	inline bool isEmpty() const { return size() == 0; }
 	inline unsigned int size() const { return size_; }
 
+	// getter functions
 	T &itemAt(const unsigned int &index);
-	T &first() const;
-	T &operator[](const unsigned int &index);
+	inline T &operator[](const unsigned int &index);
+	T &first();
 	T &last();
 
 private:
@@ -204,12 +209,14 @@ T &List<T>::operator[](const unsigned int &index)
 }
 
 template <class T>
-T &List<T>::first() const { return itemAt(0); }
+T &List<T>::first()
+{
+	return (root_ ? root_->data_ : foo_item_);
+}
 
 template <class T>
 T &List<T>::last()
 {
-	//	ListNode<T> *tmp = last_;
 	return (last_ ? last_->data_ : foo_item_);
 }
 
