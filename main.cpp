@@ -47,7 +47,7 @@ int main(void)
 	{
 		wdt_reset();
 		dp.show();
-		if (have_input || counter++ >= 0xFF)
+		if (have_input || counter++ >= 0xFF) // pre-devider for proccing function
 		{
 			dp.update();
 			dp.disable();

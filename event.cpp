@@ -43,3 +43,44 @@ void Event::clear()
 	event_ &= ~(event_ & CHANGE);
 	event_ &= ~ON_ENTRY;
 }
+
+bool Event::processTimers()
+{
+	unsigned int t = millis();
+	for (int i = 0; i < timers_.size(); i++)
+	{
+		TimerItem timer = timers_.itemAt(i);
+		timer.overflow_ = timer.process(t);
+	}
+}
+
+void Event::addTimer(byte &index, unsigned int interval)
+{
+	TimerItem t(interval);
+	timers_.append(t);
+}
+
+Timer Event::getTimer(byte &index)
+{
+	return timers_.itemAt(index);
+}
+
+bool Event::takeOverflow(byte &index)
+{
+	TimerItem t = timers_.itemAt(index);
+	if (t.overflow_)
+	{
+		t.overflow_ = false;
+		return true;
+	}
+	return false;
+}
+void Event::removeTimer(byte &index)
+{
+	timers_.remove(index);
+}
+
+void Event::removeAllTimers()
+{
+	timers_.removeAll();
+}

@@ -17,14 +17,15 @@ public:
 	T removeFirst();
 	T remove(const unsigned int &index);
 	T removeLast();
+	void removeAll();
 
 	inline bool isEmpty() const { return size() == 0; }
 	inline unsigned int size() const { return size_; }
 
-	T itemAt(const unsigned int &index) const;
-	T first() const;
-	T operator[](const unsigned int &index);
-	T last() const;
+	T &itemAt(const unsigned int &index);
+	T &first() const;
+	T &operator[](const unsigned int &index);
+	T &last();
 
 private:
 	template <class TN>
@@ -33,6 +34,8 @@ private:
 		TN data_;
 		ListNode<TN> *next_ = nullptr;
 	};
+
+	T foo_item_;
 
 	ListNode<T> *nodeAt(const unsigned int &index) const;
 	ListNode<T> *root_ = nullptr;
@@ -50,10 +53,7 @@ List<T>::List()
 template <class T>
 List<T>::~List()
 {
-	while (size_)
-	{
-		remove(size_ - 1);
-	}
+	removeAll();
 }
 
 template <class T>
@@ -115,7 +115,7 @@ template <class T>
 T List<T>::removeFirst()
 {
 	if (size_ == 0)
-		return T();
+		return foo_item_;
 
 	if (size_ > 1)
 	{
@@ -137,7 +137,7 @@ template <typename T>
 T List<T>::removeLast()
 {
 	if (size_ <= 0)
-		return T();
+		return foo_item_;
 
 	if (size_ > 1)
 	{
@@ -162,10 +162,19 @@ T List<T>::removeLast()
 }
 
 template <class T>
+void List<T>::removeAll()
+{
+	while (size_)
+	{
+		remove(size_ - 1);
+	}
+}
+
+template <class T>
 T List<T>::remove(const unsigned int &index)
 {
 	if (index < 0 || index >= size_)
-		return T();
+		return foo_item_;
 
 	if (index == 0)
 		return removeFirst();
@@ -182,26 +191,26 @@ T List<T>::remove(const unsigned int &index)
 }
 
 template <class T>
-T List<T>::itemAt(const unsigned int &index) const
+T &List<T>::itemAt(const unsigned int &index)
 {
 	ListNode<T> *d = nodeAt(index);
-	return (d ? d->data_ : T());
+	return (d ? d->data_ : foo_item_);
 }
 
 template <class T>
-T List<T>::operator[](const unsigned int &index)
+T &List<T>::operator[](const unsigned int &index)
 {
 	return itemAt(index);
 }
 
 template <class T>
-T List<T>::first() const { return itemAt(0); }
+T &List<T>::first() const { return itemAt(0); }
 
 template <class T>
-T List<T>::last() const
+T &List<T>::last()
 {
-	ListNode<T> *tmp = last_;
-	return (tmp ? tmp->data_ : T());
+	//	ListNode<T> *tmp = last_;
+	return (last_ ? last_->data_ : foo_item_);
 }
 
 template <class T>

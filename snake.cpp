@@ -98,50 +98,42 @@ void Snake::setSpeed(byte v)
 
 bool Snake::process(Event *event)
 {
-	bool button_set = true;
-	if (event->changed())
+	if (event->changed() && event->isPressed())
 	{
-		if (event->isPressed())
+		if (event->buttonUpState())
 		{
-			if (event->buttonUpState())
+			// is not 180° rotation or no rotation(in this case the snake will make
+			// a additinal ste,  what we avoid with dont allow this)
+			if (direction_ != Snake::DOWN)
 			{
-				// is not 180° rotation or no rotation(in this case the snake will make
-				// a additinal ste,  what we avoid with dont allow this)
-				if (direction_ != Snake::UP && direction_ != Snake::DOWN)
-				{
-					direction_ = Snake::UP;
-				}
+				direction_ = Snake::UP;
 			}
-			else if (event->buttonLeftState())
+		}
+		else if (event->buttonLeftState())
+		{
+			if (direction_ != Snake::RIGHT)
 			{
-				if (direction_ != Snake::LEFT && direction_ != Snake::RIGHT)
-				{
-					direction_ = Snake::LEFT;
-				}
+				direction_ = Snake::LEFT;
 			}
+		}
 
-			else if (event->buttonRightState())
+		else if (event->buttonRightState())
+		{
+			if (direction_ != Snake::RIGHT)
 			{
-				if (direction_ != Snake::LEFT && direction_ != Snake::RIGHT)
-				{
-					direction_ = Snake::RIGHT;
-				}
+				direction_ = Snake::RIGHT;
 			}
+		}
 
-			else if (event->buttonDownState())
+		else if (event->buttonDownState())
+		{
+			if (direction_ != Snake::UP)
 			{
-				if (direction_ != Snake::DOWN && direction_ != Snake::UP)
-				{
-					direction_ = Snake::DOWN;
-				}
-			}
-			else
-			{
-				button_set = false;
+				direction_ = Snake::DOWN;
 			}
 		}
 	}
-	if (event->timeOut1() || button_set)
+	if (event->timeOut1())
 	{
 		*timer_ = millis() + period_;
 		if (move())

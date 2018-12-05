@@ -1,5 +1,6 @@
 #include "avr.h"
 #include "list.h"
+#include "timer.h"
 #pragma once
 
 #define ON_ENTRY bit(8)
@@ -24,27 +25,16 @@ class Event
 {
 public:
 	Event();
-	inline bool buttonUpChanged() { return event_ & BTN_UP_CHANGE; }
+	const inline bool buttonUpChanged() { return event_ & BTN_UP_CHANGE; }
 	const inline bool buttonDownChanged() { return event_ & BTN_DOWN_CHANGE; }
 	const inline bool buttonRightChanged() { return event_ & BTN_RIGHT_CHANGE; }
 	const inline bool buttonLeftChanged() { return event_ & BTN_LEFT_CHANGE; }
-	const
 
-	    inline bool
-	    buttonUpState()
-	{
-		return event_ & BTN_UP;
-	}
+	const inline bool buttonUpState() { return event_ & BTN_UP; }
 	const inline bool buttonDownState() { return event_ & BTN_DOWN; }
 	const inline bool buttonRightState() { return event_ & BTN_RIGHT; }
 	const inline bool buttonLeftState() { return event_ & BTN_LEFT; }
-	const
-
-	    inline bool
-	    changed()
-	{
-		return event_ & CHANGE;
-	}
+	const inline bool changed() { return event_ & CHANGE; }
 	inline bool isPressed() { return event_ & INPUT_MASK; }
 
 	void setButtonUpState(bool state);
@@ -58,5 +48,22 @@ public:
 	inline void setOnEntry() { event_ |= ON_ENTRY; }
 	inline bool timeOut1() { return event_ & TIMEOUT1; }
 	inline bool timeOut2() { return event_ & TIMEOUT2; }
+
+	bool processTimers();
+	void addTimer(byte &index, unsigned int interval);
+	Timer getTimer(byte &index);
+	bool takeOverflow(byte &index);
+	void removeTimer(byte &index);
+	void removeAllTimers();
+
 	int event_;
+
+private:
+	struct TimerItem : public Timer
+	{
+		TimerItem(const unsigned int &interval = 0) : Timer(interval) {}
+		Timer t;
+		bool overflow_ = false;
+	};
+	List<TimerItem> timers_;
 };

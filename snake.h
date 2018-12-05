@@ -41,6 +41,7 @@ private:
 
 	// snake values
 	Direction direction_;
+	Pos move_vect_;
 	List<Pos> body_;
 	Pos eat_pos_;
 	static unsigned int highscore_;
