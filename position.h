@@ -14,6 +14,7 @@ struct Pos
 	bool operator==(const Pos &pos);
 	Pos &operator=(const SmartPos &pos);
 	bool operator!=(const Pos &pos);
+	Pos operator~();
 	char pos_x = 0;
 	char pos_y = 0;
 };
@@ -22,7 +23,7 @@ struct SmartPos
 {
 	SmartPos() {}
 	SmartPos(unsigned char x, unsigned char y);
-	Pos pos();
+	Pos toPos();
 	unsigned char x() const;
 	unsigned char y() const;
 	inline unsigned char setXy(unsigned char x, unsigned char y);

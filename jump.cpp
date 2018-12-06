@@ -3,8 +3,8 @@
 #include "operators.h"
 #include "position.h"
 
-static unsigned int EE_highscore EEMEM = 0;
-unsigned int Jump::highscore_ = eeprom_read_word(&EE_highscore);
+static uint16_t EE_highscore EEMEM = 0;
+uint16_t Jump::highscore_ = eeprom_read_word(&EE_highscore);
 
 Jump::Jump(Display *display)
     : Game(display)
@@ -43,17 +43,62 @@ void Jump::start(Event *event)
 	event->setFlag(Event::ProcessTimerOverflows);
 }
 
-bool Jump::process(Event *event)
+unsigned int Jump::points() const
 {
-	if (event->timer(0).overflow())
-	{
-		forward();
-	}
-	if (event->timer(1).overflow())
-	{
-		jump(event);
-	}
+	return score_;
+}
 
+void Jump::setSpeed(const byte v)
+{
+	switch (v)
+	{
+	case 0:
+		forward_period_ = 450;
+		jump_period_ = 337;
+		break;
+	case 1:
+		forward_period_ = 375;
+		jump_period_ = 280;
+		return;
+	case 3:
+		forward_period_ = 225;
+		jump_period_ = 169;
+		break;
+	case 4:
+		forward_period_ = 150;
+		jump_period_ = 112;
+		break;
+	case 2:
+	default:
+		forward_period_ = 300;
+		jump_period_ = 225;
+		break;
+	}
+}
+
+byte *Jump::row(const byte n)
+{
+	//	if(current_field_start_ + n > display_->rows()+2){
+	//		return field_ + n - (display_->rows()+2-current_field_start_);
+	//	}
+	//	else{
+	//		return field_ + current_field_start_ + n;
+	//	}
+	return field_ + ((current_field_start_ + n) % 19);
+}
+
+unsigned int Jump::highscore()
+{
+	return highscore_;
+}
+
+void Jump::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
+
+bool Jump::onButtonChange(Event *event)
+{
 	if (event->buttonRightChanged())
 	{
 		if (event->buttonRightState())
@@ -87,56 +132,16 @@ bool Jump::process(Event *event)
 	return false;
 }
 
-void Jump::clear() {}
-
-void Jump::reset() {}
-
-unsigned int Jump::points() const { return score_; }
-
-void Jump::setSpeed(byte v)
+bool Jump::onTimerOverflow(Event *event)
 {
-	switch (v)
+	if (event->timer(0).overflow())
 	{
-	case 0:
-		forward_period_ = 450;
-		jump_period_ = 337;
-		break;
-	case 1:
-		forward_period_ = 375;
-		jump_period_ = 280;
-		return;
-	case 3:
-		forward_period_ = 225;
-		jump_period_ = 169;
-		break;
-	case 4:
-		forward_period_ = 150;
-		jump_period_ = 112;
-		break;
-	case 2:
-	default:
-		forward_period_ = 300;
-		jump_period_ = 225;
-		break;
+		forward();
 	}
-}
-
-byte *Jump::row(byte n)
-{
-	//	if(current_field_start_ + n > display_->rows()+2){
-	//		return field_ + n - (display_->rows()+2-current_field_start_);
-	//	}
-	//	else{
-	//		return field_ + current_field_start_ + n;
-	//	}
-	return field_ + ((current_field_start_ + n) % 19);
-}
-
-unsigned int Jump::highscore() { return highscore_; }
-
-void Jump::resetHighscore()
-{
-	eeprom_write_word(&EE_highscore, highscore_ = 0);
+	if (event->timer(1).overflow())
+	{
+		jump(event);
+	}
 }
 
 void Jump::forward()
@@ -195,7 +200,7 @@ void Jump::newHind()
 	}
 }
 
-bool Jump::isValid(Pos pos)
+bool Jump::isValid(const Pos pos)
 {
 	for (Pos p : man_moving_points)
 	{
@@ -223,9 +228,9 @@ void Jump::render()
 	for (Pos p : man_points)
 	{
 		p += man_pos_;
-		display_->setPixel(p.pos_y, p.pos_x, true);
+		display_->setPixel(~p, true);
 	}
-	Pos p = man_moving_points[(man_state_ == 1 ? 1 : 0)];
+	Pos p = (man_moving_points[(man_state_ == 1 ? 1 : 0)]);
 	p += man_pos_;
-	display_->setPixel(p.pos_y, p.pos_x, true);
+	display_->setPixel(~p, true);
 }

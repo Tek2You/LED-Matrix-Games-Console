@@ -9,7 +9,6 @@ public:
 	Snake(Display *display);
 	~Snake();
 	void start(Event *event);
-	void reset();
 	void clear();
 
 	unsigned int points() const { return body_.size() - 3; }

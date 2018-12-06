@@ -176,7 +176,6 @@ void GameSM::stateTetris(Event *event)
 		}
 		game_ = new Tetris(display_);
 		game_->setSpeed(speed_);
-		game_->reset();
 		game_->start(event);
 		return;
 	}
@@ -199,7 +198,6 @@ void GameSM::stateSnake(Event *event)
 			game_ = nullptr;
 		}
 		game_ = new Snake(display_);
-		game_->reset();
 		game_->start(event);
 		return;
 	}
@@ -223,7 +221,6 @@ void GameSM::stateJump(Event *event)
 		}
 		game_ = new Jump(display_);
 		game_->setSpeed(speed_);
-		game_->reset();
 		game_->start(event);
 		return;
 	}
@@ -480,10 +477,9 @@ void GameSM::stateHighscoreMenu(Event *event)
 		break;
 	case 3:
 		display_->setIcon(0xbd42a59999a542bd);
-		display_->text1_.setText(language_ == EN ? "reset"
-		                                         : "Zur"
-		                                           "\x1c"
-		                                           "cksetzen");
+		display_->text1_.setText(language_ == EN ? "reset" : "Zur"
+		                                                     "\x1c"
+		                                                     "cksetzen");
 	default:
 		break;
 	}
@@ -499,20 +495,18 @@ void GameSM::stateResetMenu(Event *event)
 
 	else if (event->changed() && event->isPressed())
 	{
-		if (event->isPressed())
+		if (event->buttonDownState())
 		{
-			if (event->buttonDownState())
-			{
-				Tetris::resetHighscore();
-				Snake::resetHighscore();
-				Jump::resetHighscore();
-				LOAD_EFFECT_STANDART(stateDefault, event);
-				return;
-			}
-			if (event->buttonUpState())
-			{
-				TRANSITION(stateHighscoreMenu, event);
-			}
+			Tetris::resetHighscore();
+			//			Snake::resetHighscore();
+			//			Jump::resetHighscore();
+			LOAD_EFFECT_STANDART(stateDefault, event);
+			return;
+		}
+		if (event->buttonUpState())
+		{
+			TRANSITION(stateHighscoreMenu, event);
+			return;
 		}
 	}
 	display_->text1_.setText((language_ == EN ? "reset scores"

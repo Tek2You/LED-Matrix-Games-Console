@@ -1,5 +1,6 @@
 #pragma once
 #include "avr.h"
+#include "position.h"
 
 class MatrixDisplay
 {
@@ -8,7 +9,8 @@ public:
 	~MatrixDisplay();
 	void show();
 	void clear();
-	void setPixel(byte col, byte row, bool value);
+	void setPixel(byte col, byte row, bool value = true);
+	void setPixel(const Pos &p, bool value = true);
 	void setArray(byte *array);
 	const byte rows() { return 16; }
 	const byte cols() { return width_; }

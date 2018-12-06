@@ -1,7 +1,8 @@
 #pragma once
+#include "avr.h"
+#include "display.h"
 #include "game.h"
 #include "position.h"
-#include "tetromino.h" // only for combined position
 
 class Jump : public Game
 {
@@ -9,28 +10,29 @@ public:
 	Jump(Display *display);
 	~Jump();
 
-	// Game interface
-public:
 	void start(Event *event);
-	bool process(Event *event);
-	void clear();
-	void reset();
 
 	unsigned int points() const;
-	void setSpeed(byte v);
+	void setSpeed(const byte v);
+
+	// highscore functions
 	static unsigned int highscore();
 	static void resetHighscore();
+
+protected:
+	// Game interface
+	bool onButtonChange(Event *event) override;
+	bool onTimerOverflow(Event *event) override;
+	void render();
 
 private:
 	int forward_period_, jump_period_;
 	void newHind();
-	bool isValid(Pos pos);
+	bool isValid(const Pos pos);
 	void forward();
 	void jump(Event *event);
-	byte *row(byte n);
+	byte *row(const byte n);
 
-protected:
-	void render();
 	bool man_state_;
 	Pos man_pos_;
 	byte next_hind_;
@@ -39,7 +41,7 @@ protected:
 	bool is_jumping_ = false;
 	byte jump_count_;
 	unsigned int score_ = 0;
-	static unsigned int highscore_;
+	static uint16_t highscore_;
 	int jump_height_;
 	int jump_lenght_;
 

@@ -323,6 +323,11 @@ void MatrixDisplay::setPixel(byte col, byte row, bool value)
 	bitWrite(rows_[row], col_order[col], value);
 }
 
+void MatrixDisplay::setPixel(const Pos &p, bool value)
+{
+	setPixel(p.pos_x, p.pos_y);
+}
+
 byte MatrixDisplay::orderCols(byte value)
 {
 	byte out;

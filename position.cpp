@@ -43,15 +43,35 @@ Pos &Pos::operator=(const SmartPos &pos)
 	return *this;
 }
 
-bool Pos::operator!=(const Pos &pos) { return !operator==(pos); }
+bool Pos::operator!=(const Pos &pos)
+{
+	return !operator==(pos);
+}
 
-SmartPos::SmartPos(unsigned char x, unsigned char y) { setXy(x, y); }
+Pos Pos::operator~()
+{
+	return Pos(pos_y, pos_x);
+}
 
-Pos SmartPos::pos() { return Pos(x(), y()); }
+SmartPos::SmartPos(unsigned char x, unsigned char y)
+{
+	setXy(x, y);
+}
 
-unsigned char SmartPos::x() const { return (compact_pos_ & 0xF0) >> 4; }
+Pos SmartPos::toPos()
+{
+	return Pos(x(), y());
+}
 
-unsigned char SmartPos::y() const { return compact_pos_ & 0x0F; }
+unsigned char SmartPos::x() const
+{
+	return (compact_pos_ & 0xF0) >> 4;
+}
+
+unsigned char SmartPos::y() const
+{
+	return compact_pos_ & 0x0F;
+}
 
 unsigned char SmartPos::setXy(unsigned char x, unsigned char y)
 {

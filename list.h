@@ -1,12 +1,16 @@
 #pragma once
 #include "operators.h"
+template <class TN>
+struct ListNode
+{
+	TN data_;
+	ListNode<TN> *next_ = nullptr;
+};
+
 template <class T>
 class List
 {
 private:
-	template <class Td>
-	class ListNode;
-
 public:
 	List();
 	~List();
@@ -33,13 +37,6 @@ public:
 	T &last();
 
 private:
-	template <class TN>
-	struct ListNode
-	{
-		TN data_;
-		ListNode<TN> *next_ = nullptr;
-	};
-
 	T foo_item_;
 
 	ListNode<T> *nodeAt(const unsigned int &index) const;
@@ -221,7 +218,7 @@ T &List<T>::last()
 }
 
 template <class T>
-List<T>::ListNode<T> *List<T>::nodeAt(const unsigned int &index) const
+ListNode<T> *List<T>::nodeAt(const unsigned int &index) const
 {
 	int pos = 0;
 	ListNode<T> *current = root_;

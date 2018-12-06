@@ -13,18 +13,8 @@ Snake::Snake(Display *display)
 	setSpeed(2);
 }
 
-Snake::~Snake() {}
-
-void Snake::reset()
+Snake::~Snake()
 {
-	display_->clear();
-	body_.append(Pos(1, 7));
-	body_.append(Pos(2, 7));
-	body_.append(Pos(3, 7)); // head
-	eat_pos_ = Pos(5, 7);
-	direction_ = START;
-	new_direction_ = START;
-	render();
 }
 
 void Snake::clear()
@@ -34,6 +24,15 @@ void Snake::clear()
 
 void Snake::start(Event *event)
 {
+	clear();
+	body_.append(Pos(1, 7));
+	body_.append(Pos(2, 7));
+	body_.append(Pos(3, 7)); // head
+	eat_pos_ = Pos(5, 7);
+	direction_ = START;
+	new_direction_ = START;
+	render();
+
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 	event->removeAllTimers();
@@ -178,10 +177,10 @@ bool Snake::onButtonChange(Event *event)
 {
 	if (event->changed() && event->isPressed())
 	{
+		// is not 180° rotation or no rotation(in this case the snake will make
+		// a additinal ste,  what we avoid with dont allow this)
 		if (event->buttonUpChanged() && event->buttonUpState())
 		{
-			// is not 180° rotation or no rotation(in this case the snake will make
-			// a additinal ste,  what we avoid with dont allow this)
 			if (direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::UP;
@@ -215,8 +214,7 @@ bool Snake::onButtonChange(Event *event)
 
 bool Snake::onTimerOverflow(Event *event)
 {
-	Timer &timer = event->timer(0);
-	if (timer.overflow())
+	if (event->timer(0).overflow())
 	{
 		return move();
 	}

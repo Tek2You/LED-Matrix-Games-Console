@@ -11,8 +11,6 @@ public:
 	virtual ~Game();
 	virtual void start(Event *event) = 0;
 	virtual bool process(Event *event);
-	virtual void clear() = 0;
-	virtual void reset() = 0;
 
 	virtual void setSpeed(byte v) = 0;
 
