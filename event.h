@@ -46,13 +46,11 @@ public:
 
 	inline bool onEntry() { return event_ & ON_ENTRY; }
 	inline void setOnEntry() { event_ |= ON_ENTRY; }
-	//	inline bool timeOut1() { return event_ & TIMEOUT1; }
-	//	inline bool timeOut2() { return event_ & TIMEOUT2; }
 
 	bool process();
 	bool processTimers();
 	void addTimer(byte index, unsigned int interval = 0);
-	Timer &getTimer(byte index);
+	Timer &timer(byte index);
 	bool getOverflow(byte &index);
 	void removeTimer(byte &index);
 	void removeAllTimers();
@@ -65,9 +63,18 @@ public:
 		ProcessTimerOverflows = (1 << 2),
 	};
 
-	inline void clearFlags();
-	inline void setFlag(Flags flag, bool set = true);
-	inline bool flag(Flags flag);
+	inline void clearFlags()
+	{
+		flags_ = 0;
+	}
+	inline void setFlag(Flags flag, bool set = true)
+	{
+		bitWrite(flags_, flag, set);
+	}
+	inline bool flag(Flags flag)
+	{
+		return bitRead(flags_, flag);
+	}
 
 private:
 	List<Timer> timers_;

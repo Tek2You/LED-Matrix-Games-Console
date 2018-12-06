@@ -21,5 +21,5 @@ public:
 private:
 	unsigned long next_time_;
 	unsigned int interval_;
-	bool overflow_;
+	bool overflow_ = false;
 };

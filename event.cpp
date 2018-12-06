@@ -56,7 +56,7 @@ void Event::clear()
 bool Event::process()
 {
 	processTimers();
-	return (flag(ProcessEveryCycle) || (flag(ProcessPinChange) && changed()) || (flag(ProcessTimerOverflows) && overflow_));
+	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && changed()) || (flag(Event::ProcessTimerOverflows) && overflow_));
 }
 
 bool Event::processTimers()
@@ -64,8 +64,10 @@ bool Event::processTimers()
 	unsigned int t = millis();
 	for (int i = 0; i < timers_.size(); i++)
 	{
-		Timer timer = timers_.itemAt(i);
-		overflow_ |= timer.overflow_ = timer.process(t);
+		if (timers_.itemAt(i).process(t))
+		{
+			overflow_ = true;
+		}
 	}
 	return overflow_;
 }
@@ -76,7 +78,7 @@ void Event::addTimer(byte index, unsigned int interval)
 	timers_.append(t);
 }
 
-Timer &Event::getTimer(byte index)
+Timer &Event::timer(byte index)
 {
 	return timers_.itemAt(index);
 }
@@ -94,19 +96,4 @@ void Event::removeTimer(byte &index)
 void Event::removeAllTimers()
 {
 	timers_.removeAll();
-}
-
-void Event::setFlag(Event::Flags flag, bool set)
-{
-	bitWrite(flags_, flag, set);
-}
-
-bool Event::flag(Event::Flags flag)
-{
-	return flags_ & flag;
-}
-
-void Event::clearFlags()
-{
-	flags_ = 0;
 }
