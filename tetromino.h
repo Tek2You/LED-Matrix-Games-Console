@@ -57,25 +57,25 @@ public:
 	Tetromino(tetromino::SHAPE shape, byte heigth, byte *field, tetromino::DIRECTION direction, Pos pos);
 
 	void setPos(const Pos &pos) { pos_ = pos; }
-	Pos &pos() { return pos_; }
+	const Pos &pos() { return pos_; }
 
-	void setDirection(tetromino::DIRECTION direction) { direction_ = direction; }
-	tetromino::DIRECTION direction() const { return direction_; }
+	void setDirection(const tetromino::DIRECTION &direction) { direction_ = direction; }
+	const tetromino::DIRECTION direction() const { return direction_; }
 
-	tetromino::SHAPE shape() const { return shape_; }
+	const tetromino::SHAPE shape() const { return shape_; }
 
-	bool getPositions(Pos(&positions));
-	static bool getPositions(Pos(&positions), const SHAPE shape, const DIRECTION direction, const Pos &pos);
+	const bool getPositions(Pos (&positions)[4]);
+	static const bool getPositions(Pos (&positions)[4], const SHAPE &shape, const DIRECTION &direction, const Pos &pos);
 
-	static DIRECTION rotate(DIRECTION direction, SHAPE shape);
+	static const DIRECTION rotate(const DIRECTION &direction, const SHAPE &shape);
 	void rotate();
 
 	byte isValid() const;
-	byte isValid(const tetromino::SHAPE shape, const tetromino::DIRECTION direction, const Pos &pos) const;
+	byte isValid(const tetromino::SHAPE &shape, const tetromino::DIRECTION &direction, const Pos &pos) const;
 
-	static byte getPossibleDirections(const tetromino::SHAPE shape);
+	static byte getPossibleDirections(const tetromino::SHAPE &shape);
 	byte getPossibleDirections() const;
-	static byte possibleDirections(const tetromino::SHAPE shape);
+	static byte possibleDirections(const tetromino::SHAPE &shape);
 	byte possibleDirections() const;
 
 private:
