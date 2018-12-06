@@ -42,6 +42,7 @@ private:
 
 	// snake values
 	Direction direction_;
+	Direction new_direction_;
 	Pos move_vect_;
 	List<Pos> body_;
 	Pos eat_pos_;

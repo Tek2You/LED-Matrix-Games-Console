@@ -9,6 +9,7 @@ Snake::Snake(Display *display)
     : Game(display)
 {
 	direction_ = START;
+	new_direction_ = START;
 	setSpeed(2);
 }
 
@@ -22,6 +23,7 @@ void Snake::reset()
 	body_.append(Pos(3, 7)); // head
 	eat_pos_ = Pos(5, 7);
 	direction_ = START;
+	new_direction_ = START;
 	render();
 }
 
@@ -36,14 +38,13 @@ void Snake::start(Event *event)
 	event->setFlag(Event::ProcessTimerOverflows);
 	event->removeAllTimers();
 	event->addTimer(0, period_);
-	direction_ = Snake::START;
 	event->timer(0).start();
 }
 
 bool Snake::move()
 {
 	Pos vect;
-	switch (direction_)
+	switch (direction_ = new_direction_)
 	{
 	case UP:
 		vect = Pos(0, 1);
@@ -65,9 +66,9 @@ bool Snake::move()
 	vect += body_.last();
 	// check if highscore is broken. Directly save to avoid a not save in case of
 	// reset or poweroff.
-	if (body_.size() - 2 > highscore_)
+	if (body_.size() - 3 > highscore_)
 	{
-		highscore_ = body_.size() - 1;
+		highscore_ = body_.size() - 3;
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
@@ -183,22 +184,22 @@ bool Snake::onButtonChange(Event *event)
 			// a additinal ste,  what we avoid with dont allow this)
 			if (direction_ != Snake::DOWN)
 			{
-				direction_ = Snake::UP;
+				new_direction_ = Snake::UP;
 			}
 		}
 		else if (event->buttonRightChanged() && event->buttonRightState())
 		{
 			if (direction_ != Snake::LEFT)
 			{
-				direction_ = Snake::RIGHT;
+				new_direction_ = Snake::RIGHT;
 			}
 		}
 
 		else if (event->buttonLeftChanged() && event->buttonLeftState())
 		{
-			if (direction_ != Snake::RIGHT)
+			if (direction_ != Snake::RIGHT && direction_ != Snake::START)
 			{
-				direction_ = Snake::LEFT;
+				new_direction_ = Snake::LEFT;
 			}
 		}
 
@@ -206,7 +207,7 @@ bool Snake::onButtonChange(Event *event)
 		{
 			if (direction_ != Snake::UP)
 			{
-				direction_ = Snake::DOWN;
+				new_direction_ = Snake::DOWN;
 			}
 		}
 	}
