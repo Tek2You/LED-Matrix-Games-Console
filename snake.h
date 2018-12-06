@@ -6,9 +6,9 @@
 class Snake : public Game
 {
 public:
-	Snake(Display *display, unsigned long *t);
+	Snake(Display *display);
 	~Snake();
-	void start();
+	void start(Event *event);
 	bool process(Event *event) override;
 	void reset();
 	void clear();
@@ -35,8 +35,6 @@ private:
 		START
 	};
 
-	// processing timer variables
-	unsigned long *timer_;
 	int period_;
 
 	// snake values

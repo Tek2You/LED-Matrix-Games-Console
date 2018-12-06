@@ -6,8 +6,8 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Jump::highscore_ = eeprom_read_word(&EE_highscore);
 
-Jump::Jump(Display *display, unsigned long *t1, unsigned long *t2)
-    : Game(display), forward_timer_(t1), jump_timer_(t2)
+Jump::Jump(Display *display)
+    : Game(display)
 {
 	field_ = static_cast<byte *>(malloc(display_->rows() + 3));
 	current_field_start_ = 0;
@@ -15,9 +15,12 @@ Jump::Jump(Display *display, unsigned long *t1, unsigned long *t2)
 	setSpeed(2);
 }
 
-Jump::~Jump() { free(field_); }
+Jump::~Jump()
+{
+	free(field_);
+}
 
-void Jump::start()
+void Jump::start(Event *event)
 {
 	for (int i = 0; i < display_->rows() + 3; i++)
 	{
@@ -32,28 +35,34 @@ void Jump::start()
 	jump_count_ = 0;
 	jump_height_ = 4;
 	jump_lenght_ = 5;
-	*forward_timer_ = millis() + forward_period_;
+
+	event->removeAllTimers();
+	event->addTimer(0, forward_period_); // timer already starts if given a initzializing interval
+	event->addTimer(1);
+	event->setFlag(Event::ProcessPinChanges);
+	event->setFlag(Event::ProcessTimerOverflows);
 }
 
 bool Jump::process(Event *event)
 {
-	if (event->timeOut1())
+	if (event->timer(0).overflow())
 	{
 		forward();
-		*forward_timer_ = millis() + forward_period_;
 	}
-	if (event->timeOut2())
+	if (event->timer(1).overflow())
 	{
-		jump();
+		jump(event);
 	}
-	if (event->changed())
+
+	if (event->buttonRightChanged())
 	{
 		if (event->buttonRightState())
 		{
-			if (!jump_count_)
+			if (!jump_count_) // begin Jump
 			{
-				*jump_timer_ = millis() + jump_period_;
-				jump();
+				event->timer(1).setInterval(jump_period_);
+				event->timer(1).start();
+				jump(event);
 			}
 		}
 		else if (jump_count_ && jump_count_ < 3)
@@ -70,8 +79,8 @@ bool Jump::process(Event *event)
 			highscore_ = score_;
 			is_new_highscore_ = true;
 			eeprom_write_word(&EE_highscore, highscore_);
-			*forward_timer_ = 0;
-			*jump_timer_ = 0;
+			event->timer(0).stop();
+			event->timer(1).stop();
 		}
 		return true;
 	}
@@ -150,7 +159,7 @@ void Jump::forward()
 	score_++;
 }
 
-void Jump::jump()
+void Jump::jump(Event *event)
 {
 	if (jump_count_ < jump_height_)
 	{
@@ -165,14 +174,13 @@ void Jump::jump()
 			is_jumping_ = false;
 			jump_height_ = 4;
 			jump_lenght_ = 5;
-			*jump_timer_ = 0;
+			event->timer(1).stop();
 			return;
 		}
 		else
 		{
 		}
 	}
-	*jump_timer_ = millis() + jump_period_;
 	jump_count_++;
 	render();
 }

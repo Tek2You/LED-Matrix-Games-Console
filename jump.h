@@ -6,12 +6,12 @@
 class Jump : public Game
 {
 public:
-	Jump(Display *display, unsigned long *t1, unsigned long *t2);
+	Jump(Display *display);
 	~Jump();
 
 	// Game interface
 public:
-	void start();
+	void start(Event *event);
 	bool process(Event *event);
 	void clear();
 	void reset();
@@ -22,12 +22,11 @@ public:
 	static void resetHighscore();
 
 private:
-	unsigned long *forward_timer_, *jump_timer_;
 	int forward_period_, jump_period_;
 	void newHind();
 	bool isValid(Pos pos);
 	void forward();
-	void jump();
+	void jump(Event *event);
 	byte *row(byte n);
 
 protected:

@@ -34,12 +34,14 @@ void Tetris::start(Event *event)
 	event->removeAllTimers();
 	event->addTimer(0, general_step_interval_);
 	event->addTimer(1);
+	event->setFlag(Event::ProcessPinChanges);
+	event->setFlag(Event::ProcessTimerOverflows);
 }
 
 bool Tetris::process(Event *event)
 {
 	unsigned long now = millis();
-	Timer &move_timer = event->getTimer(1);
+	Timer &move_timer = event->timer(1);
 	if (event->changed())
 	{
 		if (event->isPressed())
@@ -53,11 +55,11 @@ bool Tetris::process(Event *event)
 			{
 				if (event->buttonDownState())
 				{
-					event->getTimer(0).setInterval(general_down_interval_);
+					event->timer(0).setInterval(general_down_interval_);
 				}
 				else
 				{
-					event->getTimer(0).setInterval(general_step_interval_);
+					event->timer(0).setInterval(general_step_interval_);
 				}
 			}
 		}
@@ -121,10 +123,10 @@ bool Tetris::process(Event *event)
 		}
 	}
 
-	Timer &down_timer = event->getTimer(0);
+	Timer &down_timer = event->timer(0);
 	if (down_timer.overflow())
 	{
-		if (down())
+		if (down()) // end of the game
 		{
 			return true;
 		}

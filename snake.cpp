@@ -5,8 +5,8 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
-Snake::Snake(Display *display, unsigned long *t)
-    : Game(display), timer_(t) //,
+Snake::Snake(Display *display)
+    : Game(display)
 {
 	direction_ = START;
 	setSpeed(2);
@@ -25,7 +25,20 @@ void Snake::reset()
 	render();
 }
 
-void Snake::clear() { display_->clear(); }
+void Snake::clear()
+{
+	display_->clear();
+}
+
+void Snake::start(Event *event)
+{
+	event->setFlag(Event::ProcessPinChanges);
+	event->setFlag(Event::ProcessTimerOverflows);
+	event->removeAllTimers();
+	event->addTimer(0, period_);
+	direction_ = Snake::START;
+	event->timer(0).start();
+}
 
 bool Snake::move()
 {
@@ -100,7 +113,7 @@ bool Snake::process(Event *event)
 {
 	if (event->changed() && event->isPressed())
 	{
-		if (event->buttonUpState())
+		if (event->buttonUpChanged() && event->buttonUpState())
 		{
 			// is not 180° rotation or no rotation(in this case the snake will make
 			// a additinal ste,  what we avoid with dont allow this)
@@ -109,7 +122,7 @@ bool Snake::process(Event *event)
 				direction_ = Snake::UP;
 			}
 		}
-		else if (event->buttonLeftState())
+		else if (event->buttonRightChanged() && event->buttonLeftState())
 		{
 			if (direction_ != Snake::RIGHT)
 			{
@@ -117,15 +130,15 @@ bool Snake::process(Event *event)
 			}
 		}
 
-		else if (event->buttonRightState())
+		else if (event->buttonRightChanged() && event->buttonRightState())
 		{
-			if (direction_ != Snake::RIGHT)
+			if (direction_ != Snake::LEFT)
 			{
 				direction_ = Snake::RIGHT;
 			}
 		}
 
-		else if (event->buttonDownState())
+		else if (event->buttonDownChanged() && event->buttonDownState())
 		{
 			if (direction_ != Snake::UP)
 			{
@@ -133,21 +146,12 @@ bool Snake::process(Event *event)
 			}
 		}
 	}
-	if (event->timeOut1())
+	Timer &timer = event->timer(0);
+	if (timer.overflow())
 	{
-		*timer_ = millis() + period_;
-		if (move())
-		{ // game ends
-			return true;
-		}
+		return move();
 	}
 	return false;
-}
-
-void Snake::start()
-{
-	*timer_ = millis() + period_;
-	direction_ = Snake::START;
 }
 
 unsigned int Snake::highscore()

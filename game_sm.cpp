@@ -9,7 +9,7 @@
 	   setState(STATE_CAST(&GameSM::s)); \
 	   event->clearFlags();              \
 	   event->setOnEntry();              \
-	   process(e);                       \
+	   process(event);                   \
 	}
 
 #define LOAD_EFFECT_STANDART(s, event)                \
@@ -36,7 +36,7 @@
 byte EE_speed EEMEM = DEFAULT_SPEED;
 byte EE_language EEMEM = DEFAULT_LANGUAGE;
 
-GameSM::GameSM(Display *display)
+GameSM::GameSM(Display *display, Event *event)
     : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display),
       language_(EN)
 {
@@ -44,9 +44,8 @@ GameSM::GameSM(Display *display)
 	display_->text2_.setShiftSpeed(5);
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
-	Event e;
-	e.setOnEntry();
-	process(&e);
+	event->setOnEntry();
+	process(event);
 }
 
 //void GameSM::processStateMaschine(Event *event)
@@ -178,14 +177,13 @@ void GameSM::stateTetris(Event *event)
 		game_ = new Tetris(display_);
 		game_->setSpeed(speed_);
 		game_->reset();
-		game_->start();
-		process_criterium_ |= PCINT | TIMER1 | TIMER2;
+		game_->start(event);
 		return;
 	}
 
 	if (game_->process(event))
 	{
-		TRANSITION(stateGameOver);
+		TRANSITION(stateGameOver, event);
 		return;
 	}
 }
@@ -200,16 +198,15 @@ void GameSM::stateSnake(Event *event)
 			delete game_;
 			game_ = nullptr;
 		}
-		game_ = new Snake(display_, &process_timer1_);
+		game_ = new Snake(display_);
 		game_->reset();
-		game_->start();
-		process_criterium_ |= PCINT | TIMER1;
+		game_->start(event);
 		return;
 	}
 
 	if (game_->process(event))
 	{
-		TRANSITION(stateGameOver);
+		TRANSITION(stateGameOver, event);
 		return;
 	}
 }
@@ -224,17 +221,16 @@ void GameSM::stateJump(Event *event)
 			delete game_;
 			game_ = nullptr;
 		}
-		game_ = new Jump(display_, &process_timer1_, &process_timer2_);
+		game_ = new Jump(display_);
 		game_->setSpeed(speed_);
 		game_->reset();
-		game_->start();
-		process_criterium_ |= PCINT | TIMER1 | TIMER2;
+		game_->start(event);
 		return;
 	}
 
 	if (game_->process(event))
 	{
-		TRANSITION(stateGameOver);
+		TRANSITION(stateGameOver, event);
 	}
 }
 
@@ -242,13 +238,12 @@ void GameSM::stateGameOver(Event *event)
 {
 	if (event->onEntry())
 	{
-		LOAD_EFFECT_BEGIN(stateGameOver);
+		LOAD_EFFECT_BEGIN(stateGameOver, event);
 		display_->text1_.clear();
 		display_->text2_.clear();
-		process_criterium_ = PCINT;
 		if (game_ != nullptr)
 		{
-			process_criterium_ = PCINT;
+			event->setFlag(Event::ProcessPinChanges);
 			display_->loadMenuConfig();
 			if (game_->isNewHighscore())
 			{
@@ -269,7 +264,7 @@ void GameSM::stateGameOver(Event *event)
 
 	if (event->changed() && event->isPressed())
 	{
-		TRANSITION(stateDefault);
+		TRANSITION(stateDefault, event);
 		return;
 	}
 }
@@ -283,7 +278,7 @@ void GameSM::stateSettingsMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		item.init(2);
-		process_criterium_ = PCINT;
+		event->setFlag(Event::ProcessPinChanges);
 	}
 	else if (event->changed() && event->isPressed())
 	{
@@ -293,17 +288,17 @@ void GameSM::stateSettingsMenu(Event *event)
 			switch (item.value_)
 			{
 			case 0:
-				TRANSITION(stateSpeedMenu);
+				TRANSITION(stateSpeedMenu, event);
 				break;
 			case 1:
-				TRANSITION(stateLanguageMenu);
+				TRANSITION(stateLanguageMenu, event);
 				break;
 			default:
 				break;
 			}
 			return;
 		case MenuItem::UP_BTN:
-			TRANSITION(stateDefault);
+			TRANSITION(stateDefault, event);
 			return;
 		default:
 			break;
@@ -331,7 +326,7 @@ void GameSM::stateSpeedMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		item.init(5, speed_);
-		process_criterium_ = PCINT;
+		event->setFlag(Event::ProcessPinChanges);
 	}
 
 	else if (event->changed() && event->isPressed())
@@ -341,9 +336,9 @@ void GameSM::stateSpeedMenu(Event *event)
 		case MenuItem::DOWN_BTN:
 			speed_ = item.value_;
 			eeprom_write_byte(&EE_speed, speed_);
-			LOAD_EFFECT_STANDART(stateSettingsMenu);
+			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 		case MenuItem::UP_BTN:
-			TRANSITION(stateSettingsMenu);
+			TRANSITION(stateSettingsMenu, event);
 			return;
 		default:
 			break;
@@ -367,7 +362,7 @@ void GameSM::stateLanguageMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		item.init(2, (language_ == DE ? 0 : 1));
-		process_criterium_ = PCINT;
+		event->setFlag(Event::ProcessPinChanges);
 	}
 	else if (event->changed() && event->isPressed())
 	{
@@ -376,10 +371,10 @@ void GameSM::stateLanguageMenu(Event *event)
 		case MenuItem::DOWN_BTN:
 			language_ = (item.value_ == 0 ? EN : DE);
 			eeprom_write_byte(&EE_language, byte(language_));
-			LOAD_EFFECT_STANDART(stateSettingsMenu);
+			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 			return;
 		case MenuItem::UP_BTN:
-			TRANSITION(stateSettingsMenu);
+			TRANSITION(stateSettingsMenu, event);
 			return;
 		default:
 			break;
@@ -408,10 +403,10 @@ void GameSM::stateLoadEffect(Event *event)
 		count = 0;
 		display_->text1_.clear();
 		display_->text2_.clear();
-		process_criterium_ = TIMER1;
-		process_timer1_ = millis() + 50;
+		event->removeAllTimers();
+		event->addTimer(0, 50);
 	}
-	if (event->timeOut1())
+	if (event->timer(0).overflow())
 	{
 		if (count >= display_->rows())
 		{
@@ -419,19 +414,18 @@ void GameSM::stateLoadEffect(Event *event)
 			{
 				setState(load_following_state_);
 				load_following_state_ = nullptr;
-				process_criterium_ = 0;
-				Event e;
-				e.setOnEntry();
-				process(&e);
+				event->removeAllTimers();
+				event->clearFlags();
+				event->setOnEntry();
+				process(event);
 			}
 			else
 			{
-				TRANSITION(stateDefault);
+				TRANSITION(stateDefault, event);
 			}
 			return;
 		}
 		display_->setRow(count, 0xFF);
-		process_timer1_ = millis() + 50;
 		count++;
 		return;
 	}
@@ -443,7 +437,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 	if (event->onEntry())
 	{
 		item.init(4, 0);
-		process_criterium_ |= PCINT;
+		event->setFlag(Event::ProcessPinChanges);
 	}
 	else if (event->changed() && event->isPressed())
 	{
@@ -454,17 +448,17 @@ void GameSM::stateHighscoreMenu(Event *event)
 			{
 				if (advanced == MenuItem::DOWN_BTN)
 				{
-					TRANSITION(stateResetMenu);
+					TRANSITION(stateResetMenu, event);
 				}
 				else
 				{
-					TRANSITION(stateDefault);
+					TRANSITION(stateDefault, event);
 				}
 				return;
 			}
 			else
 			{
-				TRANSITION(stateDefault);
+				TRANSITION(stateDefault, event);
 				return;
 			}
 		}
@@ -499,7 +493,7 @@ void GameSM::stateResetMenu(Event *event)
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		process_criterium_ = PCINT;
+		event->setFlag(Event::ProcessPinChanges);
 	}
 
 	else if (event->changed() && event->isPressed())
@@ -511,12 +505,12 @@ void GameSM::stateResetMenu(Event *event)
 				Tetris::resetHighscore();
 				Snake::resetHighscore();
 				Jump::resetHighscore();
-				LOAD_EFFECT_STANDART(stateDefault);
+				LOAD_EFFECT_STANDART(stateDefault, event);
 				return;
 			}
 			if (event->buttonUpState())
 			{
-				TRANSITION(stateHighscoreMenu);
+				TRANSITION(stateHighscoreMenu, event);
 			}
 		}
 	}

@@ -10,7 +10,7 @@ class Display;
 class GameSM : public StateMachine<Event *>
 {
 public:
-	GameSM(Display *display);
+	GameSM(Display *display, Event *event);
 	//	void processStateMaschine(Event *event);
 
 private:

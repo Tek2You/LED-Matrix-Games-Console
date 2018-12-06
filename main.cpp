@@ -10,8 +10,10 @@ FUSES = {
     EFUSE_DEFAULT,
 };
 
+Event event;
+
 Display dp(16, 8);
-GameSM sm(&dp);
+GameSM sm(&dp, &event);
 
 byte button_event;
 int counter = 0;
@@ -19,8 +21,6 @@ int counter = 0;
 byte have_input = 0;
 byte debounce_count[4] = {0, 0, 0, 0};
 byte button_transitional_states;
-
-Event event;
 
 void initGame()
 {
@@ -64,7 +64,10 @@ int main(void)
 }
 void check_buttons();
 
-ISR(PCINT1_vect) { check_buttons(); }
+ISR(PCINT1_vect)
+{
+	check_buttons();
+}
 
 ISR(TIMER2_COMPA_vect)
 {
