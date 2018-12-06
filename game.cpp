@@ -5,13 +5,29 @@ Game::Game(Display *display) : display_(display), is_new_highscore_(false) {}
 
 Game::~Game() {}
 
-void Game::onButtonUpChange(bool state) {}
+bool Game::process(Event *event)
+{
+	bool output = false;
+	if (event->changed())
+	{
+		if (onButtonChange(event))
+			output = true;
+	}
+	if (event->generalOverflow())
+	{
+		if (onTimerOverflow(event))
+			output = true;
+	}
+	return output;
+}
 
-void Game::onButtonDownChange(bool state) {}
+bool Game::onButtonChange(Event *event)
+{
+}
 
-void Game::onButtonRightChange(bool state) {}
-
-void Game::onButtonLeftChange(bool state) {}
+bool Game::onTimerOverflow(Event *event)
+{
+}
 
 extern "C" void __cxa_pure_virtual()
 {

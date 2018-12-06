@@ -9,7 +9,6 @@ public:
 	Snake(Display *display);
 	~Snake();
 	void start(Event *event);
-	bool process(Event *event) override;
 	void reset();
 	void clear();
 
@@ -18,6 +17,10 @@ public:
 
 	static unsigned int highscore();
 	static void resetHighscore();
+
+protected:
+	bool onButtonChange(Event *event) override;
+	bool onTimerOverflow(Event *event) override;
 
 private:
 	void render();

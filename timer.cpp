@@ -1,6 +1,6 @@
 #include "timer.h"
 
-Timer::Timer(unsigned int interval) : interval_(interval), overflow_(false)
+Timer::Timer(unsigned long interval) : interval_(interval), overflow_(false)
 {
 	if (interval_)
 	{

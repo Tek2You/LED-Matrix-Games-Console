@@ -109,51 +109,6 @@ void Snake::setSpeed(byte v)
 	}
 }
 
-bool Snake::process(Event *event)
-{
-	if (event->changed() && event->isPressed())
-	{
-		if (event->buttonUpChanged() && event->buttonUpState())
-		{
-			// is not 180° rotation or no rotation(in this case the snake will make
-			// a additinal ste,  what we avoid with dont allow this)
-			if (direction_ != Snake::DOWN)
-			{
-				direction_ = Snake::UP;
-			}
-		}
-		else if (event->buttonRightChanged() && event->buttonRightState())
-		{
-			if (direction_ != Snake::LEFT)
-			{
-				direction_ = Snake::RIGHT;
-			}
-		}
-
-		else if (event->buttonLeftChanged() && event->buttonLeftState())
-		{
-			if (direction_ != Snake::RIGHT)
-			{
-				direction_ = Snake::LEFT;
-			}
-		}
-
-		else if (event->buttonDownChanged() && event->buttonDownState())
-		{
-			if (direction_ != Snake::UP)
-			{
-				direction_ = Snake::DOWN;
-			}
-		}
-	}
-	Timer &timer = event->timer(0);
-	if (timer.overflow())
-	{
-		return move();
-	}
-	return false;
-}
-
 unsigned int Snake::highscore()
 {
 	return highscore_ = eeprom_read_word(&EE_highscore);
@@ -216,4 +171,53 @@ bool Snake::isValid(Pos &pos)
 void Snake::resetHighscore()
 {
 	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
+
+bool Snake::onButtonChange(Event *event)
+{
+	if (event->changed() && event->isPressed())
+	{
+		if (event->buttonUpChanged() && event->buttonUpState())
+		{
+			// is not 180° rotation or no rotation(in this case the snake will make
+			// a additinal ste,  what we avoid with dont allow this)
+			if (direction_ != Snake::DOWN)
+			{
+				direction_ = Snake::UP;
+			}
+		}
+		else if (event->buttonRightChanged() && event->buttonRightState())
+		{
+			if (direction_ != Snake::LEFT)
+			{
+				direction_ = Snake::RIGHT;
+			}
+		}
+
+		else if (event->buttonLeftChanged() && event->buttonLeftState())
+		{
+			if (direction_ != Snake::RIGHT)
+			{
+				direction_ = Snake::LEFT;
+			}
+		}
+
+		else if (event->buttonDownChanged() && event->buttonDownState())
+		{
+			if (direction_ != Snake::UP)
+			{
+				direction_ = Snake::DOWN;
+			}
+		}
+	}
+}
+
+bool Snake::onTimerOverflow(Event *event)
+{
+	Timer &timer = event->timer(0);
+	if (timer.overflow())
+	{
+		return move();
+	}
+	return false;
 }

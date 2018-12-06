@@ -51,7 +51,7 @@ public:
 	bool processTimers();
 	void addTimer(byte index, unsigned int interval = 0);
 	Timer &timer(byte index);
-	bool getOverflow(byte &index);
+	bool overflow(byte &index);
 	void removeTimer(byte &index);
 	void removeAllTimers();
 
@@ -63,18 +63,10 @@ public:
 		ProcessTimerOverflows = (1 << 2),
 	};
 
-	inline void clearFlags()
-	{
-		flags_ = 0;
-	}
-	inline void setFlag(Flags flag, bool set = true)
-	{
-		bitWrite(flags_, flag, set);
-	}
-	inline bool flag(Flags flag)
-	{
-		return bitRead(flags_, flag);
-	}
+	inline void clearFlags() { flags_ = 0; }
+	inline void setFlag(Flags flag, bool set = true) { bitWrite(flags_, flag, set); }
+	inline bool flag(Flags flag) { return bitRead(flags_, flag); }
+	bool generalOverflow() const { return overflow_; }
 
 private:
 	List<Timer> timers_;

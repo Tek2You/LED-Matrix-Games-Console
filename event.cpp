@@ -61,7 +61,7 @@ bool Event::process()
 
 bool Event::processTimers()
 {
-	unsigned int t = millis();
+	unsigned long t = millis();
 	for (int i = 0; i < timers_.size(); i++)
 	{
 		if (timers_.itemAt(i).process(t))
@@ -83,7 +83,7 @@ Timer &Event::timer(byte index)
 	return timers_.itemAt(index);
 }
 
-bool Event::getOverflow(byte &index)
+bool Event::overflow(byte &index)
 {
 	timers_.itemAt(index).overflow();
 }

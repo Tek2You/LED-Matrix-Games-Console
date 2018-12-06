@@ -10,7 +10,7 @@ public:
 	Game(Display *display);
 	virtual ~Game();
 	virtual void start(Event *event) = 0;
-	virtual bool process(Event *event) = 0;
+	virtual bool process(Event *event);
 	virtual void clear() = 0;
 	virtual void reset() = 0;
 
@@ -19,10 +19,9 @@ public:
 	virtual unsigned int points() const = 0;
 	virtual bool isNewHighscore() const { return is_new_highscore_; }
 
-	virtual void onButtonUpChange(bool state);
-	virtual void onButtonDownChange(bool state);
-	virtual void onButtonRightChange(bool state);
-	virtual void onButtonLeftChange(bool state);
+protected:
+	virtual bool onButtonChange(Event *event);
+	virtual bool onTimerOverflow(Event *event);
 
 protected:
 	virtual void render() = 0;
