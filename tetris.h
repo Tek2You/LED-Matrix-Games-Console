@@ -9,10 +9,9 @@ class Tetris : public Game
 public:
 	Tetris(Display *display);
 	~Tetris();
+
 	void start(Event *event);
-	bool process(Event *event) override;
-	void reset() override;
-	void clear() override;
+
 	unsigned int points() const { return points_; }
 	void setSpeed(byte v) override;
 
@@ -20,10 +19,15 @@ public:
 	static unsigned int highscore();
 	static void resetHighscore();
 
-private:
+protected:
 	// game interface
+	bool onButtonChange(Event *event) override;
+	bool onTimerOverflow(Event *event) override;
 	void render();
+
+private:
 	// private functions only for tetris
+	void clear();
 	bool rotate();
 	bool right();
 	bool left();
@@ -36,18 +40,11 @@ private:
 	tetromino::SHAPE randomTetrominoShape();
 	tetromino::DIRECTION randomTetrominoDirection(tetromino::SHAPE shape);
 
-	//	int down_period_, move_period_;
-
 	// from speed calculated delay intervals
 	int general_step_interval_;
 	int general_down_interval_;
 	int general_first_move_interval_;
 	int general_move_interval_;
-
-	// current button states
-	//	bool btn_down_state_;
-	//	bool btn_left_state_;
-	//	bool btn_right_state_;
 
 	byte *field_; // field without current tetromino
 	Tetromino *tetromino_;

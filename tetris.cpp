@@ -1,7 +1,6 @@
 ﻿#include "tetris.h"
 #include "avr/eeprom.h"
 #include "operators.h"
-#include "string.h"
 
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
@@ -13,7 +12,10 @@ Tetris::Tetris(Display *display)
 	field_ = static_cast<byte *>(malloc(display_->rows()));
 	tetromino_ = nullptr;
 	setSpeed(2);
-	reset();
+
+	clear();
+	display_->clear();
+	points_ = 0;
 }
 
 Tetris::~Tetris()
@@ -36,106 +38,6 @@ void Tetris::start(Event *event)
 	event->addTimer(1);
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
-}
-
-bool Tetris::process(Event *event)
-{
-	unsigned long now = millis();
-	Timer &move_timer = event->timer(1);
-	if (event->changed())
-	{
-		if (event->isPressed())
-		{
-			if (event->buttonUpState())
-			{
-				rotate();
-			}
-			// btn down
-			if (event->buttonDownChanged())
-			{
-				if (event->buttonDownState())
-				{
-					event->timer(0).setInterval(general_down_interval_);
-				}
-				else
-				{
-					event->timer(0).setInterval(general_step_interval_);
-				}
-			}
-		}
-
-		// btn left
-		if (event->buttonLeftChanged())
-		{
-			if (event->buttonLeftState())
-			{
-				if (!event->buttonRightState())
-				{
-					left();
-					move_timer.setInterval(general_first_move_interval_);
-					move_timer.start();
-				}
-			}
-			else
-			{
-				if (event->buttonLeftState())
-				{
-					move_timer.stop();
-					move_timer.clearOverflow();
-				}
-			}
-		}
-
-		// btn right
-		if (event->buttonRightChanged())
-		{
-			if (event->buttonRightState())
-			{
-				if (!event->buttonLeftState())
-				{
-					right();
-					move_timer.setInterval(general_first_move_interval_);
-					move_timer.start();
-				}
-			}
-			else
-			{
-				if (event->buttonRightState())
-				{
-					move_timer.stop();
-					move_timer.clearOverflow();
-				}
-			}
-		}
-	}
-	if (move_timer.overflow())
-	{
-		if (event->buttonLeftState())
-		{
-			left();
-			move_timer.setInterval(general_move_interval_);
-		}
-
-		else if (event->buttonRightState())
-		{
-			right();
-			move_timer.setInterval(general_move_interval_);
-		}
-	}
-
-	Timer &down_timer = event->timer(0);
-	if (down_timer.overflow())
-	{
-		if (down()) // end of the game
-		{
-			return true;
-		}
-		if (event->buttonDownState())
-			down_timer.setInterval(general_down_interval_);
-		else
-			down_timer.setInterval(general_step_interval_);
-	}
-	return false;
 }
 
 void Tetris::render()
@@ -284,18 +186,6 @@ bool Tetris::down()
 	return false;
 }
 
-void Tetris::reset()
-{
-	if (tetromino_)
-	{ // make sure, a tetromino is exiting
-		delete (tetromino_);
-		tetromino_ = nullptr;
-	}
-	clear();
-	display_->clear();
-	points_ = 0;
-}
-
 void Tetris::clear()
 {
 	for (byte *ptr = field_; ptr < &field_[display_->rows()]; ptr++)
@@ -390,6 +280,110 @@ void Tetris::takeOverTetromino()
 void Tetris::resetHighscore()
 {
 	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
+
+bool Tetris::onButtonChange(Event *event)
+{
+	Timer &move_timer = event->timer(1);
+	if (event->changed())
+	{
+		if (event->isPressed())
+		{
+			if (event->buttonUpState())
+			{
+				rotate();
+			}
+			// btn down
+			if (event->buttonDownChanged())
+			{
+				if (event->buttonDownState())
+				{
+					event->timer(0).setInterval(general_down_interval_);
+				}
+				else
+				{
+					event->timer(0).setInterval(general_step_interval_);
+				}
+			}
+		}
+
+		// btn left
+		if (event->buttonLeftChanged())
+		{
+			if (event->buttonLeftState())
+			{
+				if (!event->buttonRightState())
+				{
+					left();
+					move_timer.setInterval(general_first_move_interval_);
+					move_timer.start();
+				}
+			}
+			else
+			{
+				if (event->buttonLeftState())
+				{
+					move_timer.stop();
+					move_timer.clearOverflow();
+				}
+			}
+		}
+
+		// btn right
+		if (event->buttonRightChanged())
+		{
+			if (event->buttonRightState())
+			{
+				if (!event->buttonLeftState())
+				{
+					right();
+					move_timer.setInterval(general_first_move_interval_);
+					move_timer.start();
+				}
+			}
+			else
+			{
+				if (event->buttonRightState())
+				{
+					move_timer.stop();
+					move_timer.clearOverflow();
+				}
+			}
+		}
+	}
+}
+
+bool Tetris::onTimerOverflow(Event *event)
+{
+	Timer &move_timer = event->timer(1);
+	if (move_timer.overflow())
+	{
+		if (event->buttonLeftState())
+		{
+			left();
+			move_timer.setInterval(general_move_interval_);
+		}
+
+		else if (event->buttonRightState())
+		{
+			right();
+			move_timer.setInterval(general_move_interval_);
+		}
+	}
+
+	Timer &down_timer = event->timer(0);
+	if (down_timer.overflow())
+	{
+		if (down()) // end of the game
+		{
+			return true;
+		}
+		if (event->buttonDownState())
+			down_timer.setInterval(general_down_interval_);
+		else
+			down_timer.setInterval(general_step_interval_);
+	}
+	return false;
 }
 
 void Tetris::checkRowsFinished()
