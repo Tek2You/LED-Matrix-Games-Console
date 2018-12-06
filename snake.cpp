@@ -122,19 +122,19 @@ bool Snake::process(Event *event)
 				direction_ = Snake::UP;
 			}
 		}
-		else if (event->buttonRightChanged() && event->buttonLeftState())
-		{
-			if (direction_ != Snake::RIGHT)
-			{
-				direction_ = Snake::LEFT;
-			}
-		}
-
 		else if (event->buttonRightChanged() && event->buttonRightState())
 		{
 			if (direction_ != Snake::LEFT)
 			{
 				direction_ = Snake::RIGHT;
+			}
+		}
+
+		else if (event->buttonLeftChanged() && event->buttonLeftState())
+		{
+			if (direction_ != Snake::RIGHT)
+			{
+				direction_ = Snake::LEFT;
 			}
 		}
 

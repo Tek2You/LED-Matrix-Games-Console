@@ -405,6 +405,7 @@ void GameSM::stateLoadEffect(Event *event)
 		display_->text2_.clear();
 		event->removeAllTimers();
 		event->addTimer(0, 50);
+		event->setFlag(Event::ProcessTimerOverflows);
 	}
 	if (event->timer(0).overflow())
 	{
