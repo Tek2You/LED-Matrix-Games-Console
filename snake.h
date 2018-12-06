@@ -13,7 +13,7 @@ public:
 	void reset();
 	void clear();
 
-	unsigned int points() const { return body_.size() - 1; }
+	unsigned int points() const { return body_.size() - 3; }
 	void setSpeed(byte v) override;
 
 	static unsigned int highscore();
