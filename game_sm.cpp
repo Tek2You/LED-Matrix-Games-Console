@@ -5,41 +5,40 @@
 #include "operators.h"
 
 #undef TRANSITION
-#define TRANSITION(s, event)            \
-   {                                    \
-	   setState(STATE_CAST(&GameSM::s)); \
-	   event->clearFlags();              \
-	   event->setOnEntry();              \
-	   process(event);                   \
+#define TRANSITION(s, event)                                                                                           \
+   {                                                                                                                   \
+	   setState(STATE_CAST(&GameSM::s));                                                                                \
+	   event->clearFlags();                                                                                             \
+	   event->setOnEntry();                                                                                             \
+	   process(event);                                                                                                  \
 	}
 
-#define LOAD_EFFECT_STANDART(s, event)                \
-   {                                                  \
-	   load_following_state_ = STATE_CAST(&GameSM::s); \
-	   TRANSITION(stateLoadEffect, event);             \
-	   return;                                         \
+#define LOAD_EFFECT_STANDART(s, event)                                                                                 \
+   {                                                                                                                   \
+	   load_following_state_ = STATE_CAST(&GameSM::s);                                                                  \
+	   TRANSITION(stateLoadEffect, event);                                                                              \
+	   return;                                                                                                          \
 	}
 
-#define LOAD_EFFECT_BEGIN(s, event)      \
-   {                                     \
-	   static bool load_passed = false;   \
-	   if (load_passed)                   \
-      {                                  \
-	      load_passed = false;            \
-	   }                                  \
-	   else                               \
-      {                                  \
-	      load_passed = true;             \
-	      LOAD_EFFECT_STANDART(s, event); \
-	   }                                  \
+#define LOAD_EFFECT_BEGIN(s, event)                                                                                    \
+   {                                                                                                                   \
+	   static bool load_passed = false;                                                                                 \
+	   if (load_passed)                                                                                                 \
+      {                                                                                                                \
+	      load_passed = false;                                                                                          \
+	   }                                                                                                                \
+	   else                                                                                                             \
+      {                                                                                                                \
+	      load_passed = true;                                                                                           \
+	      LOAD_EFFECT_STANDART(s, event);                                                                               \
+	   }                                                                                                                \
 	}
 
 byte EE_speed EEMEM = DEFAULT_SPEED;
 byte EE_language EEMEM = DEFAULT_LANGUAGE;
 
 GameSM::GameSM(Display *display, Event *event)
-    : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display),
-      language_(EN)
+    : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), language_(EN)
 {
 	display_->text1_.setShiftSpeed(5);
 	display_->text2_.setShiftSpeed(5);
@@ -47,9 +46,10 @@ GameSM::GameSM(Display *display, Event *event)
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
 	event->setOnEntry();
 	process(event);
+	event->clear();
 }
 
-//void GameSM::processStateMaschine(Event *event)
+// void GameSM::processStateMaschine(Event *event)
 //{
 //	bool process = false;
 //	if ((process_criterium_ & EVER) ||
@@ -77,9 +77,7 @@ GameSM::GameSM(Display *display, Event *event)
 //		this->process(event);
 //}
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item,
-                                                   const char num,
-                                                   const char min)
+GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
 {
 
 	switch (event->event_ & INPUT_MASK)
@@ -102,10 +100,8 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item,
 
 void GameSM::stateDefault(Event *event)
 {
-
-	const char *texts[2][5] = {
-	    {"Tetris", "Snake", "Jump", "highscore", "setting"},
-	    {"Tetris", "Snake", "Jump", "Highscore", "Einstellungen"}};
+	const char *texts[2][5] = {{"Tetris", "Snake", "Jump", "highscore", "setting"},
+	                           {"Tetris", "Snake", "Jump", "Highscore", "Einstellungen"}};
 	static MenuItem item;
 	if (event->onEntry())
 	{
@@ -114,7 +110,7 @@ void GameSM::stateDefault(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 	}
 
-	else if (event->changed() && event->isPressed())
+	else if (event->hasPressed())
 	{
 		if (item.advance(event) == MenuItem::DOWN_BTN)
 		{
@@ -140,6 +136,10 @@ void GameSM::stateDefault(Event *event)
 			}
 			return;
 		}
+	}
+	else
+	{
+		return;
 	}
 
 	switch (item.value_)
@@ -246,8 +246,7 @@ void GameSM::stateGameOver(Event *event)
 			display_->loadMenuConfig();
 			if (game_->isNewHighscore())
 			{
-				display_->text1_.setText(
-				    (language_ == EN ? "new highscore!" : "neuer Highscore!"));
+				display_->text1_.setText((language_ == EN ? "new highscore!" : "neuer Highscore!"));
 			}
 			else
 			{
@@ -261,7 +260,7 @@ void GameSM::stateGameOver(Event *event)
 		return;
 	}
 
-	if (event->changed() && event->isPressed())
+	if (event->hasPressed())
 	{
 		TRANSITION(stateDefault, event);
 		return;
@@ -271,15 +270,14 @@ void GameSM::stateGameOver(Event *event)
 void GameSM::stateSettingsMenu(Event *event)
 {
 	static MenuItem item;
-	const char *menu_text[2][2] = {{"speed", "language"},
-	                               {"Geschwindigkeit", "Sprache"}};
+	const char *menu_text[2][2] = {{"speed", "language"}, {"Geschwindigkeit", "Sprache"}};
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
 		item.init(2);
 		event->setFlag(Event::ProcessPinChanges);
 	}
-	else if (event->changed() && event->isPressed())
+	else if (event->hasPressed())
 	{
 		switch (item.advance(event))
 		{
@@ -302,6 +300,10 @@ void GameSM::stateSettingsMenu(Event *event)
 		default:
 			break;
 		}
+	}
+	else
+	{
+		return;
 	}
 
 	switch (item.value_)
@@ -328,7 +330,7 @@ void GameSM::stateSpeedMenu(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 	}
 
-	else if (event->changed() && event->isPressed())
+	else if (event->hasPressed())
 	{
 		switch (item.advance(event))
 		{
@@ -342,6 +344,10 @@ void GameSM::stateSpeedMenu(Event *event)
 		default:
 			break;
 		}
+	}
+	else
+	{
+		return;
 	}
 	display_->clear();
 	display_->text1_.setNumber(item.value_ + 1);
@@ -362,7 +368,7 @@ void GameSM::stateLanguageMenu(Event *event)
 		item.init(2, (language_ == DE ? 0 : 1));
 		event->setFlag(Event::ProcessPinChanges);
 	}
-	else if (event->changed() && event->isPressed())
+	else if (event->hasPressed())
 	{
 		switch (item.advance(event))
 		{ // enter pressed
@@ -377,6 +383,10 @@ void GameSM::stateLanguageMenu(Event *event)
 		default:
 			break;
 		}
+	}
+	else
+	{
+		return;
 	}
 
 	switch (item.value_)
@@ -438,7 +448,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 		item.init(4, 0);
 		event->setFlag(Event::ProcessPinChanges);
 	}
-	else if (event->changed() && event->isPressed())
+	else if (event->hasPressed())
 	{
 		byte advanced = item.advance(event);
 		if (advanced)
@@ -462,6 +472,10 @@ void GameSM::stateHighscoreMenu(Event *event)
 			}
 		}
 	}
+	else
+	{
+		return;
+	}
 	switch (item.value_)
 	{
 	case 0:
@@ -478,9 +492,10 @@ void GameSM::stateHighscoreMenu(Event *event)
 		break;
 	case 3:
 		display_->setIcon(0xbd42a59999a542bd);
-		display_->text1_.setText(language_ == EN ? "reset" : "Zur"
-		                                                     "\x1c"
-		                                                     "cksetzen");
+		display_->text1_.setText(language_ == EN ? "reset"
+		                                         : "Zur"
+		                                           "\x1c"
+		                                           "cksetzen");
 	default:
 		break;
 	}
@@ -494,7 +509,7 @@ void GameSM::stateResetMenu(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 	}
 
-	else if (event->changed() && event->isPressed())
+	else if (event->hasPressed())
 	{
 		if (event->buttonDownState())
 		{
@@ -510,6 +525,10 @@ void GameSM::stateResetMenu(Event *event)
 			return;
 		}
 	}
+	else
+	{
+		return;
+	}
 	display_->text1_.setText((language_ == EN ? "reset scores"
 	                                          : "Highscores zur"
 	                                            "\x1c"
@@ -517,7 +536,4 @@ void GameSM::stateResetMenu(Event *event)
 	display_->setIcon(0x00040a1120408000);
 }
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event)
-{
-	advance(event, value_, num_);
-}
+GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event) { advance(event, value_, num_); }

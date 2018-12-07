@@ -18,7 +18,7 @@ GameSM sm(&dp, &event);
 byte button_event;
 int counter = 0;
 
-byte have_input = 0;
+bool have_input = false;
 byte debounce_count[4] = {0, 0, 0, 0};
 byte button_transitional_states;
 
@@ -48,15 +48,15 @@ int main(void)
 		dp.show();
 		if (have_input || counter++ >= 0xFF) // pre-devider for proccing function
 		{
+			counter = 0;
 			dp.update();
 			dp.disable();
-			counter = 0;
 			if (event.process())
 			{
 				sm.process(&event);
 				event.clear();
 			}
-			have_input = 0;
+			have_input = false;
 		}
 	}
 	return 0;

@@ -1,10 +1,14 @@
 #include "event.h"
 
-Event::Event() : event_(0), flags_(0)
+Event::Event() : event_(0), flags_(0) {}
+
+bool Event::hasPressed() const
 {
+	return (buttonDownChanged() && buttonDownState()) || (buttonLeftChanged() && buttonLeftState()) ||
+	       (buttonRightChanged() && buttonRightState()) || (buttonUpChanged() && buttonUpState());
 }
 
-void Event::setButtonUpState(bool state)
+void Event::setButtonUpState(const bool state)
 {
 	if (state != buttonUpState())
 	{
@@ -13,7 +17,7 @@ void Event::setButtonUpState(bool state)
 	}
 }
 
-void Event::setButtonDownState(bool state)
+void Event::setButtonDownState(const bool state)
 {
 	if (state != buttonDownState())
 	{
@@ -22,7 +26,7 @@ void Event::setButtonDownState(bool state)
 	}
 }
 
-void Event::setButtonRightState(bool state)
+void Event::setButtonRightState(const bool state)
 {
 	if (state != buttonRightState())
 	{
@@ -31,7 +35,7 @@ void Event::setButtonRightState(bool state)
 	}
 }
 
-void Event::setButtonLeftState(bool state)
+void Event::setButtonLeftState(const bool state)
 {
 	if (state != buttonLeftState())
 	{
@@ -56,7 +60,8 @@ void Event::clear()
 bool Event::process()
 {
 	processTimers();
-	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && changed()) || (flag(Event::ProcessTimerOverflows) && overflow_));
+	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && changed()) ||
+	        (flag(Event::ProcessTimerOverflows) && overflow_));
 }
 
 bool Event::processTimers()
@@ -78,22 +83,10 @@ void Event::addTimer(byte index, unsigned int interval)
 	timers_.append(t);
 }
 
-Timer &Event::timer(byte index)
-{
-	return timers_.itemAt(index);
-}
+Timer &Event::timer(byte index) { return timers_.itemAt(index); }
 
-bool Event::overflow(byte &index)
-{
-	timers_.itemAt(index).overflow();
-}
+bool Event::overflow(byte &index) { timers_.itemAt(index).overflow(); }
 
-void Event::removeTimer(byte &index)
-{
-	timers_.remove(index);
-}
+void Event::removeTimer(byte &index) { timers_.remove(index); }
 
-void Event::removeAllTimers()
-{
-	timers_.removeAll();
-}
+void Event::removeAllTimers() { timers_.removeAll(); }

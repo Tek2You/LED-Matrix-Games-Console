@@ -17,34 +17,34 @@
 //#define TIMEOUT1 bit(9)
 //#define TIMEOUT2 bit(10)
 // mask of all input pins
-#define CHANGE \
-	(BTN_LEFT_CHANGE | BTN_DOWN_CHANGE | BTN_UP_CHANGE | BTN_RIGHT_CHANGE)
+#define CHANGE (BTN_LEFT_CHANGE | BTN_DOWN_CHANGE | BTN_UP_CHANGE | BTN_RIGHT_CHANGE)
 #define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP)
 
 class Event
 {
 public:
 	Event();
-	const inline bool buttonUpChanged() { return event_ & BTN_UP_CHANGE; }
-	const inline bool buttonDownChanged() { return event_ & BTN_DOWN_CHANGE; }
-	const inline bool buttonRightChanged() { return event_ & BTN_RIGHT_CHANGE; }
-	const inline bool buttonLeftChanged() { return event_ & BTN_LEFT_CHANGE; }
+	const inline bool buttonUpChanged() const { return event_ & BTN_UP_CHANGE; }
+	const inline bool buttonDownChanged() const { return event_ & BTN_DOWN_CHANGE; }
+	const inline bool buttonRightChanged() const { return event_ & BTN_RIGHT_CHANGE; }
+	const inline bool buttonLeftChanged() const { return event_ & BTN_LEFT_CHANGE; }
 
-	const inline bool buttonUpState() { return event_ & BTN_UP; }
-	const inline bool buttonDownState() { return event_ & BTN_DOWN; }
-	const inline bool buttonRightState() { return event_ & BTN_RIGHT; }
-	const inline bool buttonLeftState() { return event_ & BTN_LEFT; }
-	const inline bool changed() { return event_ & CHANGE; }
-	inline bool isPressed() { return event_ & INPUT_MASK; }
+	const inline bool buttonUpState() const { return event_ & BTN_UP; }
+	const inline bool buttonDownState() const { return event_ & BTN_DOWN; }
+	const inline bool buttonRightState() const { return event_ & BTN_RIGHT; }
+	const inline bool buttonLeftState() const { return event_ & BTN_LEFT; }
+	const inline bool changed() const { return event_ & CHANGE; }
+	inline bool isPressed() const { return event_ & INPUT_MASK; }
+	bool hasPressed() const;
 
-	void setButtonUpState(bool state);
-	void setButtonDownState(bool state);
-	void setButtonRightState(bool state);
-	void setButtonLeftState(bool state);
+	void setButtonUpState(const bool state);
+	void setButtonDownState(const bool state);
+	void setButtonRightState(const bool state);
+	void setButtonLeftState(const bool state);
 
 	void clear();
 
-	inline bool onEntry() { return event_ & ON_ENTRY; }
+	const inline bool onEntry() const { return event_ & ON_ENTRY; }
 	inline void setOnEntry() { event_ |= ON_ENTRY; }
 
 	bool process();
