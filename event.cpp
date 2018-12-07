@@ -77,7 +77,7 @@ bool Event::processTimers()
 	return overflow_;
 }
 
-void Event::addTimer(byte index, unsigned int interval)
+void Event::addTimer(unsigned long interval)
 {
 	Timer t(interval);
 	timers_.append(t);

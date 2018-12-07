@@ -33,8 +33,8 @@ void Tetris::start(Event *event)
 	newTetromino();
 
 	event->removeAllTimers();
-	event->addTimer(0, general_step_interval_);
-	event->addTimer(1);
+	event->addTimer(general_step_interval_);
+	event->addTimer();
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 }

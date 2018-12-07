@@ -49,7 +49,7 @@ public:
 
 	bool process();
 	bool processTimers();
-	void addTimer(byte index, unsigned int interval = 0);
+	void addTimer(unsigned long interval = 0);
 	Timer &timer(byte index);
 	bool overflow(byte &index);
 	void removeTimer(byte &index);

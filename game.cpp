@@ -21,13 +21,9 @@ bool Game::process(Event *event)
 	return output;
 }
 
-bool Game::onButtonChange(Event *event)
-{
-}
+bool Game::onButtonChange(Event *event) {}
 
-bool Game::onTimerOverflow(Event *event)
-{
-}
+bool Game::onTimerOverflow(Event *event) {}
 
 extern "C" void __cxa_pure_virtual()
 {

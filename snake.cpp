@@ -30,7 +30,7 @@ void Snake::start(Event *event)
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 	event->removeAllTimers();
-	event->addTimer(0, period_);
+	event->addTimer(period_);
 	event->timer(0).start();
 }
 
