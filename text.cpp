@@ -59,7 +59,7 @@ void Text::setText(const char *text)
 	computeShiftMode();
 }
 
-void Text::setNumber(int value)
+void Text::setNumber(const int &value)
 {
 	setText(display_->formatInt(number_buffer_, 10, value));
 }
@@ -80,7 +80,7 @@ void Text::computeShiftMode()
 		                    offset_);
 }
 
-void Text::setShiftSpeed(int speed)
+void Text::setShiftSpeed(const int speed)
 {
 	speed_ = speed;
 	speed_time_ = 1000 / speed_; // from shifts per second to mseconds per shift
@@ -88,13 +88,13 @@ void Text::setShiftSpeed(int speed)
 
 void Text::setCursor(char pos) { curser_pos_ = pos; }
 
-void Text::setOperationRows(byte start, byte end)
+void Text::setOperationRows(const byte start, const byte end)
 {
 	start_row_ = start;
 	end_row_ = end;
 }
 
-void Text::setOperationCols(byte start, byte end)
+void Text::setOperationCols(const byte start, const byte end)
 {
 	start_col_ = start;
 	end_col_ = end;

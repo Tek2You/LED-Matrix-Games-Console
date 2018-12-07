@@ -414,7 +414,7 @@ tetromino::SHAPE Tetris::randomTetrominoShape()
 	return tetromino::SHAPE(millis() % 7);
 }
 
-tetromino::DIRECTION Tetris::randomTetrominoDirection(const SHAPE shape)
+tetromino::DIRECTION Tetris::randomTetrominoDirection(const SHAPE &shape)
 {
 	byte directions = Tetromino::getPossibleDirections(shape);
 	byte num = Tetromino::possibleDirections(shape);

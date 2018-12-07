@@ -1,5 +1,6 @@
 ﻿#include "game_sm.h"
 #include "avr/eeprom.h"
+#include "avr/wdt.h"
 #include "defaults.h"
 #include "operators.h"
 
@@ -352,8 +353,7 @@ void GameSM::stateSpeedMenu(Event *event)
 
 void GameSM::stateLanguageMenu(Event *event)
 {
-	const char *menu_text[2][2] = {{"english", "Deutsch"},
-	                               {"english", "Deutsch"}};
+	const char *menu_text[2] = {"english", "Deutsch"};
 	static MenuItem item;
 	if (event->onEntry())
 	{
@@ -389,7 +389,7 @@ void GameSM::stateLanguageMenu(Event *event)
 	default:
 		break;
 	}
-	display_->text1_.setText(menu_text[language_][item.value_]);
+	display_->text1_.setText(menu_text[item.value_]);
 }
 
 void GameSM::stateLoadEffect(Event *event)
@@ -497,9 +497,11 @@ void GameSM::stateResetMenu(Event *event)
 	{
 		if (event->buttonDownState())
 		{
+			wdt_disable();
 			Tetris::resetHighscore();
-			//			Snake::resetHighscore();
-			//			Jump::resetHighscore();
+			Snake::resetHighscore();
+			Jump::resetHighscore();
+			wdt_enable(WDTO_15MS);
 			LOAD_EFFECT_STANDART(stateDefault, event);
 			return;
 		}

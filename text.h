@@ -21,7 +21,7 @@ public:
 	};
 
 	void setText(const char *text);
-	void setNumber(int number);
+	void setNumber(const int &number);
 
 	void shift();
 
@@ -29,17 +29,17 @@ public:
 
 	void clear();
 
-	void setShiftSpeed(int speed);
+	void setShiftSpeed(const int speed);
 	int shiftSpeed() const { return speed_; }
 
-	void setOffset(byte offset) { offset_ = offset; }
-	byte offset() { return offset_; }
+	void setOffset(const byte offset) { offset_ = offset; }
+	byte offset() const { return offset_; }
 
 	void setCursor(char pos);
 	char getCursor() const { return curser_pos_; }
 
-	void setOperationRows(byte start, byte end);
-	void setOperationCols(byte start, byte end);
+	void setOperationRows(const byte start, const byte end);
+	void setOperationCols(const byte start, const byte end);
 
 	void setShiftStartCol(byte col)
 	{
