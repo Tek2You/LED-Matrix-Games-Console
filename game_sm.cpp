@@ -199,6 +199,7 @@ void GameSM::stateSnake(Event *event)
 			game_ = nullptr;
 		}
 		game_ = new Snake(display_);
+		game_->setSpeed(speed_);
 		game_->start(event);
 		return;
 	}
@@ -497,11 +498,9 @@ void GameSM::stateResetMenu(Event *event)
 	{
 		if (event->buttonDownState())
 		{
-			wdt_disable();
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
 			Jump::resetHighscore();
-			wdt_enable(WDTO_15MS);
 			LOAD_EFFECT_STANDART(stateDefault, event);
 			return;
 		}

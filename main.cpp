@@ -40,9 +40,8 @@ void initGame()
 
 int main(void)
 {
-	bitSet(DDRB, 1);
 	initGame();
-	wdt_enable(WDTO_15MS);
+	wdt_enable(WDTO_60MS);
 	while (1)
 	{
 		wdt_reset();

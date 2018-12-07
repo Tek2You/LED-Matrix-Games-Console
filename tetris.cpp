@@ -287,23 +287,28 @@ bool Tetris::onButtonChange(Event *event)
 	Timer &move_timer = event->timer(1);
 	if (event->changed())
 	{
-		if (event->isPressed())
+		// Rotation
+		if (event->buttonUpChanged() && event->buttonUpState())
 		{
-			if (event->buttonUpState())
+			rotate();
+		}
+
+		// Down(faster)
+		if (event->buttonDownChanged())
+		{
+			if (event->buttonDownState())
 			{
-				rotate();
+				if (down())
+				{
+					return true;
+				}
+				event->timer(0).setInterval(general_down_interval_);
+				event->timer(0).restart();
 			}
-			// btn down
-			if (event->buttonDownChanged())
+			else
 			{
-				if (event->buttonDownState())
-				{
-					event->timer(0).setInterval(general_down_interval_);
-				}
-				else
-				{
-					event->timer(0).setInterval(general_step_interval_);
-				}
+				// unset fast down
+				event->timer(0).setInterval(general_step_interval_);
 			}
 		}
 
@@ -351,6 +356,7 @@ bool Tetris::onButtonChange(Event *event)
 			}
 		}
 	}
+	return false;
 }
 
 bool Tetris::onTimerOverflow(Event *event)
