@@ -6,23 +6,19 @@
 static uint16_t EE_highscore EEMEM = 0;
 uint16_t Jump::highscore_ = eeprom_read_word(&EE_highscore);
 
-Jump::Jump(Display *display)
-    : Game(display)
+Jump::Jump(Display *display) : Game(display)
 {
-	field_ = static_cast<byte *>(malloc(display_->rows() + 3));
+	field_ = static_cast<byte *>(malloc(display_->rows() + 4));
 	current_field_start_ = 0;
 	score_ = 0;
 	setSpeed(2);
 }
 
-Jump::~Jump()
-{
-	free(field_);
-}
+Jump::~Jump() { free(field_); }
 
 void Jump::start(Event *event)
 {
-	for (int i = 0; i < display_->rows() + 3; i++)
+	for (int i = 0; i < display_->rows() + 4; i++)
 	{
 		field_[i] = 0;
 	}
@@ -35,18 +31,16 @@ void Jump::start(Event *event)
 	jump_count_ = 0;
 	jump_height_ = 4;
 	jump_lenght_ = 5;
+	render();
 
 	event->removeAllTimers();
-	event->addTimer(0, forward_period_); // timer already starts if given a initzializing interval
-	event->addTimer(1);
+	event->addTimer(forward_period_); // timer already starts if given a initzializing interval
+	event->addTimer();
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 }
 
-unsigned int Jump::points() const
-{
-	return score_;
-}
+unsigned int Jump::points() const { return score_; }
 
 void Jump::setSpeed(const byte v)
 {
@@ -84,18 +78,12 @@ byte *Jump::row(const byte n)
 	//	else{
 	//		return field_ + current_field_start_ + n;
 	//	}
-	return field_ + ((current_field_start_ + n) % 19);
+	return field_ + ((current_field_start_ + n) % 20);
 }
 
-unsigned int Jump::highscore()
-{
-	return highscore_;
-}
+unsigned int Jump::highscore() { return highscore_; }
 
-void Jump::resetHighscore()
-{
-	eeprom_write_word(&EE_highscore, highscore_ = 0);
-}
+void Jump::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Jump::onButtonChange(Event *event)
 {
@@ -103,8 +91,9 @@ bool Jump::onButtonChange(Event *event)
 	{
 		if (event->buttonRightState())
 		{
-			if (!jump_count_) // begin Jump
+			if (jump_count_ == 0 && !is_jumping_) // begin Jump
 			{
+				is_jumping_ = true;
 				event->timer(1).setInterval(jump_period_);
 				event->timer(1).start();
 				jump(event);
@@ -116,24 +105,12 @@ bool Jump::onButtonChange(Event *event)
 			jump_lenght_ = 3;
 		}
 	}
-
-	if (!isValid(man_pos_))
-	{
-		if (score_ > highscore_)
-		{
-			highscore_ = score_;
-			is_new_highscore_ = true;
-			eeprom_write_word(&EE_highscore, highscore_);
-			event->timer(0).stop();
-			event->timer(1).stop();
-		}
-		return true;
-	}
 	return false;
 }
 
 bool Jump::onTimerOverflow(Event *event)
 {
+
 	if (event->timer(0).overflow())
 	{
 		forward();
@@ -142,6 +119,19 @@ bool Jump::onTimerOverflow(Event *event)
 	{
 		jump(event);
 	}
+	if (!isValid(man_pos_))
+	{
+		if (score_ > highscore_)
+		{
+			highscore_ = score_;
+			is_new_highscore_ = true;
+			eeprom_write_word(&EE_highscore, highscore_);
+		}
+		event->timer(0).stop();
+		event->timer(1).stop();
+		return true;
+	}
+	return false;
 }
 
 void Jump::forward()
@@ -158,7 +148,7 @@ void Jump::forward()
 		newHind();
 	}
 	*row(0) = 0;
-	if (++current_field_start_ == display_->rows() + 3)
+	if (++current_field_start_ == display_->rows() + 4)
 		current_field_start_ = 0;
 	render();
 	score_++;
@@ -181,9 +171,6 @@ void Jump::jump(Event *event)
 			jump_lenght_ = 5;
 			event->timer(1).stop();
 			return;
-		}
-		else
-		{
 		}
 	}
 	jump_count_++;
