@@ -5,22 +5,16 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
-Snake::Snake(Display *display)
-    : Game(display)
+Snake::Snake(Display *display) : Game(display)
 {
 	direction_ = START;
 	new_direction_ = START;
 	setSpeed(2);
 }
 
-Snake::~Snake()
-{
-}
+Snake::~Snake() {}
 
-void Snake::clear()
-{
-	display_->clear();
-}
+void Snake::clear() { display_->clear(); }
 
 void Snake::start(Event *event)
 {
@@ -109,10 +103,7 @@ void Snake::setSpeed(byte v)
 	}
 }
 
-unsigned int Snake::highscore()
-{
-	return highscore_ = eeprom_read_word(&EE_highscore);
-}
+unsigned int Snake::highscore() { return highscore_ = eeprom_read_word(&EE_highscore); }
 
 void Snake::render()
 {
@@ -168,14 +159,11 @@ bool Snake::isValid(Pos &pos)
 	return true;
 }
 
-void Snake::resetHighscore()
-{
-	eeprom_write_word(&EE_highscore, highscore_ = 0);
-}
+void Snake::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Snake::onButtonChange(Event *event)
 {
-	if (event->changed() && event->isPressed())
+	if (event->hasPressed())
 	{
 		// is not 180° rotation or no rotation(in this case the snake will make
 		// a additinal ste,  what we avoid with dont allow this)
