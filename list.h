@@ -16,13 +16,13 @@ public:
 	~List();
 
 	// expanding functions
-	void append(const T &item);
-	void insert(const unsigned int &index, const T &item);
+	T &append(const T &item);
+	void insert(const unsigned int index, const T &item);
 	void prepent(const T &item);
 
 	// decreasing functions
 	T removeFirst();
-	T remove(const unsigned int &index);
+	T remove(const unsigned int index);
 	T removeLast();
 	void removeAll();
 
@@ -31,15 +31,15 @@ public:
 	inline unsigned int size() const { return size_; }
 
 	// getter functions
-	T &itemAt(const unsigned int &index);
-	inline T &operator[](const unsigned int &index);
+	T &itemAt(const unsigned int index);
+	inline T &operator[](const unsigned int index);
 	T &first();
 	T &last();
 
 private:
 	T foo_item_;
 
-	ListNode<T> *nodeAt(const unsigned int &index) const;
+	ListNode<T> *nodeAt(const unsigned int index) const;
 	ListNode<T> *root_ = nullptr;
 	ListNode<T> *last_ = nullptr;
 	unsigned int size_;
@@ -59,7 +59,7 @@ List<T>::~List()
 }
 
 template <class T>
-void List<T>::append(const T &item)
+T &List<T>::append(const T &item)
 {
 	ListNode<T> *tmp = new ListNode<T>();
 
@@ -80,16 +80,15 @@ void List<T>::append(const T &item)
 	}
 
 	size_++;
+	return last_->data_;
 }
 
 template <class T>
-void List<T>::insert(const unsigned int &index, const T &item)
+void List<T>::insert(const unsigned int index, const T &item)
 {
-	if (index >= size_)
-		return append(item);
+	if (index >= size_) return append(item);
 
-	if (index == 0)
-		return prepent(item);
+	if (index == 0) return prepent(item);
 
 	ListNode<T> *tmp = new ListNode<T>(), *prev = nodeAt(index - 1);
 	tmp->data_ = item;
@@ -102,8 +101,7 @@ void List<T>::insert(const unsigned int &index, const T &item)
 template <class T>
 void List<T>::prepent(const T &item)
 {
-	if (size_ == 0)
-		return append(item);
+	if (size_ == 0) return append(item);
 
 	ListNode<T> *tmp = new ListNode<T>();
 	tmp->next_ = root_;
@@ -116,8 +114,7 @@ void List<T>::prepent(const T &item)
 template <class T>
 T List<T>::removeFirst()
 {
-	if (size_ == 0)
-		return foo_item_;
+	if (size_ == 0) return foo_item_;
 
 	if (size_ > 1)
 	{
@@ -138,8 +135,7 @@ T List<T>::removeFirst()
 template <typename T>
 T List<T>::removeLast()
 {
-	if (size_ <= 0)
-		return foo_item_;
+	if (size_ <= 0) return foo_item_;
 
 	if (size_ > 1)
 	{
@@ -173,15 +169,12 @@ void List<T>::removeAll()
 }
 
 template <class T>
-T List<T>::remove(const unsigned int &index)
+T List<T>::remove(const unsigned int index)
 {
-	if (index < 0 || index >= size_)
-		return foo_item_;
+	if (index < 0 || index >= size_) return foo_item_;
 
-	if (index == 0)
-		return removeFirst();
-	if (index == size_ - 1)
-		return removeLast();
+	if (index == 0) return removeFirst();
+	if (index == size_ - 1) return removeLast();
 
 	ListNode<T> *tmp = nodeAt(index - 1);
 	ListNode<T> *toDelete = tmp->next_;
@@ -193,14 +186,14 @@ T List<T>::remove(const unsigned int &index)
 }
 
 template <class T>
-T &List<T>::itemAt(const unsigned int &index)
+T &List<T>::itemAt(const unsigned int index)
 {
 	ListNode<T> *d = nodeAt(index);
 	return (d ? d->data_ : foo_item_);
 }
 
 template <class T>
-T &List<T>::operator[](const unsigned int &index)
+T &List<T>::operator[](const unsigned int index)
 {
 	return itemAt(index);
 }
@@ -218,7 +211,7 @@ T &List<T>::last()
 }
 
 template <class T>
-ListNode<T> *List<T>::nodeAt(const unsigned int &index) const
+ListNode<T> *List<T>::nodeAt(const unsigned int index) const
 {
 	int pos = 0;
 	ListNode<T> *current = root_;
