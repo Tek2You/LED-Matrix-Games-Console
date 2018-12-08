@@ -4,10 +4,13 @@ class SmartPos;
 
 struct Pos
 {
-	Pos() {}
+	Pos()
+	{
+	}
 	Pos(char x, char y);
 	Pos(const SmartPos &pos);
 	Pos operator+(const Pos &pos);
+	Pos operator+(const Pos &pos) const;
 	Pos &operator+=(const Pos &pos);
 	Pos operator-(const Pos &pos);
 	Pos &operator-=(const Pos &pos);
@@ -21,7 +24,9 @@ struct Pos
 
 struct SmartPos
 {
-	SmartPos() {}
+	SmartPos()
+	{
+	}
 	SmartPos(unsigned char x, unsigned char y);
 	Pos toPos();
 	unsigned char x() const;

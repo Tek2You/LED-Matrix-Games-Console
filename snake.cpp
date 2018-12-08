@@ -12,9 +12,14 @@ Snake::Snake(Display *display) : Game(display)
 	setSpeed(2);
 }
 
-Snake::~Snake() {}
+Snake::~Snake()
+{
+}
 
-void Snake::clear() { display_->clear(); }
+void Snake::clear()
+{
+	display_->clear();
+}
 
 void Snake::start(Event *event)
 {
@@ -103,7 +108,10 @@ void Snake::setSpeed(byte v)
 	}
 }
 
-unsigned int Snake::highscore() { return highscore_ = eeprom_read_word(&EE_highscore); }
+unsigned int Snake::highscore()
+{
+	return highscore_ = eeprom_read_word(&EE_highscore);
+}
 
 void Snake::render()
 {
@@ -159,7 +167,10 @@ bool Snake::isValid(Pos &pos)
 	return true;
 }
 
-void Snake::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
+void Snake::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
 
 bool Snake::onButtonChange(Event *event)
 {

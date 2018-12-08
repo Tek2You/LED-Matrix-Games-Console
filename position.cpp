@@ -1,6 +1,8 @@
 #include "position.h"
 
-Pos::Pos(char x, char y) : pos_x(x), pos_y(y) {}
+Pos::Pos(char x, char y) : pos_x(x), pos_y(y)
+{
+}
 
 Pos::Pos(const SmartPos &pos)
 {
@@ -9,6 +11,12 @@ Pos::Pos(const SmartPos &pos)
 }
 
 Pos Pos::operator+(const Pos &pos)
+{
+
+	return Pos(pos.pos_x + pos_x, pos.pos_y + pos_y);
+}
+
+Pos Pos::operator+(const Pos &pos) const
 {
 
 	return Pos(pos.pos_x + pos_x, pos.pos_y + pos_y);

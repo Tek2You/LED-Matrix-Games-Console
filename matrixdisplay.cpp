@@ -154,119 +154,18 @@ const byte LETTERS[] PROGMEM = {
 };
 
 const int PTN_LETTERS[] PROGMEM{
-	 0,
-	 7,
-	 15,
-	 23,
-	 31,
-	 35,
-	 39,
-	 43,
-	 47,
-	 51,
-	 55,
-	 58,
-	 59,
-	 62,
-	 67,
-	 71,
-	 76,
-	 81,
-	 82,
-	 85,
-	 88,
-	 93,
-	 98,
-	 100,
-	 103,
-	 105,
-	 109,
-	 113,
-	 116,
-	 120,
-	 124,
-	 128,
-	 132,
-	 136,
-	 140,
-	 144,
-	 148,
-	 150,
-	 152,
-	 155,
-	 158,
-	 161,
-	 165,
-	 170,
-	 174,
-	 178,
-	 182,
-	 186,
-	 190,
-	 194,
-	 198,
-	 202,
-	 205,
-	 209,
-	 213,
-	 217,
-	 222,
-	 227,
-	 231,
-	 235,
-	 239,
-	 243,
-	 247,
-	 252,
-	 256,
-	 261,
-	 266,
-	 271,
-	 276,
-	 280,
-	 282,
-	 286,
-	 288,
-	 291,
-	 295,
-	 297,
-	 301,
-	 305,
-	 309,
-	 313,
-	 317,
-	 320,
-	 324,
-	 328,
-	 331,
-	 335,
-	 339,
-	 342,
-	 347,
-	 351,
-	 355,
-	 359,
-	 363,
-	 367,
-	 371,
-	 374,
-	 378,
-	 383,
-	 388,
-	 393,
-	 397,
-	 400,
-	 403,
-	 404,
-	 407,
-	 411,
+	 0,   7,   15,  23,  31,  35,  39,  43,  47,  51,  55,  58,  59,  62,  67,  71,  76,  81,
+	 82,  85,  88,  93,  98,  100, 103, 105, 109, 113, 116, 120, 124, 128, 132, 136, 140, 144,
+	 148, 150, 152, 155, 158, 161, 165, 170, 174, 178, 182, 186, 190, 194, 198, 202, 205, 209,
+	 213, 217, 222, 227, 231, 235, 239, 243, 247, 252, 256, 261, 266, 271, 276, 280, 282, 286,
+	 288, 291, 295, 297, 301, 305, 309, 313, 317, 320, 324, 328, 331, 335, 339, 342, 347, 351,
+	 355, 359, 363, 367, 371, 374, 378, 383, 388, 393, 397, 400, 403, 404, 407, 411,
 };
 
 const byte col_order[] = {5, 0, 2, 3, 1, 4, 6, 7};
 const byte row_order[] = {7, 6, 5, 4, 3, 2, 1, 0};
 
-MatrixDisplay::MatrixDisplay(byte height, byte width)
-    : height_(height), width_(width)
+MatrixDisplay::MatrixDisplay(byte height, byte width) : height_(height), width_(width)
 {
 	// allocate memory for (columnwi0,se) display content
 	rows_ = static_cast<byte *>(malloc(height_));
@@ -288,14 +187,16 @@ MatrixDisplay::MatrixDisplay(byte height, byte width)
 #endif
 }
 
-MatrixDisplay::~MatrixDisplay() { free(rows_); }
+MatrixDisplay::~MatrixDisplay()
+{
+	free(rows_);
+}
 
 void MatrixDisplay::show()
 {
 	static byte row = 0;
 	bitClear(PORTB, 2); // clear latch
-	for (byte *col = rows_ + row, *end = rows_ + height_ + row; col != end;
-	     col += 8)
+	for (byte *col = rows_ + row, *end = rows_ + height_ + row; col != end; col += 8)
 	{
 		SPI_SendByte(~*col);
 	}
@@ -386,8 +287,7 @@ void MatrixDisplay::clearRows(byte start, byte end)
 	if (end > height_)
 		end = height_;
 
-	for (; start < end; ++start)
-		setRow(start, 0);
+	for (; start < end; ++start) setRow(start, 0);
 }
 
 void MatrixDisplay::clearColumns(byte start, byte end, byte offset)
@@ -433,8 +333,7 @@ byte MatrixDisplay::setChar(char ch, int column, byte offset)
 	return width;
 }
 
-int MatrixDisplay::setString(const char *s, int column, char cursor_pos,
-                             char spacing, byte offset)
+int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char spacing, byte offset)
 {
 	while (*s != 0 && column < width_)
 	{
@@ -449,7 +348,10 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos,
 	return column;
 }
 
-int MatrixDisplay::width(char ch) { return letterWidth(ch); }
+int MatrixDisplay::width(char ch)
+{
+	return letterWidth(ch);
+}
 
 // determine the width of the given string
 int MatrixDisplay::width(const char *s, char spacing)

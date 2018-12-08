@@ -15,7 +15,10 @@ public:
 	virtual void setSpeed(byte v) = 0;
 
 	virtual unsigned int points() const = 0;
-	virtual bool isNewHighscore() const { return is_new_highscore_; }
+	virtual bool isNewHighscore() const
+	{
+		return is_new_highscore_;
+	}
 
 protected:
 	virtual bool onButtonChange(Event *event);

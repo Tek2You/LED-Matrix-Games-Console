@@ -1,13 +1,14 @@
 #include "display.h"
 #include "operators.h"
 
-Display::Display(byte height, byte width)
-    : MatrixDisplay(height, width), text1_(this), text2_(this)
+Display::Display(byte height, byte width) : MatrixDisplay(height, width), text1_(this), text2_(this)
 {
 	loadMenuConfig();
 }
 
-Display::~Display() {}
+Display::~Display()
+{
+}
 
 void Display::setIcon(uint64_t icon, byte offset)
 {

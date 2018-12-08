@@ -26,8 +26,17 @@ bool Timer::process()
 	return process(t);
 }
 
-void Timer::start() { next_time_ = millis() + interval_; }
+void Timer::start()
+{
+	next_time_ = millis() + interval_;
+}
 
-unsigned int Timer::interval() const { return interval_; }
+unsigned int Timer::interval() const
+{
+	return interval_;
+}
 
-void Timer::setInterval(unsigned int interval) { interval_ = interval; }
+void Timer::setInterval(unsigned int interval)
+{
+	interval_ = interval;
+}

@@ -14,11 +14,13 @@ bool Game::process(Event *event)
 	bool output = false;
 	if (event->changed())
 	{
-		if (onButtonChange(event)) output = true;
+		if (onButtonChange(event))
+			output = true;
 	}
 	if (event->generalOverflow())
 	{
-		if (onTimerOverflow(event)) output = true;
+		if (onTimerOverflow(event))
+			output = true;
 	}
 	return output;
 }

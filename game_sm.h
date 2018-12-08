@@ -35,7 +35,10 @@ private:
 			num_ = num;
 			value_ = initial;
 		}
-		void init(char num) { num_ = num; }
+		void init(char num)
+		{
+			num_ = num;
+		}
 
 		enum Button
 		{
@@ -45,8 +48,7 @@ private:
 		};
 
 		Button advance(Event *event);
-		static Button advance(Event *event, char &item, const char num,
-		                      const char min = 0);
+		static Button advance(Event *event, char &item, const char num, const char min = 0);
 		char value_ = 0;
 
 	private:

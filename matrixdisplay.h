@@ -14,8 +14,7 @@ public:
 	void setArray(byte *array);
 	const byte rows() { return 16; }
 	const byte cols() { return width_; }
-	int setString(const char *s, int column, char cursor_pos, char spacing = 1,
-	              byte offset = 0);
+	int setString(const char *s, int column, char cursor_pos, char spacing = 1, byte offset = 0);
 	byte setChar(char ch, int column, byte offset);
 	void clearRows(byte start, byte end);
 	void setColumn(byte column, byte value, byte offset = 0);

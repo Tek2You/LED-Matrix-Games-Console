@@ -1,10 +1,13 @@
 #include "event.h"
 
-Event::Event() : event_(0), flags_(0) {}
+Event::Event() : event_(0), flags_(0)
+{
+}
 
 bool Event::hasPressed() const
 {
-	return (buttonDownChanged() && buttonDownState()) || (buttonLeftChanged() && buttonLeftState()) ||
+	return (buttonDownChanged() && buttonDownState()) ||
+	       (buttonLeftChanged() && buttonLeftState()) ||
 	       (buttonRightChanged() && buttonRightState()) || (buttonUpChanged() && buttonUpState());
 }
 
@@ -83,10 +86,22 @@ void Event::addTimer(unsigned long interval)
 	timers_.append(t);
 }
 
-Timer &Event::timer(byte index) { return timers_.itemAt(index); }
+Timer &Event::timer(byte index)
+{
+	return timers_.itemAt(index);
+}
 
-bool Event::overflow(byte &index) { timers_.itemAt(index).overflow(); }
+bool Event::overflow(byte &index)
+{
+	timers_.itemAt(index).overflow();
+}
 
-void Event::removeTimer(byte &index) { timers_.remove(index); }
+void Event::removeTimer(byte &index)
+{
+	timers_.remove(index);
+}
 
-void Event::removeAllTimers() { timers_.removeAll(); }
+void Event::removeAllTimers()
+{
+	timers_.removeAll();
+}

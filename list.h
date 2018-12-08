@@ -27,8 +27,14 @@ public:
 	void removeAll();
 
 	// checker functions
-	inline bool isEmpty() const { return size() == 0; }
-	inline unsigned int size() const { return size_; }
+	inline bool isEmpty() const
+	{
+		return size() == 0;
+	}
+	inline unsigned int size() const
+	{
+		return size_;
+	}
 
 	// getter functions
 	T &itemAt(const unsigned int index);
@@ -86,9 +92,11 @@ T &List<T>::append(const T &item)
 template <class T>
 void List<T>::insert(const unsigned int index, const T &item)
 {
-	if (index >= size_) return append(item);
+	if (index >= size_)
+		return append(item);
 
-	if (index == 0) return prepent(item);
+	if (index == 0)
+		return prepent(item);
 
 	ListNode<T> *tmp = new ListNode<T>(), *prev = nodeAt(index - 1);
 	tmp->data_ = item;
@@ -101,7 +109,8 @@ void List<T>::insert(const unsigned int index, const T &item)
 template <class T>
 void List<T>::prepent(const T &item)
 {
-	if (size_ == 0) return append(item);
+	if (size_ == 0)
+		return append(item);
 
 	ListNode<T> *tmp = new ListNode<T>();
 	tmp->next_ = root_;
@@ -114,7 +123,8 @@ void List<T>::prepent(const T &item)
 template <class T>
 T List<T>::removeFirst()
 {
-	if (size_ == 0) return foo_item_;
+	if (size_ == 0)
+		return foo_item_;
 
 	if (size_ > 1)
 	{
@@ -135,7 +145,8 @@ T List<T>::removeFirst()
 template <typename T>
 T List<T>::removeLast()
 {
-	if (size_ <= 0) return foo_item_;
+	if (size_ <= 0)
+		return foo_item_;
 
 	if (size_ > 1)
 	{
@@ -171,10 +182,13 @@ void List<T>::removeAll()
 template <class T>
 T List<T>::remove(const unsigned int index)
 {
-	if (index < 0 || index >= size_) return foo_item_;
+	if (index < 0 || index >= size_)
+		return foo_item_;
 
-	if (index == 0) return removeFirst();
-	if (index == size_ - 1) return removeLast();
+	if (index == 0)
+		return removeFirst();
+	if (index == size_ - 1)
+		return removeLast();
 
 	ListNode<T> *tmp = nodeAt(index - 1);
 	ListNode<T> *toDelete = tmp->next_;

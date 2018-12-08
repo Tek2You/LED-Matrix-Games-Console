@@ -18,9 +18,8 @@ void SPI_Init()
 
 	// set up the SPI module: SPI enabled, MSB first, master mode,
 	//  clock polarity and phase = 0, F_osc/16
-	SPI_SPCR = (1 << SPI_SPE) |
-	           (1 << SPI_MSTR) /*| (1 << SPIE)*/; // | ( 1 << SPI_SPR0 );
-	SPI_SPSR = (1 << SPI2X) /*| (1 << SPIF)*/;    // set double SPI speed for F_osc/2
+	SPI_SPCR = (1 << SPI_SPE) | (1 << SPI_MSTR) /*| (1 << SPIE)*/; // | ( 1 << SPI_SPR0 );
+	SPI_SPSR = (1 << SPI2X) /*| (1 << SPIF)*/;                     // set double SPI speed for F_osc/2
 }
 
 // Transfer a byte of data
@@ -51,7 +50,13 @@ uint8_t SPI_ReadByte(void)
 }
 
 // Assert the SS line
-void SPI_AssertSS() { SPI_PORT &= ~(1 << SPI_SS); }
+void SPI_AssertSS()
+{
+	SPI_PORT &= ~(1 << SPI_SS);
+}
 
 // Deassert the SS line
-void SPI_DeassertSS() { SPI_PORT |= (1 << SPI_SS); }
+void SPI_DeassertSS()
+{
+	SPI_PORT |= (1 << SPI_SS);
+}

@@ -24,17 +24,47 @@ class Event
 {
 public:
 	Event();
-	const inline bool buttonUpChanged() const { return event_ & BTN_UP_CHANGE; }
-	const inline bool buttonDownChanged() const { return event_ & BTN_DOWN_CHANGE; }
-	const inline bool buttonRightChanged() const { return event_ & BTN_RIGHT_CHANGE; }
-	const inline bool buttonLeftChanged() const { return event_ & BTN_LEFT_CHANGE; }
+	const inline bool buttonUpChanged() const
+	{
+		return event_ & BTN_UP_CHANGE;
+	}
+	const inline bool buttonDownChanged() const
+	{
+		return event_ & BTN_DOWN_CHANGE;
+	}
+	const inline bool buttonRightChanged() const
+	{
+		return event_ & BTN_RIGHT_CHANGE;
+	}
+	const inline bool buttonLeftChanged() const
+	{
+		return event_ & BTN_LEFT_CHANGE;
+	}
 
-	const inline bool buttonUpState() const { return event_ & BTN_UP; }
-	const inline bool buttonDownState() const { return event_ & BTN_DOWN; }
-	const inline bool buttonRightState() const { return event_ & BTN_RIGHT; }
-	const inline bool buttonLeftState() const { return event_ & BTN_LEFT; }
-	const inline bool changed() const { return event_ & CHANGE; }
-	inline bool isPressed() const { return event_ & INPUT_MASK; }
+	const inline bool buttonUpState() const
+	{
+		return event_ & BTN_UP;
+	}
+	const inline bool buttonDownState() const
+	{
+		return event_ & BTN_DOWN;
+	}
+	const inline bool buttonRightState() const
+	{
+		return event_ & BTN_RIGHT;
+	}
+	const inline bool buttonLeftState() const
+	{
+		return event_ & BTN_LEFT;
+	}
+	const inline bool changed() const
+	{
+		return event_ & CHANGE;
+	}
+	inline bool isPressed() const
+	{
+		return event_ & INPUT_MASK;
+	}
 	bool hasPressed() const;
 
 	void setButtonUpState(const bool state);
@@ -44,8 +74,14 @@ public:
 
 	void clear();
 
-	const inline bool onEntry() const { return event_ & ON_ENTRY; }
-	inline void setOnEntry() { event_ |= ON_ENTRY; }
+	const inline bool onEntry() const
+	{
+		return event_ & ON_ENTRY;
+	}
+	inline void setOnEntry()
+	{
+		event_ |= ON_ENTRY;
+	}
 
 	bool process();
 	bool processTimers();
@@ -63,10 +99,22 @@ public:
 		ProcessTimerOverflows = (1 << 2),
 	};
 
-	inline void clearFlags() { flags_ = 0; }
-	inline void setFlag(Flags flag, bool set = true) { bitWrite(flags_, flag, set); }
-	inline bool flag(Flags flag) { return bitRead(flags_, flag); }
-	bool generalOverflow() const { return overflow_; }
+	inline void clearFlags()
+	{
+		flags_ = 0;
+	}
+	inline void setFlag(Flags flag, bool set = true)
+	{
+		bitWrite(flags_, flag, set);
+	}
+	inline bool flag(Flags flag)
+	{
+		return bitRead(flags_, flag);
+	}
+	bool generalOverflow() const
+	{
+		return overflow_;
+	}
 
 private:
 	List<Timer> timers_;

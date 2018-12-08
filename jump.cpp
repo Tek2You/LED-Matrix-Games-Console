@@ -14,7 +14,10 @@ Jump::Jump(Display *display) : Game(display)
 	setSpeed(2);
 }
 
-Jump::~Jump() { free(field_); }
+Jump::~Jump()
+{
+	free(field_);
+}
 
 void Jump::start(Event *event)
 {
@@ -40,7 +43,10 @@ void Jump::start(Event *event)
 	event->setFlag(Event::ProcessTimerOverflows);
 }
 
-unsigned int Jump::points() const { return score_; }
+unsigned int Jump::points() const
+{
+	return score_;
+}
 
 void Jump::setSpeed(const byte v)
 {
@@ -81,9 +87,15 @@ byte *Jump::row(const byte n)
 	return field_ + ((current_field_start_ + n) % 20);
 }
 
-unsigned int Jump::highscore() { return highscore_; }
+unsigned int Jump::highscore()
+{
+	return highscore_;
+}
 
-void Jump::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
+void Jump::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
 
 bool Jump::onButtonChange(Event *event)
 {
