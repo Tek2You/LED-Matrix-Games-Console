@@ -1,54 +1,55 @@
 #include "tetromino.h"
 
-Tetromino::Tetromino(tetromino::SHAPE shape, byte heigth, byte *field,
-                     tetromino::DIRECTION direction, Pos pos)
-    : shape_(shape), heigth_(heigth), field_(field), direction_(direction),
-      pos_(pos) {}
+Tetromino::Tetromino(Shape shape, byte heigth, byte *field, Direction direction, Pos pos)
+    : shape_(shape), heigth_(heigth), field_(field), direction_(direction), pos_(pos)
+{
+}
 
 bool Tetromino::getPositions(Pos (&positions)[4]) const
 {
 	return getPositions(positions, shape_, direction_, pos_);
 }
 
-bool Tetromino::getPositions(Pos (&positions)[4], const SHAPE &shape,
-                             const DIRECTION &direction, const Pos &pos)
+bool Tetromino::getPositions(Pos (&positions)[4], const Shape &shape, const Direction &direction,
+                             const Pos &pos)
 {
-	tetromino::SPECIFICATIONS brick = tetrominos[shape];
-	if (!brick.directions & BV_(direction))
+	Specifications brick = tetrominos[shape];
+
+	if (!brick.directions & BV_(direction)) // direction not available
 		return false;
-	Pos pos_rotate = brick.shape[0];
+
+	const Pos pos_rotate = brick.shape[0];
 	for (int i = 0; i < 4; i++)
 	{
-		Pos rotated_brick_part_pos, brick_position;
+		const Pos dot_pos = brick.shape[i].toPos() - pos_rotate;
+		Pos rotated_dot_pos;
+		switch (direction)
+		{
+		case BOTTOM:
+			rotated_dot_pos = dot_pos;
+			break;
+		case LEFT:
+			rotated_dot_pos.pos_x = dot_pos.pos_y;
+			rotated_dot_pos.pos_y = -dot_pos.pos_x;
+			break;
+		case TOP:
+			rotated_dot_pos.pos_x = -dot_pos.pos_x;
+			rotated_dot_pos.pos_y = -dot_pos.pos_y;
+			break;
+		case RIGHT:
+			rotated_dot_pos.pos_x = -dot_pos.pos_y;
+			rotated_dot_pos.pos_y = dot_pos.pos_x;
+			break;
+		default:
+			break;
+		}
 
-		brick_position = brick.shape[i].toPos() - pos_rotate;
-
-		if (direction == tetromino::BOTTOM)
-		{
-			rotated_brick_part_pos = brick_position;
-		}
-		else if (direction == tetromino::LEFT)
-		{
-			rotated_brick_part_pos.pos_x = brick_position.pos_y;
-			rotated_brick_part_pos.pos_y = -brick_position.pos_x;
-		}
-		else if (direction == tetromino::TOP)
-		{
-			rotated_brick_part_pos.pos_x = -brick_position.pos_x;
-			rotated_brick_part_pos.pos_y = -brick_position.pos_y;
-		}
-		else if (direction == tetromino::RIGHT)
-		{
-			rotated_brick_part_pos.pos_x = -brick_position.pos_y;
-			rotated_brick_part_pos.pos_y = brick_position.pos_x;
-		}
-		positions[i].pos_x = pos.pos_x + rotated_brick_part_pos.pos_x;
-		positions[i].pos_y = pos.pos_y + rotated_brick_part_pos.pos_y;
+		positions[i] = pos + rotated_dot_pos;
 	}
 	return true;
 }
 
-const DIRECTION Tetromino::rotate(const DIRECTION direction, const SHAPE shape)
+const Direction Tetromino::rotate(const Direction direction, const Shape shape)
 {
 	byte directions = getPossibleDirections(shape);
 	if (directions == bit(direction))
@@ -56,11 +57,11 @@ const DIRECTION Tetromino::rotate(const DIRECTION direction, const SHAPE shape)
 		return direction; // not rotateable
 	}
 
-	DIRECTION new_direction = direction;
+	Direction new_direction = direction;
 
 	for (int i = 0; i < 4; i++)
 	{
-		new_direction = DIRECTION((byte(new_direction) + 1) % 4);
+		new_direction = Direction((byte(new_direction) + 1) % 4);
 		if (directions & bit(new_direction))
 			return new_direction;
 	}
@@ -77,13 +78,13 @@ byte Tetromino::getPossibleDirections() const
 	return getPossibleDirections(shape_);
 }
 
-byte Tetromino::getPossibleDirections(const SHAPE shape)
+byte Tetromino::getPossibleDirections(const Shape shape)
 {
-	SPECIFICATIONS brick = tetrominos[shape];
+	Specifications brick = tetrominos[shape];
 	return brick.directions;
 }
 
-byte Tetromino::possibleDirections(const SHAPE shape)
+byte Tetromino::possibleDirections(const Shape shape)
 {
 	byte num = 0;
 	byte directions = getPossibleDirections(shape);
@@ -105,7 +106,7 @@ byte Tetromino::isValid() const
 	return isValid(shape_, direction_, pos_);
 }
 
-byte Tetromino::isValid(const SHAPE shape, const DIRECTION direction, const Pos pos) const
+byte Tetromino::isValid(const Shape shape, const Direction direction, const Pos pos) const
 {
 	Pos positions[4];
 	byte valid_errors = 0;
@@ -114,25 +115,25 @@ byte Tetromino::isValid(const SHAPE shape, const DIRECTION direction, const Pos 
 	{
 		if (positions[i].pos_y > (heigth_ - 1))
 		{
-			valid_errors |= tetromino::OVER_ABOVE;
+			valid_errors |= OVER_ABOVE;
 		}
 		else if (positions[i].pos_y < 0)
 		{
-			valid_errors |= tetromino::OVER_BELOW; // is over below
+			valid_errors |= OVER_BELOW; // is over below
 		}
 		if (positions[i].pos_x < 0)
 		{
-			valid_errors |= tetromino::OVER_LEFT; // is left over
+			valid_errors |= OVER_LEFT; // is left over
 		}
 
 		else if (positions[i].pos_x > 7)
 		{
-			valid_errors |= tetromino::OVER_RIGHT; // is right over
+			valid_errors |= OVER_RIGHT; // is right over
 		}
 
 		if (bitRead(*(field_ + positions[i].pos_y), byte(positions[i].pos_x)))
 		{
-			valid_errors |= tetromino::COLLIDE; // collides with exiting tetromino part
+			valid_errors |= COLLIDE; // collides with exiting tetromino part
 		}
 	}
 	return valid_errors; // no collisions - valid

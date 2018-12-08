@@ -57,68 +57,65 @@ void Tetris::render()
 bool Tetris::rotate()
 {
 	/*
-	 * function scheme:
+	 * sheme of work:
 	 * 1. get current values
-	 * 2. calculate next(possible) direction. Possible means not that the brick
+	 * 2. calculate next(possible) direction. Possible is'nt meaning that the brick
 	 * dosnt collides
 	 * 3. Check if the new direction is valid
-	 *    4. if not: try to change to a valid position
-	 *
+	 * 4. if not: try to change to a valid position
 	 */
+
 	if (tetromino_ == nullptr)
 		return false;
-	tetromino::DIRECTION direction = tetromino_->direction();
-	tetromino::DIRECTION new_direction;
-	Pos position = tetromino_->pos();
-	Pos new_position = position;
-	tetromino::SHAPE shape = tetromino_->shape();
 
-	byte possible_directions = tetromino_->getPossibleDirections();
-	new_direction = Tetromino::rotate(direction, shape);
+	// 1.	get current values
+	Pos tmp_pos = tetromino_->pos();
+	const Shape shape = tetromino_->shape();
 
-	// position is not valid
-	byte valid_output = tetromino_->isValid(shape, new_direction, position);
+	// 2. calculate new direction
+	const Direction new_dir = Tetromino::rotate(tetromino_->direction(), shape);
+
+	// 3. check valid
+	byte valid_output = tetromino_->isValid(shape, new_dir, tmp_pos);
+
+	// if not valid, try to move to make valid
 	if (valid_output)
 	{
-		if (valid_output & tetromino::OVER_LEFT) // left over
+		if (valid_output & OVER_LEFT)
 		{
-			++new_position.pos_x;
-			while (valid_output = tetromino_->isValid(shape, new_direction, new_position) & tetromino::OVER_LEFT)
+			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_LEFT)
 			{
-				new_position.pos_x++;
+				tmp_pos.pos_x++;
 			}
 		}
-		else if (valid_output & tetromino::OVER_RIGHT) // right over
+		else if (valid_output & OVER_RIGHT)
 		{
-			new_position.pos_x--;
-			while (valid_output = tetromino_->isValid(shape, new_direction, new_position) & tetromino::OVER_RIGHT)
+			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_RIGHT)
 			{
-				new_position.pos_x--;
+				tmp_pos.pos_x--;
 			}
 		}
-		if (valid_output & tetromino::OVER_BELOW) // over below
+		if (valid_output & OVER_BELOW)
 		{
-			new_position.pos_y++;
-			while (valid_output = tetromino_->isValid(shape, new_direction, new_position) & tetromino::OVER_BELOW)
+			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_BELOW)
 			{
-				new_position.pos_y++;
+				tmp_pos.pos_y++;
 			}
 		}
-		else if (valid_output & tetromino::OVER_ABOVE) // above over
+		else if (valid_output & OVER_ABOVE)
 		{
-			new_position.pos_y--;
-			while (valid_output = tetromino_->isValid(shape, new_direction, new_position) & tetromino::OVER_ABOVE)
+			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_ABOVE)
 			{
-				new_position.pos_y--;
+				tmp_pos.pos_y--;
 			}
 		}
-		if (valid_output & tetromino::COLLIDE) // collides with exiting tetromino
+		if (valid_output & COLLIDE) // collides with exiting tetromino
 		{
 			return false;
 		}
 	}
-	tetromino_->setPos(new_position);
-	tetromino_->setDirection(new_direction);
+	tetromino_->setPos(tmp_pos);
+	tetromino_->setDirection(new_dir);
 	render();
 	return true;
 }
@@ -146,7 +143,7 @@ bool Tetris::left()
 	Pos pos = tetromino_->pos();
 	pos.pos_x--;
 	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
-	{ // not valid
+	{
 		return false;
 	}
 	tetromino_->setPos(pos);
@@ -160,9 +157,9 @@ bool Tetris::down()
 		return false;
 	Pos pos = tetromino_->pos();
 	pos.pos_y--;
-	byte valid_output = tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos);
-	if (valid_output)
-	{ // not valid
+
+	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
+	{
 		takeOverTetromino();
 		checkRowsFinished();
 		if (newTetromino())
@@ -189,39 +186,42 @@ void Tetris::setSpeed(const byte v)
 	case 0:
 		general_step_interval_ = 1800;
 		general_down_interval_ = 180;
-		general_first_move_interval_ = 550;
+		general_first_move_interval_ = 400;
 		general_move_interval_ = 200;
 		break;
 	case 1:
 		general_step_interval_ = 1400;
 		general_down_interval_ = 140;
-		general_first_move_interval_ = 380;
+		general_first_move_interval_ = 320;
 		general_move_interval_ = 160;
 		break;
 	case 3:
 		general_step_interval_ = 800;
 		general_down_interval_ = 80;
-		general_first_move_interval_ = 270;
+		general_first_move_interval_ = 240;
 		general_move_interval_ = 120;
 		break;
 	case 4:
 		general_step_interval_ = 500;
 		general_down_interval_ = 50;
-		general_first_move_interval_ = 250;
+		general_first_move_interval_ = 200;
 		general_move_interval_ = 100;
 		break;
 	case 2:
 		general_step_interval_ = 1000;
 		general_down_interval_ = 100;
-		general_first_move_interval_ = 300;
-		general_move_interval_ = 120;
+		general_first_move_interval_ = 280;
+		general_move_interval_ = 140;
 		break;
 	default:
 		break;
 	}
 }
 
-unsigned int Tetris::highscore() { return highscore_; }
+unsigned int Tetris::highscore()
+{
+	return highscore_;
+}
 
 bool Tetris::newTetromino()
 {
@@ -230,9 +230,9 @@ bool Tetris::newTetromino()
 		delete tetromino_;
 		tetromino_ = nullptr;
 	}
-	tetromino::SHAPE shape = randomTetrominoShape();
-	tetromino_ =
-	    new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape), Pos(4, display_->rows() - 1));
+	const Shape shape = randomTetrominoShape();
+	tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),
+	                           Pos(4, display_->rows() - 1));
 	Pos points[4];
 	tetromino_->getPositions(points);
 	for (Pos p : points)
@@ -264,7 +264,10 @@ void Tetris::takeOverTetromino()
 	render();
 }
 
-void Tetris::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
+void Tetris::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
 
 bool Tetris::onButtonChange(Event *event)
 {
@@ -393,9 +396,12 @@ void Tetris::checkRowsFinished()
 	}
 }
 
-tetromino::SHAPE Tetris::randomTetrominoShape() { return tetromino::SHAPE(millis() % 7); }
+Shape Tetris::randomTetrominoShape()
+{
+	return Shape(millis() % 7);
+}
 
-tetromino::DIRECTION Tetris::randomTetrominoDirection(const SHAPE &shape)
+Direction Tetris::randomTetrominoDirection(const Shape &shape)
 {
 	byte directions = Tetromino::getPossibleDirections(shape);
 	byte num = Tetromino::possibleDirections(shape);
@@ -412,7 +418,7 @@ tetromino::DIRECTION Tetris::randomTetrominoDirection(const SHAPE &shape)
 		{
 			if (j == i_direction)
 			{
-				tetromino::DIRECTION dir = tetromino::DIRECTION(j);
+				Direction dir = Direction(j);
 				return dir;
 			}
 			j++;
