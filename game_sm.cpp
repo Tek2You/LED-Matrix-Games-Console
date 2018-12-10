@@ -5,33 +5,33 @@
 #include "operators.h"
 
 #undef TRANSITION
-#define TRANSITION(s, event)                                                                       \
-   {                                                                                               \
-	   setState(STATE_CAST(&GameSM::s));                                                            \
-	   event->clearFlags();                                                                         \
-	   event->setOnEntry();                                                                         \
-	   process(event);                                                                              \
+#define TRANSITION(s, event)                                                                                           \
+   {                                                                                                                   \
+	   setState(STATE_CAST(&GameSM::s));                                                                                \
+	   event->clearFlags();                                                                                             \
+	   event->setOnEntry();                                                                                             \
+	   process(event);                                                                                                  \
 	}
 
-#define LOAD_EFFECT_STANDART(s, event)                                                             \
-   {                                                                                               \
-	   load_following_state_ = STATE_CAST(&GameSM::s);                                              \
-	   TRANSITION(stateLoadEffect, event);                                                          \
-	   return;                                                                                      \
+#define LOAD_EFFECT_STANDART(s, event)                                                                                 \
+   {                                                                                                                   \
+	   load_following_state_ = STATE_CAST(&GameSM::s);                                                                  \
+	   TRANSITION(stateLoadEffect, event);                                                                              \
+	   return;                                                                                                          \
 	}
 
-#define LOAD_EFFECT_BEGIN(s, event)                                                                \
-   {                                                                                               \
-	   static bool load_passed = false;                                                             \
-	   if (load_passed)                                                                             \
-      {                                                                                            \
-	      load_passed = false;                                                                      \
-	   }                                                                                            \
-	   else                                                                                         \
-      {                                                                                            \
-	      load_passed = true;                                                                       \
-	      LOAD_EFFECT_STANDART(s, event);                                                           \
-	   }                                                                                            \
+#define LOAD_EFFECT_BEGIN(s, event)                                                                                    \
+   {                                                                                                                   \
+	   static bool load_passed = false;                                                                                 \
+	   if (load_passed)                                                                                                 \
+      {                                                                                                                \
+	      load_passed = false;                                                                                          \
+	   }                                                                                                                \
+	   else                                                                                                             \
+      {                                                                                                                \
+	      load_passed = true;                                                                                           \
+	      LOAD_EFFECT_STANDART(s, event);                                                                               \
+	   }                                                                                                                \
 	}
 
 byte EE_speed EEMEM = DEFAULT_SPEED;
@@ -77,8 +77,7 @@ GameSM::GameSM(Display *display, Event *event)
 //		this->process(event);
 //}
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num,
-                                                   const char min)
+GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
 {
 
 	switch (event->event_ & INPUT_MASK)

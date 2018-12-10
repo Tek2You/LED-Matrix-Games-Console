@@ -10,8 +10,7 @@ bool Tetromino::getPositions(Pos (&positions)[4]) const
 	return getPositions(positions, shape_, direction_, pos_);
 }
 
-bool Tetromino::getPositions(Pos (&positions)[4], const Shape &shape, const Direction &direction,
-                             const Pos &pos)
+bool Tetromino::getPositions(Pos (&positions)[4], const Shape &shape, const Direction &direction, const Pos &pos)
 {
 	Specifications brick = tetrominos[shape];
 

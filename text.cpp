@@ -1,8 +1,8 @@
 #include "text.h"
 
 Text::Text(MatrixDisplay *display)
-    : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(7),
-      start_row_(0), end_row_(15), shift_start_col_(3)
+    : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(7), start_row_(0),
+      end_row_(15), shift_start_col_(3)
 {
 	setShiftSpeed(5);
 }
@@ -33,8 +33,7 @@ void Text::shift()
 	//	if(current_shift_start_col_ == 1)
 	//		return;
 	--current_shift_start_col_;
-	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_ - first_, 1,
-	                        offset_) <= 0)
+	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_ - first_, 1, offset_) <= 0)
 	{
 		first_ = text_;
 		current_shift_start_col_ = shift_start_col_;

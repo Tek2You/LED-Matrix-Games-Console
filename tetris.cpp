@@ -231,8 +231,8 @@ bool Tetris::newTetromino()
 		tetromino_ = nullptr;
 	}
 	const Shape shape = randomTetrominoShape();
-	tetromino_ = new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape),
-	                           Pos(4, display_->rows() - 1));
+	tetromino_ =
+	    new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape), Pos(4, display_->rows() - 1));
 	Pos points[4];
 	tetromino_->getPositions(points);
 	for (Pos p : points)

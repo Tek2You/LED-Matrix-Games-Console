@@ -6,8 +6,7 @@ Event::Event() : event_(0), flags_(0)
 
 bool Event::hasPressed() const
 {
-	return (buttonDownChanged() && buttonDownState()) ||
-	       (buttonLeftChanged() && buttonLeftState()) ||
+	return (buttonDownChanged() && buttonDownState()) || (buttonLeftChanged() && buttonLeftState()) ||
 	       (buttonRightChanged() && buttonRightState()) || (buttonUpChanged() && buttonUpState());
 }
 
