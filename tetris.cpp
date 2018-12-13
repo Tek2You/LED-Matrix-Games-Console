@@ -275,7 +275,7 @@ bool Tetris::onButtonChange(Event *event)
 	if (event->changed())
 	{
 		// Rotation
-		if (event->buttonUpChanged() && event->buttonUpState())
+		if (event->buttonUpHasPressed())
 		{
 			rotate();
 		}
