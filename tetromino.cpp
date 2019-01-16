@@ -50,7 +50,7 @@ bool Tetromino::getPositions(Pos (&positions)[4], const Shape &shape, const Dire
 
 const Direction Tetromino::rotate(const Direction direction, const Shape shape)
 {
-	byte directions = getPossibleDirections(shape);
+	byte directions = possibleDirections(shape);
 	if (directions == bit(direction))
 	{
 		return direction; // not rotateable
@@ -72,21 +72,21 @@ void Tetromino::rotate()
 	rotate(direction_, shape_);
 }
 
-byte Tetromino::getPossibleDirections() const
+byte Tetromino::possibleDirections() const
 {
-	return getPossibleDirections(shape_);
+	return possibleDirections(shape_);
 }
 
-byte Tetromino::getPossibleDirections(const Shape shape)
+byte Tetromino::possibleDirections(const Shape shape)
 {
 	Specifications brick = tetrominos[shape];
 	return brick.directions;
 }
 
-byte Tetromino::possibleDirections(const Shape shape)
+byte Tetromino::possibleDirectionNum(const Shape shape)
 {
 	byte num = 0;
-	byte directions = getPossibleDirections(shape);
+	byte directions = possibleDirections(shape);
 	for (int i = 0; i < 4; i++)
 	{
 		if (bitRead(directions, i))
@@ -95,9 +95,9 @@ byte Tetromino::possibleDirections(const Shape shape)
 	return num;
 }
 
-byte Tetromino::possibleDirections() const
+byte Tetromino::possibleDirectionNum() const
 {
-	possibleDirections(shape_);
+	possibleDirectionNum(shape_);
 }
 
 byte Tetromino::isValid() const

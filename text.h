@@ -35,7 +35,7 @@ public:
 	void setOffset(const byte offset) { offset_ = offset; }
 	byte offset() const { return offset_; }
 
-	void setCursor(char pos);
+	void setCursor(const char pos);
 	char getCursor() const { return curser_pos_; }
 
 	void setOperationRows(const byte start, const byte end);

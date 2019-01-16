@@ -88,10 +88,10 @@ public:
 	byte isValid() const;
 	byte isValid(const Shape shape, const Direction direction, const Pos pos) const;
 
-	static byte getPossibleDirections(const Shape shape);
-	byte getPossibleDirections() const;
 	static byte possibleDirections(const Shape shape);
 	byte possibleDirections() const;
+	static byte possibleDirectionNum(const Shape shape);
+	byte possibleDirectionNum() const;
 
 private:
 	const Shape shape_;

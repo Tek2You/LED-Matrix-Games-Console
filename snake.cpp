@@ -24,9 +24,9 @@ void Snake::clear()
 void Snake::start(Event *event)
 {
 	clear();
-	body_.append(Pos(1, 7));
-	body_.append(Pos(2, 7));
-	body_.append(Pos(3, 7)); // head
+	body_ << Pos(1, 7);
+	body_ << Pos(2, 7);
+	body_ << Pos(3, 7); // head
 	eat_pos_ = Pos(5, 7);
 	direction_ = START;
 	new_direction_ = START;
@@ -75,7 +75,7 @@ bool Snake::move()
 		return true;
 	}
 
-	body_.append(vect);
+	body_ << vect;
 	if (!eat())
 	{
 		body_.removeFirst();
@@ -128,11 +128,11 @@ bool Snake::eat()
 {
 	if (body_.last() == eat_pos_)
 	{
-		Pos p = Pos(char(millis() % 8), char(millis() % 16));
-		while (!isValid(p))
+		Pos p;
+		do
 		{
 			p = Pos(char(millis() % 8), char(millis() % 16));
-		}
+		} while (!isValid(p));
 
 		eat_pos_ = p;
 		return true;
@@ -154,7 +154,7 @@ bool Snake::validate(Pos &pos)
 	return isValid(pos);
 }
 
-bool Snake::isValid(Pos &pos)
+bool Snake::isValid(const Pos &pos)
 {
 	//  if colides, return true
 	for (int i = 0; i < body_.size(); i++)
@@ -178,14 +178,14 @@ bool Snake::onButtonChange(Event *event)
 	{
 		// is not 180° rotation or no rotation(in this case the snake will make
 		// a additinal ste,  what we avoid with dont allow this)
-		if (event->buttonUpChanged() && event->buttonUpState())
+		if (event->buttonUpHasPressed())
 		{
 			if (direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::UP;
 			}
 		}
-		else if (event->buttonRightChanged() && event->buttonRightState())
+		else if (event->buttonRightHasPressed())
 		{
 			if (direction_ != Snake::LEFT)
 			{
@@ -193,7 +193,7 @@ bool Snake::onButtonChange(Event *event)
 			}
 		}
 
-		else if (event->buttonLeftChanged() && event->buttonLeftState())
+		else if (event->buttonLeftHasPressed())
 		{
 			if (direction_ != Snake::RIGHT && direction_ != Snake::START)
 			{
@@ -201,7 +201,7 @@ bool Snake::onButtonChange(Event *event)
 			}
 		}
 
-		else if (event->buttonDownChanged() && event->buttonDownState())
+		else if (event->buttonDownHasPressed())
 		{
 			if (direction_ != Snake::UP)
 			{

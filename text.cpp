@@ -82,7 +82,7 @@ void Text::setShiftSpeed(const int speed)
 	speed_time_ = 1000 / speed_; // from shifts per second to mseconds per shift
 }
 
-void Text::setCursor(char pos)
+void Text::setCursor(const char pos)
 {
 	curser_pos_ = pos;
 }

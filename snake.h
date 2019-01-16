@@ -11,7 +11,10 @@ public:
 	void start(Event *event);
 	void clear();
 
-	unsigned int points() const { return body_.size() - 3; }
+	unsigned int points() const
+	{
+		return body_.size() - 3;
+	}
 	void setSpeed(byte v) override;
 
 	static unsigned int highscore();
@@ -24,7 +27,7 @@ protected:
 private:
 	void render();
 	bool eat();
-	bool isValid(Pos &pos);
+	bool isValid(const Pos &pos);
 	bool validate(Pos &pos);
 	bool move();
 

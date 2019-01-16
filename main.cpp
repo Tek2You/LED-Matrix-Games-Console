@@ -42,6 +42,8 @@ int main(void)
 {
 	initGame();
 	wdt_enable(WDTO_60MS);
+
+	// containing loop for the main programm
 	while (1)
 	{
 		wdt_reset();
@@ -63,11 +65,14 @@ int main(void)
 }
 void check_buttons();
 
+// pin change interrupt routine
 ISR(PCINT1_vect)
 {
 	check_buttons();
 }
 
+// debounce check counter.
+// checks button change and takes over the button states if doubounce count completed
 ISR(TIMER2_COMPA_vect)
 {
 	TCNT2 = 200;
@@ -85,7 +90,7 @@ ISR(TIMER2_COMPA_vect)
 		}
 	}
 }
-
+// checks any button change and enables if changed an debounce count for the considering button
 void check_buttons()
 {
 	byte tmp = ~PINC & INPUT_MASK;

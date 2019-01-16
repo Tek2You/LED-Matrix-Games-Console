@@ -403,23 +403,22 @@ Shape Tetris::randomTetrominoShape()
 
 Direction Tetris::randomTetrominoDirection(const Shape &shape)
 {
-	byte directions = Tetromino::getPossibleDirections(shape);
-	byte num = Tetromino::possibleDirections(shape);
+	byte directions = Tetromino::possibleDirections(shape);
+	byte num = Tetromino::possibleDirectionNum(shape);
 
 	if (num <= 1)
 	{
 		return TOP;
 	}
 
-	byte i_direction = ((millis()) % (num));
+	byte rand = ((millis()) % (num));
 	for (int i = 0, j = 0; i < 4; i++)
 	{
 		if (bitRead(directions, i))
 		{
-			if (j == i_direction)
+			if (j == rand)
 			{
-				Direction dir = Direction(j);
-				return dir;
+				return Direction(j);
 			}
 			j++;
 		}

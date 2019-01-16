@@ -16,7 +16,7 @@ public:
 	~List();
 
 	// expanding functions
-	T &append(const T &item);
+	void append(const T &item);
 	void insert(const unsigned int index, const T &item);
 	void prepent(const T &item);
 
@@ -41,6 +41,9 @@ public:
 	inline T &operator[](const unsigned int index);
 	T &first();
 	T &last();
+	inline List<T> &operator<<(const T &t);
+	inline List<T> &operator+=(const T &t);
+	inline List<T> &operator>>(T &t);
 
 private:
 	T foo_item_;
@@ -65,7 +68,7 @@ List<T>::~List()
 }
 
 template <class T>
-T &List<T>::append(const T &item)
+void List<T>::append(const T &item)
 {
 	ListNode<T> *tmp = new ListNode<T>();
 
@@ -86,7 +89,7 @@ T &List<T>::append(const T &item)
 	}
 
 	size_++;
-	return last_->data_;
+	return;
 }
 
 template <class T>
@@ -124,7 +127,7 @@ template <class T>
 T List<T>::removeFirst()
 {
 	if (size_ == 0)
-		return foo_item_;
+		return T();
 
 	if (size_ > 1)
 	{
@@ -133,7 +136,6 @@ T List<T>::removeFirst()
 		delete (root_);
 		root_ = next;
 		size_--;
-
 		return ret;
 	}
 	else
@@ -146,7 +148,7 @@ template <typename T>
 T List<T>::removeLast()
 {
 	if (size_ <= 0)
-		return foo_item_;
+		return T();
 
 	if (size_ > 1)
 	{
@@ -161,12 +163,12 @@ T List<T>::removeLast()
 	else
 	{
 		// Only one element left on the list
-		T ret = root_->data_;
+		foo_item_ = root_->data_;
 		delete (root_);
 		root_ = nullptr;
 		last_ = nullptr;
 		size_ = 0;
-		return ret;
+		return foo_item_;
 	}
 }
 
@@ -183,8 +185,7 @@ template <class T>
 T List<T>::remove(const unsigned int index)
 {
 	if (index < 0 || index >= size_)
-		return foo_item_;
-
+		return T();
 	if (index == 0)
 		return removeFirst();
 	if (index == size_ - 1)
@@ -222,6 +223,27 @@ template <class T>
 T &List<T>::last()
 {
 	return (last_ ? last_->data_ : foo_item_);
+}
+
+template <class T>
+List<T> &List<T>::operator<<(const T &t)
+{
+	append(t);
+	return *this;
+}
+
+template <class T>
+List<T> &List<T>::operator+=(const T &t)
+{
+	append(t);
+	return *this;
+}
+
+template <class T>
+List<T> &List<T>::operator>>(T &t)
+{
+	t = removeFirst();
+	return *this;
 }
 
 template <class T>

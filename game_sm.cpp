@@ -49,50 +49,24 @@ GameSM::GameSM(Display *display, Event *event)
 	event->clear();
 }
 
-// void GameSM::processStateMaschine(Event *event)
-//{
-//	bool process = false;
-//	if ((process_criterium_ & EVER) ||
-//	    (process_criterium_ & ProcessCriterum::PCINT && event->changed()))
-//	{
-//		process = true;
-//	}
-//	unsigned long now = millis();
-//	if (process_criterium_ & ProcessCriterum::TIMER1 && process_timer1_ &&
-//	    process_timer1_ <= now)
-//	{
-//		event->event_ |= TIMEOUT1;
-//		process_timer1_ = 0;
-//		process = true;
-//	}
-
-//	if (process_criterium_ & ProcessCriterum::TIMER2 && process_timer2_ &&
-//	    process_timer2_ <= now)
-//	{
-//		event->event_ |= TIMEOUT2;
-//		process_timer2_ = 0;
-//		process = true;
-//	}
-//	if (process)
-//		this->process(event);
-//}
-
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
 {
-
-	switch (event->event_ & INPUT_MASK)
+	if (event->buttonLeftHasPressed())
 	{
-	case BTN_LEFT:
 		if (--item < min)
 			item = num - 1;
-		break;
-	case BTN_RIGHT:
+	}
+	else if (event->buttonRightHasPressed())
+	{
 		if (++item >= num)
 			item = min;
-		break;
-	case BTN_DOWN:
+	}
+	else if (event->buttonDownHasPressed())
+	{
 		return DOWN_BTN;
-	case BTN_UP:
+	}
+	else if (event->buttonUpHasPressed())
+	{
 		return UP_BTN;
 	}
 	return NO_BTN;

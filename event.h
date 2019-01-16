@@ -58,11 +58,23 @@ public:
 		return event_ & BTN_LEFT;
 	}
 
+	// the "HasPressed" functions give you a true, if value of the considering button has changed to Pressed
 	const inline bool buttonUpHasPressed() const
 	{
 		return buttonUpChanged() && buttonUpState();
 	}
-
+	const inline bool buttonDownHasPressed() const
+	{
+		return buttonDownChanged() && buttonDownState();
+	}
+	const inline bool buttonRightHasPressed() const
+	{
+		return buttonRightChanged() && buttonRightState();
+	}
+	const inline bool buttonLeftHasPressed() const
+	{
+		return buttonLeftChanged() && buttonLeftState();
+	}
 	const inline bool changed() const
 	{
 		return event_ & CHANGE;
