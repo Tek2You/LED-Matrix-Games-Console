@@ -11,7 +11,6 @@ FUSES = {
 };
 
 Event event;
-
 Display dp(16, 8);
 GameSM sm(&dp, &event);
 
@@ -22,25 +21,11 @@ bool have_input = false;
 byte debounce_count[4] = {0, 0, 0, 0};
 byte button_transitional_states;
 
-void initGame()
-{
-	// init pin change interrup for buttons
-	DDRC &= ~INPUT_MASK;
-	PORTC |= INPUT_MASK;
-	PCMSK1 |= INPUT_MASK;  // select mask
-	PCICR |= (1 << PCIE1); // enable mask1
-	init();
-
-	TCNT2 = 200;
-	TCCR2A |= (1 << WGM21);
-	TIMSK2 |= (1 << OCIE2A);
-	TCCR2B |= (1 << CS20);
-	sei(); // enable global interrupts
-}
+void initHardware();
 
 int main(void)
 {
-	initGame();
+	initHardware();
 	wdt_enable(WDTO_60MS);
 
 	// containing loop for the main programm
@@ -103,4 +88,20 @@ void check_buttons()
 			debounce_count[i] = 1;
 		}
 	}
+}
+
+void initHardware()
+{
+	// init pin change interrup for buttons
+	DDRC &= ~INPUT_MASK;
+	PORTC |= INPUT_MASK;
+	PCMSK1 |= INPUT_MASK;  // select mask
+	PCICR |= (1 << PCIE1); // enable mask1
+	init();
+
+	TCNT2 = 200;
+	TCCR2A |= (1 << WGM21);
+	TIMSK2 |= (1 << OCIE2A);
+	TCCR2B |= (1 << CS20);
+	sei(); // enable global interrupts
 }
