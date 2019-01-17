@@ -14,25 +14,36 @@ Event event;
 Display dp(16, 8);
 GameSM sm(&dp, &event);
 
-byte button_event;
 int counter = 0;
 
-bool have_input = false;
-byte debounce_count[4] = {0, 0, 0, 0};
-byte button_transitional_states;
+bool process_debounce = false;
+bool check_buttons = false;
 
 void initHardware();
 
 int main(void)
 {
 	initHardware();
-	//	wdt_enable(WDTO_120MS);
+	wdt_enable(WDTO_120MS);
 
 	// containing loop for the main programm
 	while (1)
 	{
 		wdt_reset();
 		dp.show();
+		if (process_debounce)
+		{
+			process_debounce = false;
+			dp.disable();
+			event.processDebounce();
+		}
+
+		if (check_buttons)
+		{
+			check_buttons = false;
+			event.checkButtons();
+		}
+
 		if (event.controlButtonPressed() || counter++ >= 0xFF) // pre-devider for proccing function
 		{
 			counter = 0;
@@ -43,22 +54,20 @@ int main(void)
 				sm.process(&event);
 				event.clear();
 			}
-			have_input = false;
 		}
 	}
 	return 0;
 }
-void check_buttons();
 
 // pin change interrupt routine
 ISR(PCINT1_vect)
 {
-	event.checkButtons();
+	check_buttons = true;
 }
 
 ISR(PCINT0_vect)
 {
-	event.checkButtons();
+	check_buttons = true;
 }
 
 // debounce check counter.
@@ -66,36 +75,8 @@ ISR(PCINT0_vect)
 ISR(TIMER2_COMPA_vect)
 {
 	TCNT2 = 200;
-	event.process();
-	event.processDebounce();
-	//	check_buttons();
-	//	for (int i = 0; i < 4; i++)
-	//	{
-	//		if (debounce_count[i] && debounce_count[i]++ == 20)
-	//		{
-	//			debounce_count[i] = 0;
-	//			event.setButtonLeftState(bitRead(button_transitional_states, 0));
-	//			event.setButtonDownState(bitRead(button_transitional_states, 1));
-	//			event.setButtonUpState(bitRead(button_transitional_states, 2));
-	//			event.setButtonRightState(bitRead(button_transitional_states, 3));
-	//			have_input = true;
-	//		}
-	//	}
+	process_debounce = true;
 }
-// checks any button change and enables if changed an debounce count for the considering button
-// void check_buttons()
-//{
-//	byte tmp = ~PINC & INPUT_MASK;
-//	byte change = button_transitional_states ^ tmp;
-//	button_transitional_states = tmp;
-//	for (int i = 0; i < 4; i++)
-//	{
-//		if (bitRead(change, i))
-//		{
-//			debounce_count[i] = 1;
-//		}
-//	}
-//}
 
 void initHardware()
 {

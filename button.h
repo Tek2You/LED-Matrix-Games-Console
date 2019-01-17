@@ -10,11 +10,11 @@ public:
 	void checkChange();
 	inline bool changed() const
 	{
-		return state_ & Changed;
+		return state_ & (1 << Changed);
 	}
 	inline bool state() const
 	{
-		return state_ & State;
+		return state_ & (1 << State);
 	}
 	inline bool pressed() const
 	{
@@ -22,15 +22,15 @@ public:
 	}
 	inline bool clear()
 	{
-		state_ |= ~Changed;
+		bitClear(state_, Changed);
 	}
 
 private:
 	enum ButtonSpecifications
 	{
-		State = 1 << 0,
-		Changed = 1 << 1,
-		InDebounce = 1 << 2,
+		State = 0,
+		Changed = 1,
+		InDebounce = 2,
 	};
 
 	byte state_;

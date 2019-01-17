@@ -9,7 +9,7 @@ Button::Button(PortPin pin, byte debounce_time) : pin_(pin), debounce_time_(debo
 void Button::processDebounce()
 {
 	checkChange();
-	if (state_ & InDebounce)
+	if (state_ & (1 << InDebounce))
 	{
 		if (++count_ == debounce_time_)
 		{
@@ -24,14 +24,14 @@ void Button::checkChange()
 {
 	if (pin_.read() != state())
 	{
-		if (!(state_ & InDebounce))
+		if (!(state_ & (1 << InDebounce)))
 		{
 			bitSet(state_, InDebounce);
 			count_ = 0;
 		}
 	}
 
-	else if (state_ & InDebounce)
+	else if (state_ & (1 << InDebounce))
 	{
 		bitClear(state_, InDebounce);
 	}

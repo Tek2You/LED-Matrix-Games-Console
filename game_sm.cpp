@@ -84,8 +84,10 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 
 void GameSM::stateDefault(Event *event)
 {
+
 	const char *texts[2][5] = {{"Tetris", "Snake", "Jump", "highscore", "setting"},
 	                           {"Tetris", "Snake", "Jump", "Highscore", "Einstellungen"}};
+
 	static MenuItem item;
 	if (event->onEntry())
 	{
