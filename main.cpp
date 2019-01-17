@@ -40,12 +40,10 @@ int main(void)
 
 		if (check_buttons)
 		{
-			check_buttons = false;
 			event.checkButtons();
 		}
 
-		if (event.controlButtonPressed() || event.buttonStop().pressed() ||
-		    counter++ >= 0xFF) // pre-devider for proccing function
+		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
 		{
 			counter = 0;
 			dp.update();
@@ -56,6 +54,7 @@ int main(void)
 				event.clear();
 			}
 		}
+		check_buttons = false;
 	}
 	return 0;
 }

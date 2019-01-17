@@ -22,7 +22,7 @@ void Button::processDebounce()
 
 void Button::checkChange()
 {
-	if (pin_.read() != state())
+	if (pin_.read() == state()) // state is already inverted, so if state changed it will pass
 	{
 		if (!(state_ & (1 << InDebounce)))
 		{

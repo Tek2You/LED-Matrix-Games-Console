@@ -96,9 +96,11 @@ void GameSM::stateDefault(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
 	}
-	else if (processMenuStop(event))
+	else if (event->buttonStop().pressed())
 	{
-		return;
+		item.value_ = 0;
+		event->clear();
+		stateDefault(event);
 	}
 	else if (event->controlButtonPressed())
 	{
