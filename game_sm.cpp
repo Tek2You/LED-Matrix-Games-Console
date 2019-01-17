@@ -126,6 +126,7 @@ void GameSM::stateDefault(Event *event)
 			default:
 				break;
 			}
+			item.value_ = 0;
 			return;
 		}
 	}

@@ -34,6 +34,7 @@ void Snake::start(Event *event)
 
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
+	event->setFlag(Event::ProcessStop);
 	event->removeAllTimers();
 	event->addTimer(period_);
 	event->timer(0).start();
@@ -222,8 +223,12 @@ bool Snake::onTimerOverflow(Event *event)
 
 void Snake::onStop(Event *event)
 {
+	event->timer(0).stop();
+	Game::onStop(event);
 }
 
 void Snake::onContinue(Event *event)
 {
+	event->timer(0).start();
+	Game::onContinue(event);
 }

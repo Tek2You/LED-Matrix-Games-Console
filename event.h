@@ -52,7 +52,7 @@ public:
 
 	inline bool controlButtonChanged()
 	{
-		return buttonRight().changed() || buttonLeft().changed() || buttonRight().changed() || buttonLeft().changed();
+		return buttonUp().changed() || buttonDown().changed() || buttonRight().changed() || buttonLeft().changed();
 	}
 	inline bool controlButtonPressed()
 	{
