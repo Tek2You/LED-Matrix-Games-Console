@@ -33,7 +33,7 @@ int main(void)
 	{
 		wdt_reset();
 		dp.show();
-		if (have_input || counter++ >= 0xFF) // pre-devider for proccing function
+		if (event.controlButtonPressed() || counter++ >= 0xFF) // pre-devider for proccing function
 		{
 			counter = 0;
 			dp.update();
@@ -53,7 +53,12 @@ void check_buttons();
 // pin change interrupt routine
 ISR(PCINT1_vect)
 {
-	check_buttons();
+	event.checkButtons();
+}
+
+ISR(PCINT0_vect)
+{
+	event.checkButtons();
 }
 
 // debounce check counter.
@@ -61,42 +66,43 @@ ISR(PCINT1_vect)
 ISR(TIMER2_COMPA_vect)
 {
 	TCNT2 = 200;
-	check_buttons();
-	for (int i = 0; i < 4; i++)
-	{
-		if (debounce_count[i] && debounce_count[i]++ == 20)
-		{
-			debounce_count[i] = 0;
-			event.setButtonLeftState(bitRead(button_transitional_states, 0));
-			event.setButtonDownState(bitRead(button_transitional_states, 1));
-			event.setButtonUpState(bitRead(button_transitional_states, 2));
-			event.setButtonRightState(bitRead(button_transitional_states, 3));
-			have_input = true;
-		}
-	}
+	event.process();
+	event.processDebounce();
+	//	check_buttons();
+	//	for (int i = 0; i < 4; i++)
+	//	{
+	//		if (debounce_count[i] && debounce_count[i]++ == 20)
+	//		{
+	//			debounce_count[i] = 0;
+	//			event.setButtonLeftState(bitRead(button_transitional_states, 0));
+	//			event.setButtonDownState(bitRead(button_transitional_states, 1));
+	//			event.setButtonUpState(bitRead(button_transitional_states, 2));
+	//			event.setButtonRightState(bitRead(button_transitional_states, 3));
+	//			have_input = true;
+	//		}
+	//	}
 }
 // checks any button change and enables if changed an debounce count for the considering button
-void check_buttons()
-{
-	byte tmp = ~PINC & INPUT_MASK;
-	byte change = button_transitional_states ^ tmp;
-	button_transitional_states = tmp;
-	for (int i = 0; i < 4; i++)
-	{
-		if (bitRead(change, i))
-		{
-			debounce_count[i] = 1;
-		}
-	}
-}
+// void check_buttons()
+//{
+//	byte tmp = ~PINC & INPUT_MASK;
+//	byte change = button_transitional_states ^ tmp;
+//	button_transitional_states = tmp;
+//	for (int i = 0; i < 4; i++)
+//	{
+//		if (bitRead(change, i))
+//		{
+//			debounce_count[i] = 1;
+//		}
+//	}
+//}
 
 void initHardware()
 {
 	// init pin change interrup for buttons
-	DDRC &= ~INPUT_MASK;
-	PORTC |= INPUT_MASK;
-	PCMSK1 |= INPUT_MASK;  // select mask
-	PCICR |= (1 << PCIE1); // enable mask1
+	PCMSK1 |= 0x0F; // select mask
+	PCMSK0 |= (1 << PCINT0);
+	PCICR |= (1 << PCIE1) | (1 << PCIE0); // enable mask1
 	init();
 
 	TCNT2 = 200;

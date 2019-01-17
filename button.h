@@ -5,7 +5,7 @@
 class Button
 {
 public:
-	Button(byte debounce_time);
+	Button(PortPin pin, byte debounce_time);
 	void processDebounce();
 	void checkChange();
 	inline bool changed() const
@@ -19,6 +19,10 @@ public:
 	inline bool pressed() const
 	{
 		return state() && changed();
+	}
+	inline bool clear()
+	{
+		state_ |= ~Changed;
 	}
 
 private:

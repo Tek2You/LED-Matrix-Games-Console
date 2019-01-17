@@ -272,18 +272,18 @@ void Tetris::resetHighscore()
 bool Tetris::onButtonChange(Event *event)
 {
 	Timer &move_timer = event->timer(1);
-	if (event->changed())
+	if (event->controlButtonPressed())
 	{
 		// Rotation
-		if (event->buttonUpHasPressed())
+		if (event->buttonUp().pressed())
 		{
 			rotate();
 		}
 
 		// Down(faster)
-		if (event->buttonDownChanged())
+		if (event->buttonDown().changed())
 		{
-			if (event->buttonDownState())
+			if (event->buttonDown().changed())
 			{
 				if (down())
 				{
@@ -300,11 +300,11 @@ bool Tetris::onButtonChange(Event *event)
 		}
 
 		// btn left
-		if (event->buttonLeftChanged())
+		if (event->buttonLeft().changed())
 		{
-			if (event->buttonLeftState())
+			if (event->buttonLeft().state())
 			{
-				if (!event->buttonRightState())
+				if (!event->buttonRight().state())
 				{
 					left();
 					move_timer.setInterval(general_first_move_interval_);
@@ -319,11 +319,11 @@ bool Tetris::onButtonChange(Event *event)
 		}
 
 		// btn right
-		if (event->buttonRightChanged())
+		if (event->buttonRight().changed())
 		{
-			if (event->buttonRightState())
+			if (event->buttonRight().state())
 			{
-				if (!event->buttonLeftState())
+				if (!event->buttonLeft().state())
 				{
 					right();
 					move_timer.setInterval(general_first_move_interval_);
@@ -345,13 +345,13 @@ bool Tetris::onTimerOverflow(Event *event)
 	Timer &move_timer = event->timer(1);
 	if (move_timer.overflow())
 	{
-		if (event->buttonLeftState())
+		if (event->buttonLeft().state())
 		{
 			left();
 			move_timer.setInterval(general_move_interval_);
 		}
 
-		else if (event->buttonRightState())
+		else if (event->buttonRight().state())
 		{
 			right();
 			move_timer.setInterval(general_move_interval_);
@@ -365,7 +365,7 @@ bool Tetris::onTimerOverflow(Event *event)
 		{
 			return true;
 		}
-		if (event->buttonDownState())
+		if (event->buttonDown().state())
 			down_timer.setInterval(general_down_interval_);
 		else
 			down_timer.setInterval(general_step_interval_);

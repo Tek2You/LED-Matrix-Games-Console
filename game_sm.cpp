@@ -51,21 +51,21 @@ GameSM::GameSM(Display *display, Event *event)
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
 {
-	if (event->buttonLeftHasPressed())
+	if (event->buttonLeft().pressed())
 	{
 		if (--item < min)
 			item = num - 1;
 	}
-	else if (event->buttonRightHasPressed())
+	else if (event->buttonRight().pressed())
 	{
 		if (++item >= num)
 			item = min;
 	}
-	else if (event->buttonDownHasPressed())
+	else if (event->buttonDown().pressed())
 	{
 		return DOWN_BTN;
 	}
-	else if (event->buttonUpHasPressed())
+	else if (event->buttonUp().pressed())
 	{
 		return UP_BTN;
 	}
@@ -84,7 +84,7 @@ void GameSM::stateDefault(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 	}
 
-	else if (event->hasPressed())
+	else if (event->controlButtonPressed())
 	{
 		if (item.advance(event) == MenuItem::DOWN_BTN)
 		{
@@ -235,7 +235,7 @@ void GameSM::stateGameOver(Event *event)
 		return;
 	}
 
-	if (event->hasPressed())
+	if (event->controlButtonPressed())
 	{
 		TRANSITION(stateDefault, event);
 		return;
@@ -252,7 +252,7 @@ void GameSM::stateSettingsMenu(Event *event)
 		item.init(2);
 		event->setFlag(Event::ProcessPinChanges);
 	}
-	else if (event->hasPressed())
+	else if (event->controlButtonPressed())
 	{
 		switch (item.advance(event))
 		{
@@ -305,7 +305,7 @@ void GameSM::stateSpeedMenu(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 	}
 
-	else if (event->hasPressed())
+	else if (event->controlButtonPressed())
 	{
 		switch (item.advance(event))
 		{
@@ -343,7 +343,7 @@ void GameSM::stateLanguageMenu(Event *event)
 		item.init(2, (language_ == DE ? 0 : 1));
 		event->setFlag(Event::ProcessPinChanges);
 	}
-	else if (event->hasPressed())
+	else if (event->controlButtonPressed())
 	{
 		switch (item.advance(event))
 		{ // enter pressed
@@ -423,7 +423,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 		item.init(4, 0);
 		event->setFlag(Event::ProcessPinChanges);
 	}
-	else if (event->hasPressed())
+	else if (event->controlButtonPressed())
 	{
 		byte advanced = item.advance(event);
 		if (advanced)
@@ -484,9 +484,9 @@ void GameSM::stateResetMenu(Event *event)
 		event->setFlag(Event::ProcessPinChanges);
 	}
 
-	else if (event->hasPressed())
+	else if (event->controlButtonPressed())
 	{
-		if (event->buttonDownState())
+		if (event->buttonDown().state())
 		{
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
@@ -494,7 +494,7 @@ void GameSM::stateResetMenu(Event *event)
 			LOAD_EFFECT_STANDART(stateDefault, event);
 			return;
 		}
-		if (event->buttonUpState())
+		if (event->buttonUp().state())
 		{
 			TRANSITION(stateHighscoreMenu, event);
 			return;

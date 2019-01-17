@@ -99,9 +99,9 @@ void Jump::resetHighscore()
 
 bool Jump::onButtonChange(Event *event)
 {
-	if (event->buttonRightChanged())
+	if (event->buttonRight().changed())
 	{
-		if (event->buttonRightState())
+		if (event->buttonRight().state())
 		{
 			if (jump_count_ == 0 && !is_jumping_) // begin Jump
 			{

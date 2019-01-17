@@ -174,18 +174,18 @@ void Snake::resetHighscore()
 
 bool Snake::onButtonChange(Event *event)
 {
-	if (event->hasPressed())
+	if (event->controlButtonPressed())
 	{
 		// is not 180° rotation or no rotation(in this case the snake will make
 		// a additinal ste,  what we avoid with dont allow this)
-		if (event->buttonUpHasPressed())
+		if (event->buttonUp().pressed())
 		{
 			if (direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::UP;
 			}
 		}
-		else if (event->buttonRightHasPressed())
+		else if (event->buttonRight().pressed())
 		{
 			if (direction_ != Snake::LEFT)
 			{
@@ -193,7 +193,7 @@ bool Snake::onButtonChange(Event *event)
 			}
 		}
 
-		else if (event->buttonLeftHasPressed())
+		else if (event->buttonLeft().pressed())
 		{
 			if (direction_ != Snake::RIGHT && direction_ != Snake::START)
 			{
@@ -201,7 +201,7 @@ bool Snake::onButtonChange(Event *event)
 			}
 		}
 
-		else if (event->buttonDownHasPressed())
+		else if (event->buttonDown().pressed())
 		{
 			if (direction_ != Snake::UP)
 			{

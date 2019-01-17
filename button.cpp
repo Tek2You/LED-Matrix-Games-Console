@@ -1,7 +1,9 @@
 #include "button.h"
 
-Button::Button(byte debounce_time) : debounce_time_(debounce_time)
+Button::Button(PortPin pin, byte debounce_time) : pin_(pin), debounce_time_(debounce_time)
 {
+	pin_.input();
+	pin_.set();
 }
 
 void Button::processDebounce()

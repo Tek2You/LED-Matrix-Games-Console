@@ -12,7 +12,7 @@ Game::~Game()
 bool Game::process(Event *event)
 {
 	bool output = false;
-	if (event->changed())
+	if (event->controlButtonPressed())
 	{
 		if (onButtonChange(event))
 			output = true;

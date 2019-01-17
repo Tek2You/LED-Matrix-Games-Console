@@ -1,55 +1,40 @@
 #include "event.h"
 
-Event::Event() : event_(0), flags_(0)
+Event::Event()
+    : on_entry_(false), flags_(0), button_up_(PortPin(PortPin::C, 2), 100), button_down_(PortPin(PortPin::C, 1), 100),
+      button_right_(PortPin(PortPin::C, 3), 100), button_left_(PortPin(PortPin::C, 0), 100),
+      button_stop_(PortPin(PortPin::B, 1), 100)
+
 {
 }
 
-bool Event::hasPressed() const
+void Event::processDebounce()
 {
-	return buttonUpHasPressed() || buttonDownHasPressed() || buttonRightHasPressed() || buttonLeftHasPressed();
+	buttonUp().processDebounce();
+	buttonDown().processDebounce();
+	buttonRight().processDebounce();
+	buttonLeft().processDebounce();
+	buttonStop().processDebounce();
 }
 
-void Event::setButtonUpState(const bool state)
+void Event::checkButtons()
 {
-	if (state != buttonUpState())
-	{
-		bitSet(event_, 6);
-		bitWrite(event_, 2, state);
-	}
-}
-
-void Event::setButtonDownState(const bool state)
-{
-	if (state != buttonDownState())
-	{
-		bitSet(event_, 5);
-		bitWrite(event_, 1, state);
-	}
-}
-
-void Event::setButtonRightState(const bool state)
-{
-	if (state != buttonRightState())
-	{
-		bitSet(event_, 7);
-		bitWrite(event_, 3, state);
-	}
-}
-
-void Event::setButtonLeftState(const bool state)
-{
-	if (state != buttonLeftState())
-	{
-		bitSet(event_, 4);
-		bitWrite(event_, 0, state);
-	}
+	buttonUp().checkChange();
+	buttonDown().checkChange();
+	buttonRight().checkChange();
+	buttonLeft().checkChange();
+	buttonStop().checkChange();
 }
 
 void Event::clear()
 {
+	buttonUp().clear();
+	buttonDown().clear();
+	buttonRight().clear();
+	buttonLeft().clear();
+	buttonStop().clear();
 	// call after processed all
-	event_ &= ~(event_ & CHANGE);
-	event_ &= ~ON_ENTRY;
+	on_entry_ = false;
 	unsigned int t = millis();
 	for (int i = 0; i < timers_.size(); i++)
 	{
@@ -61,7 +46,7 @@ void Event::clear()
 bool Event::process()
 {
 	processTimers();
-	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && changed()) ||
+	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && controlButtonPressed()) ||
 	        (flag(Event::ProcessTimerOverflows) && overflow_));
 }
 
