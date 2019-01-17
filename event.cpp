@@ -47,8 +47,7 @@ bool Event::process()
 {
 	processTimers();
 	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && controlButtonChanged()) ||
-	        (flag(Event::ProcessTimerOverflows) && overflow_) ||
-	        (/*flag(Event::ProcessStop) && */ buttonStop().changed()));
+	        (flag(Event::ProcessTimerOverflows) && overflow_) || (flag(Event::ProcessStop) && buttonStop().changed()));
 }
 
 bool Event::processTimers()
