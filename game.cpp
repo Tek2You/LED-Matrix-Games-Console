@@ -31,6 +31,8 @@ bool Game::process(Event *event)
 		}
 		else
 		{
+			while (true)
+				;
 			onContinue(event);
 		}
 	}

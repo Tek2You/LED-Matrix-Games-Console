@@ -10,11 +10,11 @@ public:
 	void checkChange();
 	inline bool changed() const
 	{
-		return state_ & (1 << Changed);
+		return bitRead(state_, Changed);
 	}
 	inline bool state() const
 	{
-		return state_ & (1 << State);
+		return bitRead(state_, State);
 	}
 	inline bool pressed() const
 	{
