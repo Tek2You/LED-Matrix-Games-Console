@@ -49,6 +49,16 @@ GameSM::GameSM(Display *display, Event *event)
 	event->clear();
 }
 
+bool GameSM::processMenuStop(Event *event)
+{
+	if (event->buttonStop().pressed())
+	{
+		TRANSITION(stateDefault, event);
+		return true;
+	}
+	return false;
+}
+
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
 {
 	if (event->buttonLeft().pressed())
@@ -83,7 +93,10 @@ void GameSM::stateDefault(Event *event)
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
 	}
-
+	else if (processMenuStop(event))
+	{
+		return;
+	}
 	else if (event->controlButtonPressed())
 	{
 		if (item.advance(event) == MenuItem::DOWN_BTN)
@@ -234,7 +247,10 @@ void GameSM::stateGameOver(Event *event)
 		}
 		return;
 	}
-
+	else if (processMenuStop(event))
+	{
+		return;
+	}
 	if (event->controlButtonPressed())
 	{
 		TRANSITION(stateDefault, event);
@@ -251,6 +267,10 @@ void GameSM::stateSettingsMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(2);
 		event->setFlag(Event::ProcessPinChanges);
+	}
+	else if (processMenuStop(event))
+	{
+		return;
 	}
 	else if (event->controlButtonPressed())
 	{
@@ -304,7 +324,10 @@ void GameSM::stateSpeedMenu(Event *event)
 		item.init(5, speed_);
 		event->setFlag(Event::ProcessPinChanges);
 	}
-
+	else if (processMenuStop(event))
+	{
+		return;
+	}
 	else if (event->controlButtonPressed())
 	{
 		switch (item.advance(event))
@@ -342,6 +365,10 @@ void GameSM::stateLanguageMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(2, (language_ == DE ? 0 : 1));
 		event->setFlag(Event::ProcessPinChanges);
+	}
+	else if (processMenuStop(event))
+	{
+		return;
 	}
 	else if (event->controlButtonPressed())
 	{
@@ -390,6 +417,10 @@ void GameSM::stateLoadEffect(Event *event)
 		event->addTimer(50);
 		event->setFlag(Event::ProcessTimerOverflows);
 	}
+	else if (processMenuStop(event))
+	{
+		return;
+	}
 	if (event->timer(0).overflow())
 	{
 		if (count >= display_->rows())
@@ -422,6 +453,10 @@ void GameSM::stateHighscoreMenu(Event *event)
 	{
 		item.init(4, 0);
 		event->setFlag(Event::ProcessPinChanges);
+	}
+	else if (processMenuStop(event))
+	{
+		return;
 	}
 	else if (event->controlButtonPressed())
 	{
@@ -482,6 +517,10 @@ void GameSM::stateResetMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
+	}
+	else if (processMenuStop(event))
+	{
+		return;
 	}
 
 	else if (event->controlButtonPressed())

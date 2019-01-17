@@ -12,8 +12,8 @@ class GameSM : public StateMachine<Event *>
 public:
 	GameSM(Display *display, Event *event);
 	//	void processStateMaschine(Event *event);
-
 private:
+	bool processMenuStop(Event *event);
 	// states
 	void stateDefault(Event *event);
 	void stateTetris(Event *event);
@@ -63,7 +63,6 @@ private:
 
 	Display *display_;
 	Game *game_; // pointer to the current game
-
 	Language language_ = EN;
 	byte speed_ = 0;
 	State load_following_state_; // state load effect need a pointer to the state
