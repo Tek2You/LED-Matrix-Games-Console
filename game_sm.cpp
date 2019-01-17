@@ -167,7 +167,6 @@ void GameSM::stateTetris(Event *event)
 		game_->start(event);
 		return;
 	}
-
 	if (game_->process(event))
 	{
 		TRANSITION(stateGameOver, event);

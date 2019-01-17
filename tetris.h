@@ -27,6 +27,8 @@ protected:
 	bool onButtonChange(Event *event) override;
 	bool onTimerOverflow(Event *event) override;
 	void render();
+	void onStop(Event *event) override;
+	void onContinue(Event *event) override;
 
 private:
 	// private functions only for tetris

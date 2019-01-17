@@ -23,9 +23,12 @@ public:
 protected:
 	virtual bool onButtonChange(Event *event);
 	virtual bool onTimerOverflow(Event *event);
+	virtual void onStop(Event *event);
+	virtual void onContinue(Event *event);
 
 protected:
 	virtual void render() = 0;
 	Display *display_;
 	bool is_new_highscore_ = false;
+	bool stop_state_;
 };

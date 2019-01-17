@@ -219,3 +219,11 @@ bool Snake::onTimerOverflow(Event *event)
 	}
 	return false;
 }
+
+void Snake::onStop(Event *event)
+{
+}
+
+void Snake::onContinue(Event *event)
+{
+}

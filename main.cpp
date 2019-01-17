@@ -26,7 +26,7 @@ void initHardware();
 int main(void)
 {
 	initHardware();
-	wdt_enable(WDTO_60MS);
+	//	wdt_enable(WDTO_120MS);
 
 	// containing loop for the main programm
 	while (1)

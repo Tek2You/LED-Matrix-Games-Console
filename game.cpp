@@ -1,7 +1,7 @@
 #include "game.h"
 #include "operators.h"
 
-Game::Game(Display *display) : display_(display), is_new_highscore_(false)
+Game::Game(Display *display) : display_(display), is_new_highscore_(false), stop_state_(false)
 {
 }
 
@@ -22,7 +22,30 @@ bool Game::process(Event *event)
 		if (onTimerOverflow(event))
 			output = true;
 	}
+	if (event->buttonStop().pressed())
+	{
+		stop_state_ = !stop_state_;
+		if (stop_state_)
+		{
+			onStop(event);
+		}
+		else
+		{
+			onContinue(event);
+		}
+	}
 	return output;
+}
+
+void Game::onStop(Event *event)
+{
+	display_->clear();
+	display_->setIcon(0x003359304539475832, 5); // update
+}
+
+void Game::onContinue(Event *event)
+{
+	render();
 }
 
 bool Game::onButtonChange(Event *event)
