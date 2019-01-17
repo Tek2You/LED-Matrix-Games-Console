@@ -210,6 +210,7 @@ bool Snake::onButtonChange(Event *event)
 			}
 		}
 	}
+	return false;
 }
 
 bool Snake::onTimerOverflow(Event *event)

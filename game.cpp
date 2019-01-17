@@ -28,7 +28,7 @@ bool Game::process(Event *event)
 	{
 		return false;
 	}
-	if (event->controlButtonPressed())
+	if (event->controlButtonChanged())
 	{
 		if (onButtonChange(event))
 			output = true;

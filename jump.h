@@ -23,6 +23,8 @@ protected:
 	// Game interface
 	bool onButtonChange(Event *event) override;
 	bool onTimerOverflow(Event *event) override;
+	void onStop(Event *event) override;
+	void onContinue(Event *event) override;
 	void render();
 
 private:

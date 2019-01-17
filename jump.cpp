@@ -78,12 +78,6 @@ void Jump::setSpeed(const byte v)
 
 byte *Jump::row(const byte n)
 {
-	//	if(current_field_start_ + n > display_->rows()+2){
-	//		return field_ + n - (display_->rows()+2-current_field_start_);
-	//	}
-	//	else{
-	//		return field_ + current_field_start_ + n;
-	//	}
 	return field_ + ((current_field_start_ + n) % 20);
 }
 
@@ -144,6 +138,23 @@ bool Jump::onTimerOverflow(Event *event)
 		return true;
 	}
 	return false;
+}
+
+void Jump::onStop(Event *event)
+{
+	Game::onStop(event);
+	event->timer(0).stop();
+	event->timer(1).stop();
+}
+
+void Jump::onContinue(Event *event)
+{
+	event->timer(0).start();
+	if (is_jumping_)
+	{
+		event->timer(1).start();
+	}
+	Game::onContinue(event);
 }
 
 void Jump::forward()
