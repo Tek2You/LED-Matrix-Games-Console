@@ -16,7 +16,7 @@ void Display::setIcon(uint64_t icon, byte offset)
 	i.i64 = icon;
 	for (int r = offset; r < 8 + offset; r++)
 	{
-		setRow(r, i.array[7 - r]);
+		setRow(r, i.array[7 + offset - r]);
 	}
 }
 

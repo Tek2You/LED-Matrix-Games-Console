@@ -44,7 +44,8 @@ int main(void)
 			event.checkButtons();
 		}
 
-		if (event.controlButtonPressed() || counter++ >= 0xFF) // pre-devider for proccing function
+		if (event.controlButtonPressed() || event.buttonStop().pressed() ||
+		    counter++ >= 0xFF) // pre-devider for proccing function
 		{
 			counter = 0;
 			dp.update();

@@ -40,7 +40,7 @@ bool Game::process(Event *event)
 void Game::onStop(Event *event)
 {
 	display_->clear();
-	display_->setIcon(0x003359304539475832, 5); // update
+	display_->setIcon(0x0000000024242424, 2); // update
 }
 
 void Game::onContinue(Event *event)

@@ -94,6 +94,7 @@ void GameSM::stateDefault(Event *event)
 		item.init(5);
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
