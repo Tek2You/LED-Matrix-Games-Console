@@ -6,7 +6,6 @@ class Display : public MatrixDisplay
 {
 public:
 	Display(byte height, byte width);
-	~Display();
 
 	void setIcon(uint64_t icon, byte offset = 0);
 	void update();

@@ -1,3 +1,20 @@
+/* text.cpp : Provides functions to set a (shifted) text on the display
+ * Copyright (C) 2019 Felix Haschke
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
 #include "text.h"
 
 Text::Text(MatrixDisplay *display)
@@ -30,8 +47,6 @@ void Text::clear()
 // shift text by one column and start over if nothing is shown anymore
 void Text::shift()
 {
-	//	if(current_shift_start_col_ == 1)
-	//		return;
 	--current_shift_start_col_;
 	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_ - first_, 1, offset_) <= 0)
 	{

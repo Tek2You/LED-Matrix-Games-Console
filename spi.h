@@ -31,15 +31,6 @@
 void SPI_Init();
 
 // Transfer a byte of data
-uint8_t SPI_SendByte(uint8_t data);
-
-// Read a byte of data
-uint8_t SPI_ReadByte(void);
-
-// Assert the SS line
-void SPI_AssertSS(void);
-
-// Deassert the SS line
-void SPI_DeassertSS(void);
+void SPI_SendByte(uint8_t data);
 
 #endif // _SPI_CLARKDAWG

@@ -1,25 +1,8 @@
+#pragma once
 #include "avr.h"
 #include "button.h"
 #include "list.h"
 #include "timer.h"
-#pragma once
-
-#define ON_ENTRY bit(8)
-// these are the actual input pins (of PINC)
-//#define BTN_LEFT bit(0)
-//#define BTN_DOWN bit(1)
-//#define BTN_UP bit(2)
-//#define BTN_RIGHT bit(3)
-//#define BTN_LEFT_CHANGE bit(4)
-//#define BTN_DOWN_CHANGE bit(5)
-//#define BTN_UP_CHANGE bit(6)
-//#define BTN_RIGHT_CHANGE bit(7)
-
-//#define TIMEOUT1 bit(9)
-//#define TIMEOUT2 bit(10)
-// mask of all input pins
-//#define CHANGE (BTN_LEFT_CHANGE | BTN_DOWN_CHANGE | BTN_UP_CHANGE | BTN_RIGHT_CHANGE)
-//#define INPUT_MASK (BTN_DOWN | BTN_LEFT | BTN_RIGHT | BTN_UP)
 
 class Event
 {

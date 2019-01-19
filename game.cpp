@@ -1,3 +1,21 @@
+/* game.cpp : abstract class for all games proving a interface
+ *            for managing the game from the statemaschine
+ * Copyright (C) 2019 Felix Haschke
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
 #include "game.h"
 #include "operators.h"
 
@@ -28,6 +46,7 @@ bool Game::process(Event *event)
 	{
 		return false;
 	}
+	// check if processing is required
 	if (event->controlButtonChanged())
 	{
 		if (onButtonChange(event))
@@ -44,7 +63,8 @@ bool Game::process(Event *event)
 void Game::onStop(Event *event)
 {
 	display_->clear();
-	display_->setIcon(0x0000242424240000, 4); // update
+	// set stop icon
+	display_->setIcon(0x0000242424240000, 4);
 }
 
 void Game::onContinue(Event *event)

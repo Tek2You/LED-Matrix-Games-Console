@@ -1,3 +1,20 @@
+/* main.cpp : main file executing all needed systems
+ * Copyright (C) 2019 Felix Haschke
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+
 #include "avr.h"
 #include "avr/wdt.h"
 #include "display.h"
@@ -5,9 +22,9 @@
 #include "game_sm.h"
 
 FUSES = {
-    LFUSE_DEFAULT | (byte)~FUSE_CKDIV8, // run at 8MHz
-    HFUSE_DEFAULT &FUSE_EESAVE,         // protect EEPROM from erase
-    EFUSE_DEFAULT,
+	 LFUSE_DEFAULT | (byte)~FUSE_CKDIV8, // run at 8MHz
+	 HFUSE_DEFAULT &FUSE_EESAVE,         // protect EEPROM from erase
+	 EFUSE_DEFAULT,
 };
 
 Event event;
@@ -37,12 +54,10 @@ int main(void)
 			dp.disable();
 			event.processDebounce();
 		}
-
 		if (check_buttons)
 		{
 			event.checkButtons();
 		}
-
 		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
 		{
 			counter = 0;

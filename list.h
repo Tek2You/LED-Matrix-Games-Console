@@ -1,5 +1,6 @@
 #pragma once
 #include "operators.h"
+
 template <class TN>
 struct ListNode
 {
