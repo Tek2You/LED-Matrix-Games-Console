@@ -1,4 +1,5 @@
 /* main.cpp : main file executing all needed systems
+ *
  * Copyright (C) 2019 Felix Haschke
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +44,7 @@ int main(void)
 	initHardware();
 	wdt_enable(WDTO_120MS);
 
-	// containing loop for the main programm
+	// containing loop for the main librarym
 	while (1)
 	{
 		wdt_reset();

@@ -1,4 +1,4 @@
-/* timer.cpp : Timer library that puts on a basic timer function
+/* dodge.cpp : Dodge game class
  *
  * Copyright (C) 2019 Felix Haschke
  *
@@ -16,28 +16,49 @@
  * along with this library.  If not, see http://www.gnu.org/licenses/.
  */
 
-#pragma once
-#include "avr.h"
+#include "dodge.h"
 
-class Timer
+Dodge::Dodge(Display * display) : Game(display)
 {
-public:
-	Timer(unsigned long interval = 0);
-	bool process(const unsigned long &t);
-	bool process();
 
-	void start();
-	inline void restart() { start(); }
-	inline void stop() { next_time_ = 0xFFFFFFFE; }
+}
 
-	unsigned int interval() const;
-	void setInterval(unsigned int interval);
+void Dodge::start(Event *event)
+{
 
-	bool overflow() { return overflow_; }
-	void clearOverflow() { overflow_ = false; }
+}
 
-private:
-	unsigned long next_time_;
-	unsigned long interval_;
-	bool overflow_ = false;
-};
+void Dodge::setSpeed(byte v)
+{
+
+}
+
+bool Dodge::isNewHighscore() const
+{
+
+}
+
+bool Dodge::onButtonChange(Event *event)
+{
+
+}
+
+bool Dodge::onTimerOverflow(Event *event)
+{
+
+}
+
+void Dodge::onStop(Event *event)
+{
+
+}
+
+void Dodge::onContinue(Event *event)
+{
+
+}
+
+void Dodge::render()
+{
+
+}

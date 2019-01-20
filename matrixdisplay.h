@@ -1,3 +1,21 @@
+/* button.cpp : Display driving library
+ *
+ * Copyright (C) 2019 Felix Haschke
+ *
+ * This library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library.  If not, see http://www.gnu.org/licenses/.
+ */
+
 #pragma once
 #include "avr.h"
 #include "position.h"
@@ -12,8 +30,14 @@ public:
 	void setPixel(byte col, byte row, bool value = true);
 	void setPixel(const Pos &p, bool value = true);
 	void setArray(byte *array);
-	const byte rows() { return 16; }
-	const byte cols() { return width_; }
+	const byte rows()
+	{
+		return 16;
+	}
+	const byte cols()
+	{
+		return width_;
+	}
 	int setString(const char *s, int column, char cursor_pos, char spacing = 1, byte offset = 0);
 	byte setChar(char ch, int column, byte offset);
 	void clearRows(byte start, byte end);

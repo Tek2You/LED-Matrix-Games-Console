@@ -1,4 +1,5 @@
-/* button.cpp : Class for query and debounce of a button
+/* button.cpp : Library for query and debounce of a button
+ *
  * Copyright (C) 2019 Felix Haschke
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-
 #include "button.h"
 
 Button::Button(PortPin pin, byte debounce_time) : pin_(pin), debounce_time_(debounce_time)

@@ -1,4 +1,4 @@
-/* timer.cpp : Timer library that puts on a basic timer function
+/* dodge.h : Dodge game class
  *
  * Copyright (C) 2019 Felix Haschke
  *
@@ -17,27 +17,28 @@
  */
 
 #pragma once
-#include "avr.h"
+#include "game.h"
 
-class Timer
+class Dodge : public Game
 {
 public:
-	Timer(unsigned long interval = 0);
-	bool process(const unsigned long &t);
-	bool process();
+    Dodge(Display *display);
 
-	void start();
-	inline void restart() { start(); }
-	inline void stop() { next_time_ = 0xFFFFFFFE; }
+    // Game interface
+public:
+    void start(Event *event) override;
+    void setSpeed(byte v) override;
+    unsigned int points() const{
+        return points_;
+    }
+    bool isNewHighscore() const;
 
-	unsigned int interval() const;
-	void setInterval(unsigned int interval);
-
-	bool overflow() { return overflow_; }
-	void clearOverflow() { overflow_ = false; }
-
+protected:
+    bool onButtonChange(Event *event) override;
+    bool onTimerOverflow(Event *event) override;
+    void onStop(Event *event) override;
+    void onContinue(Event *event) override;
+    void render() override;
 private:
-	unsigned long next_time_;
-	unsigned long interval_;
-	bool overflow_ = false;
+    unsigned int points_;
 };
