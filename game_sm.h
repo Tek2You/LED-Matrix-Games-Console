@@ -19,10 +19,8 @@
 #pragma once
 #include "display.h"
 #include "event.h"
-#include "jump.h"
-#include "snake.h"
+#include "game.h"
 #include "statemachine.h"
-#include "tetris.h"
 
 class Display;
 class GameSM : public StateMachine<Event *>
@@ -37,6 +35,7 @@ private:
 	void stateTetris(Event *event);
 	void stateSnake(Event *event);
 	void stateJump(Event *event);
+	void stateDodge(Event *event);
 	void stateSettingsMenu(Event *event);
 	void stateGameOver(Event *event);
 	void stateSpeedMenu(Event *event);

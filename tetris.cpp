@@ -304,8 +304,6 @@ void Tetris::resetHighscore()
 bool Tetris::onButtonChange(Event *event)
 {
 	Timer &move_timer = event->timer(1);
-	if (event->controlButtonChanged())
-	{
 		// Rotation
 		if (event->buttonUp().pressed())
 		{
@@ -367,7 +365,6 @@ bool Tetris::onButtonChange(Event *event)
 				move_timer.stop();
 				move_timer.clearOverflow();
 			}
-		}
 	}
 	return false;
 }

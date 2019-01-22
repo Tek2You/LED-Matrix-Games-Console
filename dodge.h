@@ -31,31 +31,30 @@ public:
 	void setSpeed(byte v) override;
 	unsigned int points() const
 	{
-		return points_;
+		return score_;
 	}
-	bool isNewHighscore() const;
 
 	struct LineData
 	{
 		byte settings_;
-		byte data_[4];
+		byte data_[5];
 			static byte set(byte width, byte top_margin, byte bottom_margin){
-				if(width > 3) width = 3;
+				if(width > 5) width = 5;
 				if(top_margin > 3) top_margin = 3;
 				if(bottom_margin > 3) bottom_margin = 3;
-				return width | (top_margin << 2) | (bottom_margin << 4);
+				return width | (top_margin << 3) | (bottom_margin << 5);
 			}
 			byte width()
 			{
-				return settings_ & 0b00000011;
+				return (settings_ & 0b00000111);
 			}
 			byte topMargin()
 			{
-				return (settings_ >> 2) & 0b00000011;
+				return (settings_ >> 3) & 0b00000011;
 			}
 			byte bottomMargin()
 			{
-				return (settings_ >> 4) & 0b00000011;
+				return (settings_ >> 5) & 0b00000011;
 			}
 	};
 protected:
@@ -69,9 +68,13 @@ private:
 	byte randomLineId();
 	byte appendElement(byte element);
 	void appending();
+	void right();
+	void left();
 
-	unsigned int points_;
+	unsigned int score_;
+	bool dot_state_;
 	Pos pos_;
 	List<byte> elements_;
+	static unsigned int highscore_;
 };
 

@@ -22,41 +22,46 @@
 #include "defaults.h"
 #include "operators.h"
 
+#include "dodge.h"
+#include "jump.h"
+#include "snake.h"
+#include "tetris.h"
+
 #undef TRANSITION
 #define TRANSITION(s, event)                                                                                           \
-   {                                                                                                                   \
-	   setState(STATE_CAST(&GameSM::s));                                                                                \
-	   event->clearFlags();                                                                                             \
-	   event->setOnEntry();                                                                                             \
-	   process(event);                                                                                                  \
+	{                                                                                                                   \
+		setState(STATE_CAST(&GameSM::s));                                                                                \
+		event->clearFlags();                                                                                             \
+		event->setOnEntry();                                                                                             \
+		process(event);                                                                                                  \
 	}
 
 #define LOAD_EFFECT_STANDART(s, event)                                                                                 \
-   {                                                                                                                   \
-	   load_following_state_ = STATE_CAST(&GameSM::s);                                                                  \
-	   TRANSITION(stateLoadEffect, event);                                                                              \
-	   return;                                                                                                          \
+	{                                                                                                                   \
+		load_following_state_ = STATE_CAST(&GameSM::s);                                                                  \
+		TRANSITION(stateLoadEffect, event);                                                                              \
+		return;                                                                                                          \
 	}
 
 #define LOAD_EFFECT_BEGIN(s, event)                                                                                    \
-   {                                                                                                                   \
-	   static bool load_passed = false;                                                                                 \
-	   if (load_passed)                                                                                                 \
-      {                                                                                                                \
-	      load_passed = false;                                                                                          \
-	   }                                                                                                                \
-	   else                                                                                                             \
-      {                                                                                                                \
-	      load_passed = true;                                                                                           \
-	      LOAD_EFFECT_STANDART(s, event);                                                                               \
-	   }                                                                                                                \
+	{                                                                                                                   \
+		static bool load_passed = false;                                                                                 \
+		if (load_passed)                                                                                                 \
+		{                                                                                                                \
+			load_passed = false;                                                                                          \
+		}                                                                                                                \
+		else                                                                                                             \
+		{                                                                                                                \
+			load_passed = true;                                                                                           \
+			LOAD_EFFECT_STANDART(s, event);                                                                               \
+		}                                                                                                                \
 	}
 
 byte EE_speed EEMEM = DEFAULT_SPEED;
 byte EE_language EEMEM = DEFAULT_LANGUAGE;
 
 GameSM::GameSM(Display *display, Event *event)
-    : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), language_(EN)
+	 : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), language_(EN)
 {
 	display_->text1_.setShiftSpeed(5);
 	display_->text2_.setShiftSpeed(5);
@@ -103,8 +108,8 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 void GameSM::stateDefault(Event *event)
 {
 
-	const char *texts[2][5] = {{"Tetris", "Snake", "Jump", "highscore", "setting"},
-	                           {"Tetris", "Snake", "Jump", "Highscore", "Einstellungen"}};
+	const char *texts[2][6] = {{"Tetris", "Snake", "Jump", "Dodge", "highscore", "setting"},
+										{"Tetris", "Snake", "Jump", "Dodge", "Highscore", "Einstellungen"}};
 
 	static MenuItem item;
 	if (event->onEntry())
@@ -136,9 +141,12 @@ void GameSM::stateDefault(Event *event)
 				TRANSITION(stateJump, event);
 				break;
 			case 3:
-				TRANSITION(stateHighscoreMenu, event);
+				TRANSITION(stateDodge,event);
 				break;
 			case 4:
+				TRANSITION(stateHighscoreMenu, event);
+				break;
+			case 5:
 				TRANSITION(stateSettingsMenu, event);
 				break;
 			default:
@@ -165,10 +173,13 @@ void GameSM::stateDefault(Event *event)
 		display_->setIcon(0x60600a040e040000);
 		break;
 	case 3:
-		display_->setIcon(0x00081c2018043810);
+		display_->setIcon(0x381003c00e30310);
 		break;
 	case 4:
-		display_->setIcon(0x00003c3c3c3c0000);
+		display_->setIcon(0x00081c2018043810);
+		break;
+	case 5:
+		display_->setIcon(0xc381003c00e30310);
 		break;
 	default:
 		break;
@@ -232,6 +243,29 @@ void GameSM::stateJump(Event *event)
 			game_ = nullptr;
 		}
 		game_ = new Jump(display_);
+		game_->setSpeed(speed_);
+		game_->start(event);
+		return;
+	}
+
+	if (game_->process(event))
+	{
+		TRANSITION(stateGameOver, event);
+		return;
+	}
+}
+
+void GameSM::stateDodge(Event *event)
+{
+	if (event->onEntry())
+	{
+		display_->loadsGameCofig();
+		if (game_ != nullptr)
+		{
+			delete game_;
+			game_ = nullptr;
+		}
+		game_ = new Dodge(display_);
 		game_->setSpeed(speed_);
 		game_->start(event);
 		return;
@@ -526,9 +560,9 @@ void GameSM::stateHighscoreMenu(Event *event)
 	case 3:
 		display_->setIcon(0xbd42a59999a542bd);
 		display_->text1_.setText(language_ == EN ? "reset"
-		                                         : "Zur"
-		                                           "\x1c"
-		                                           "cksetzen");
+															  : "Zur"
+																 "\x1c"
+																 "cksetzen");
 	default:
 		break;
 	}
@@ -567,9 +601,9 @@ void GameSM::stateResetMenu(Event *event)
 		return;
 	}
 	display_->text1_.setText((language_ == EN ? "reset scores"
-	                                          : "Highscores zur"
-	                                            "\x1c"
-	                                            "cksetzen"));
+															: "Highscores zur"
+															  "\x1c"
+															  "cksetzen"));
 	display_->setIcon(0x00040a1120408000);
 }
 

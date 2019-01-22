@@ -38,6 +38,10 @@ public:
 	{
 		return state() && changed();
 	}
+	inline bool released() const
+	{
+		return (!state()) && changed();
+	}
 	inline bool clear()
 	{
 		bitClear(state_, Changed);
