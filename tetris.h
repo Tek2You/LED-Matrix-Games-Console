@@ -16,7 +16,6 @@
  * along with this library.  If not, see http://www.gnu.org/licenses/.
  */
 
-
 #pragma once
 #include "avr.h"
 #include "display.h"
@@ -30,15 +29,17 @@ public:
 	~Tetris();
 
 	void start(Event *event);
+	void setSpeed(const byte v) override;
 
-	unsigned int points() const
+	// score functions
+	unsigned int score() const
 	{
 		return points_;
 	}
-	void setSpeed(const byte v) override;
-
-	// highscore functions
-	static unsigned int highscore();
+	static unsigned int highscore()
+	{
+		return highscore_;
+	}
 	static void resetHighscore();
 
 protected:

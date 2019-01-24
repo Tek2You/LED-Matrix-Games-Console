@@ -30,7 +30,7 @@ public:
 
 	void start(Event *event);
 
-	unsigned int points() const;
+	unsigned int score() const;
 	void setSpeed(const byte v);
 
 	// highscore functions

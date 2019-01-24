@@ -250,10 +250,7 @@ void Tetris::setSpeed(const byte v)
 	}
 }
 
-unsigned int Tetris::highscore()
-{
-	return highscore_;
-}
+
 
 bool Tetris::newTetromino()
 {

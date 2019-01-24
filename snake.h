@@ -29,7 +29,7 @@ public:
 	void start(Event *event);
 	void clear();
 
-	unsigned int points() const
+	unsigned int score() const
 	{
 		return body_.size() - 3;
 	}

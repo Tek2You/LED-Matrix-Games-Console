@@ -61,7 +61,7 @@ void Jump::start(Event *event)
 	event->setFlag(Event::ProcessTimerOverflows);
 }
 
-unsigned int Jump::points() const
+unsigned int Jump::score() const
 {
 	return score_;
 }

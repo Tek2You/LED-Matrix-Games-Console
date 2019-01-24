@@ -17,8 +17,8 @@
  */
 
 #pragma once
-#include "game.h"
 #include "avr.h"
+#include "game.h"
 
 class Dodge : public Game
 {
@@ -29,34 +29,45 @@ public:
 public:
 	void start(Event *event) override;
 	void setSpeed(byte v) override;
-	unsigned int points() const
+
+	unsigned int score() const
 	{
 		return score_;
 	}
+	static unsigned int highscore()
+	{
+		return highscore_;
+	}
+	static void resetHighscore();
 
 	struct LineData
 	{
 		byte settings_;
 		byte data_[5];
-			static byte set(byte width, byte top_margin, byte bottom_margin){
-				if(width > 5) width = 5;
-				if(top_margin > 3) top_margin = 3;
-				if(bottom_margin > 3) bottom_margin = 3;
-				return width | (top_margin << 3) | (bottom_margin << 5);
-			}
-			byte width()
-			{
-				return (settings_ & 0b00000111);
-			}
-			byte topMargin()
-			{
-				return (settings_ >> 3) & 0b00000011;
-			}
-			byte bottomMargin()
-			{
-				return (settings_ >> 5) & 0b00000011;
-			}
+		static byte set(byte width, byte top_margin, byte bottom_margin)
+		{
+			if (width > 5)
+				width = 5;
+			if (top_margin > 3)
+				top_margin = 3;
+			if (bottom_margin > 3)
+				bottom_margin = 3;
+			return width | (top_margin << 3) | (bottom_margin << 5);
+		}
+		byte width()
+		{
+			return (settings_ & 0b00000111);
+		}
+		byte topMargin()
+		{
+			return (settings_ >> 3) & 0b00000011;
+		}
+		byte bottomMargin()
+		{
+			return (settings_ >> 5) & 0b00000011;
+		}
 	};
+
 protected:
 	bool onButtonChange(Event *event) override;
 	bool onTimerOverflow(Event *event) override;
@@ -77,4 +88,3 @@ private:
 	List<byte> elements_;
 	static unsigned int highscore_;
 };
-

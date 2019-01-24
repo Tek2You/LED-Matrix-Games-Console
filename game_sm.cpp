@@ -297,7 +297,7 @@ void GameSM::stateGameOver(Event *event)
 			{
 				display_->text1_.setText("Game Over");
 			}
-			display_->text2_.setNumber(game_->points());
+			display_->text2_.setNumber(game_->score());
 			// delete game
 			delete game_;
 			game_ = nullptr;
@@ -508,7 +508,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(4, 0);
+		item.init(5, 0);
 		event->setFlag(Event::ProcessPinChanges);
 	}
 	else if (processMenuStop(event))
@@ -520,7 +520,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 		byte advanced = item.advance(event);
 		if (advanced)
 		{
-			if (item.value_ == 3)
+			if (item.value_ == 4)
 			{
 				if (advanced == MenuItem::DOWN_BTN)
 				{
@@ -557,7 +557,9 @@ void GameSM::stateHighscoreMenu(Event *event)
 		display_->setIcon(0x60600a040e040000);
 		display_->text1_.setNumber(Jump::highscore());
 		break;
-	case 3:
+	case 3: display_->setIcon(0x381003c00e30310);
+		display_->text1_.setNumber(Dodge::highscore());
+	case 4:
 		display_->setIcon(0xbd42a59999a542bd);
 		display_->text1_.setText(language_ == EN ? "reset"
 															  : "Zur"
@@ -587,6 +589,7 @@ void GameSM::stateResetMenu(Event *event)
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
 			Jump::resetHighscore();
+			Dodge::resetHighscore();
 			LOAD_EFFECT_STANDART(stateDefault, event);
 			return;
 		}

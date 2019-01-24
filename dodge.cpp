@@ -65,6 +65,11 @@ void Dodge::setSpeed(byte v)
 {
 }
 
+void Dodge::resetHighscore()
+{
+	eeprom_write_word(&EE_highscore, highscore_ = 0);
+}
+
 bool Dodge::onButtonChange(Event *event)
 {
 	if (event->buttonDown().pressed())
@@ -132,6 +137,11 @@ bool Dodge::onTimerOverflow(Event *event)
 		appending();
 		if (bitRead(elements_.itemAt(15 - pos_.pos_y), pos_.pos_x))
 		{
+			if (score_ > highscore_)
+			{
+				is_new_highscore_ = true;
+				eeprom_write_word(&EE_highscore, highscore_ = score_);
+			}
 			return true;
 		}
 		render();
