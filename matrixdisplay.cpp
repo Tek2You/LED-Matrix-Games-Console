@@ -216,7 +216,7 @@ void MatrixDisplay::show()
 	if (row >= 8)
 	{
 		PORTD = 0;
-		if(row == brigthness_){
+		if(row >= brigthness_){
 			row = 0;
 		}
 		else{
