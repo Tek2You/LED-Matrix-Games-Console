@@ -213,7 +213,7 @@ void MatrixDisplay::show()
 {
 	static int row = 0;
 	row++;
-	if (row >= 9)
+	if (row >= 8)
 	{
 		PORTD = 0;
 		if(row == brigthness_){
