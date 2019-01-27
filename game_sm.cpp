@@ -59,6 +59,7 @@
 
 byte EE_speed EEMEM = DEFAULT_SPEED;
 byte EE_language EEMEM = DEFAULT_LANGUAGE;
+byte EE_brightness EEMEM = DEFAULT_BRIGHTNESS;
 
 GameSM::GameSM(Display *display, Event *event)
 	 : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), language_(EN)
@@ -67,6 +68,8 @@ GameSM::GameSM(Display *display, Event *event)
 	display_->text2_.setShiftSpeed(5);
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
+	brightness_ = (eeprom_read_byte(&EE_brightness));
+	display->setBrightness(((brightness_ + 1) * 8) + 1);
 	event->setOnEntry();
 	process(event);
 	event->clear();
@@ -114,7 +117,7 @@ void GameSM::stateDefault(Event *event)
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(5);
+		item.init(6);
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
@@ -141,7 +144,7 @@ void GameSM::stateDefault(Event *event)
 				TRANSITION(stateJump, event);
 				break;
 			case 3:
-				TRANSITION(stateDodge,event);
+				TRANSITION(stateDodge, event);
 				break;
 			case 4:
 				TRANSITION(stateHighscoreMenu, event);
@@ -179,7 +182,7 @@ void GameSM::stateDefault(Event *event)
 		display_->setIcon(0x00081c2018043810);
 		break;
 	case 5:
-		display_->setIcon(0xc381003c00e30310);
+		display_->setIcon(0x00003c3c3c3c0000);
 		break;
 	default:
 		break;
@@ -318,11 +321,11 @@ void GameSM::stateGameOver(Event *event)
 void GameSM::stateSettingsMenu(Event *event)
 {
 	static MenuItem item;
-	const char *menu_text[2][2] = {{"speed", "language"}, {"Geschwindigkeit", "Sprache"}};
+	const char *menu_text[2][2] = {{"speed", "language"/*, "brightness"*/}, {"Geschwindigkeit", "Sprache"/*, "Helligkeit"*/}};
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		item.init(2);
+		item.init(3);
 		event->setFlag(Event::ProcessPinChanges);
 	}
 	else if (processMenuStop(event))
@@ -341,6 +344,9 @@ void GameSM::stateSettingsMenu(Event *event)
 				break;
 			case 1:
 				TRANSITION(stateLanguageMenu, event);
+				break;
+			case 2:
+				TRANSITION(stateBrightnessMenu,event);
 				break;
 			default:
 				break;
@@ -365,6 +371,9 @@ void GameSM::stateSettingsMenu(Event *event)
 		break;
 	case 1:
 		display_->setIcon(0x2060ff818181ff00);
+		break;
+	case 2:
+		display_->setIcon(0x0007133558900000);
 		break;
 	default:
 		break;
@@ -393,6 +402,47 @@ void GameSM::stateSpeedMenu(Event *event)
 			speed_ = item.value_;
 			eeprom_write_byte(&EE_speed, speed_);
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
+		case MenuItem::UP_BTN:
+			TRANSITION(stateSettingsMenu, event);
+			return;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		return;
+	}
+	display_->clear();
+	display_->text1_.setNumber(item.value_ + 1);
+	byte cols = display_->cols() / 5.0 * (item.value_ + 1);
+	for (int col = 0; col < cols; col++)
+	{
+		display_->setColumn(col, 0xFF);
+	}
+}
+
+void GameSM::stateBrightnessMenu(Event *event)
+{
+	static MenuItem item;
+	if (event->onEntry())
+	{
+		display_->loadMenuConfig();
+		item.init(8, brightness_);
+		event->setFlag(Event::ProcessPinChanges);
+	}
+	else if (processMenuStop(event))
+	{
+		return;
+	}
+	else if (event->controlButtonPressed())
+	{
+		switch (item.advance(event))
+		{
+		case MenuItem::DOWN_BTN:
+			brightness_ = item.value_;
+			display_->setBrightness(((brightness_ + 1) * 8) + 1);
+			eeprom_write_byte(&EE_brightness, brightness_);
 		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu, event);
 			return;
@@ -557,8 +607,10 @@ void GameSM::stateHighscoreMenu(Event *event)
 		display_->setIcon(0x60600a040e040000);
 		display_->text1_.setNumber(Jump::highscore());
 		break;
-	case 3: display_->setIcon(0x381003c00e30310);
+	case 3:
+		display_->setIcon(0x381003c00e30310);
 		display_->text1_.setNumber(Dodge::highscore());
+		break;
 	case 4:
 		display_->setIcon(0xbd42a59999a542bd);
 		display_->text1_.setText(language_ == EN ? "reset"

@@ -36,11 +36,12 @@ private:
 	void stateSnake(Event *event);
 	void stateJump(Event *event);
 	void stateDodge(Event *event);
-	void stateSettingsMenu(Event *event);
 	void stateGameOver(Event *event);
-	void stateSpeedMenu(Event *event);
-	void stateLanguageMenu(Event *event);
 	void stateLoadEffect(Event *event);
+	void stateSettingsMenu(Event *event);
+	void stateSpeedMenu(Event *event);
+	void stateBrightnessMenu(Event *event);
+	void stateLanguageMenu(Event *event);
 	void stateHighscoreMenu(Event *event);
 	void stateResetMenu(Event *event);
 
@@ -82,6 +83,7 @@ private:
 	Game *game_; // pointer to the current game
 	Language language_ = EN;
 	byte speed_ = 0;
+	byte brightness_ = 0;
 	State load_following_state_; // state load effect need a pointer to the state
 										  // after its
 };
