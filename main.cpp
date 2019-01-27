@@ -1,4 +1,4 @@
-/* main.cpp : main file executing all needed systems
+/* main.cpp : main file executing all needed systems and containing interruptroutines
  *
  * Copyright (C) 2019 Felix Haschke
  *
@@ -48,22 +48,17 @@ int main(void)
 	while (1)
 	{
 		wdt_reset();
-		dp.show();
 		if (process_debounce)
 		{
 			process_debounce = false;
-			dp.disable();
 			event.processDebounce();
 		}
 		if (check_buttons)
-		{
 			event.checkButtons();
-		}
 		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
 		{
 			counter = 0;
 			dp.update();
-			dp.disable();
 			if (event.process())
 			{
 				sm.process(&event);
@@ -86,11 +81,11 @@ ISR(PCINT0_vect)
 	check_buttons = true;
 }
 
-// debounce check counter.
-// checks button change and takes over the button states if doubounce count completed
+// display-show-/ debounce-checkcounter
 ISR(TIMER2_COMPA_vect)
 {
-	TCNT2 = 200;
+	dp.show();
+	TCNT2 = 255;
 	process_debounce = true;
 }
 
@@ -102,7 +97,7 @@ void initHardware()
 	PCICR |= (1 << PCIE1) | (1 << PCIE0); // enable mask1
 	init();
 
-	TCNT2 = 200;
+	TCNT2 = 255;
 	TCCR2A |= (1 << WGM21);
 	TIMSK2 |= (1 << OCIE2A);
 	TCCR2B |= (1 << CS20);

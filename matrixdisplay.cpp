@@ -182,7 +182,7 @@ const int PTN_LETTERS[] PROGMEM{
 const byte col_order[] = {5, 0, 2, 3, 1, 4, 6, 7};
 const byte row_order[] = {7, 6, 5, 4, 3, 2, 1, 0};
 
-MatrixDisplay::MatrixDisplay(byte height, byte width) : height_(height), width_(width)
+MatrixDisplay::MatrixDisplay(byte height, byte width) : height_(height), width_(width), brigthness_(9)
 {
 	// allocate memory for (columnwi0,se) display content
 	rows_ = static_cast<byte *>(malloc(height_));
@@ -211,7 +211,18 @@ MatrixDisplay::~MatrixDisplay()
 
 void MatrixDisplay::show()
 {
-	static byte row = 0;
+	static int row = 0;
+	row++;
+	if (row >= 9)
+	{
+		PORTD = 0;
+		if(row == brigthness_){
+			row = 0;
+		}
+		else{
+			return;
+		}
+	}
 	bitClear(PORTB, 2); // clear latch
 	for (byte *col = rows_ + row, *end = rows_ + height_ + row; col != end; col += 8)
 	{
@@ -221,11 +232,6 @@ void MatrixDisplay::show()
 	bitSet(PORTB, 2); // set latch
 	PORTD = _BV(row_order[row]);
 	// select row to be displayed
-	row++;
-	if (row >= 8)
-	{
-		row = 0;
-	}
 }
 
 void MatrixDisplay::clear()
@@ -263,13 +269,9 @@ void MatrixDisplay::setRow(byte row, int value)
 	rows_[row] = orderCols(value);
 }
 
-void MatrixDisplay::disable()
+void MatrixDisplay::setBrightness(const byte brightness)
 {
-	for (byte i = 0; i < 2; i++)
-	{
-		SPI_SendByte(0xFF);
-	}
-	PORTD = 0;
+	brigthness_ = (255 - brightness) + 9;
 }
 
 byte MatrixDisplay::mapCol(byte row)
