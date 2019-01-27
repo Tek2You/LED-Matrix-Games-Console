@@ -45,7 +45,7 @@ public:
 	void clearColumns(byte start, byte end, byte offset);
 	void setRow(byte row, int value);
 
-	void setBrightness(const byte brightness);
+	virtual void setBrightness(const byte brightness);
 
 	// compute width (in columns) of a single char
 	static int width(char ch);

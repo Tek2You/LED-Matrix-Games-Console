@@ -29,6 +29,7 @@ public:
 	void update();
 	void loadMenuConfig();
 	void loadsGameCofig();
+	void setBrightness(byte brigthness) override;
 
 	Text text1_, text2_;
 

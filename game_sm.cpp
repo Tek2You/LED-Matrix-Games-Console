@@ -69,7 +69,7 @@ GameSM::GameSM(Display *display, Event *event)
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
 	brightness_ = (eeprom_read_byte(&EE_brightness));
-	display->setBrightness(((brightness_ + 1) * 8) + 1);
+	display->setBrightness(brightness_);
 	event->setOnEntry();
 	process(event);
 	event->clear();
@@ -321,7 +321,7 @@ void GameSM::stateGameOver(Event *event)
 void GameSM::stateSettingsMenu(Event *event)
 {
 	static MenuItem item;
-	const char *menu_text[2][2] = {{"speed", "language"/*, "brightness"*/}, {"Geschwindigkeit", "Sprache"/*, "Helligkeit"*/}};
+	const char *menu_text[2][3] = {{"speed", "language", "brightness"}, {"Geschwindigkeit", "Sprache", "Helligkeit"}};
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
@@ -346,7 +346,7 @@ void GameSM::stateSettingsMenu(Event *event)
 				TRANSITION(stateLanguageMenu, event);
 				break;
 			case 2:
-				TRANSITION(stateBrightnessMenu,event);
+				TRANSITION(stateBrightnessMenu, event);
 				break;
 			default:
 				break;
@@ -428,7 +428,7 @@ void GameSM::stateBrightnessMenu(Event *event)
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		item.init(8, brightness_);
+		item.init(4, brightness_);
 		event->setFlag(Event::ProcessPinChanges);
 	}
 	else if (processMenuStop(event))
@@ -441,8 +441,10 @@ void GameSM::stateBrightnessMenu(Event *event)
 		{
 		case MenuItem::DOWN_BTN:
 			brightness_ = item.value_;
-			display_->setBrightness(((brightness_ + 1) * 8) + 1);
+			display_->setBrightness(brightness_);
 			eeprom_write_byte(&EE_brightness, brightness_);
+			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
+			return;
 		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu, event);
 			return;
@@ -456,11 +458,12 @@ void GameSM::stateBrightnessMenu(Event *event)
 	}
 	display_->clear();
 	display_->text1_.setNumber(item.value_ + 1);
-	byte cols = display_->cols() / 5.0 * (item.value_ + 1);
+	byte cols = display_->cols() / 4.0 * (item.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
 		display_->setColumn(col, 0xFF);
 	}
+	display_->setBrightness(item.value_);
 }
 
 void GameSM::stateLanguageMenu(Event *event)
@@ -664,5 +667,5 @@ void GameSM::stateResetMenu(Event *event)
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event)
 {
-	advance(event, value_, num_);
+	return advance(event, value_, num_);
 }

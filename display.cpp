@@ -62,3 +62,13 @@ void Display::loadsGameCofig()
 	text2_.clear();
 	clear();
 }
+
+void Display::setBrightness(byte brigthness)
+{
+	if (brigthness > 3)
+	{
+		brigthness = 3;
+	}
+	const byte values[4] = {100, 220, 245, 255};
+	MatrixDisplay::setBrightness(values[brigthness]);
+}
