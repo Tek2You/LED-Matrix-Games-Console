@@ -104,6 +104,7 @@ public:
 		return overflow_;
 	}
 
+	List<Timer> timers_;
 private:
 	bool on_entry_;
 	Button button_up_;
@@ -111,7 +112,6 @@ private:
 	Button button_left_;
 	Button button_right_;
 	Button button_stop_;
-	List<Timer> timers_;
 	byte flags_;
 	bool overflow_ = false;
 };

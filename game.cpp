@@ -31,21 +31,39 @@ Game::~Game()
 bool Game::process(Event *event)
 {
 	bool output = false;
+	static byte reset_count = 0;
 	if (event->buttonStop().pressed())
 	{
 		stop_state_ = !stop_state_;
 		if (stop_state_)
 		{
 			onStop(event);
+			event->addTimer(400);
 		}
 		else
 		{
 			onContinue(event);
 		}
 	}
-	if (stop_state_)
+	else if (event->buttonStop().released())
 	{
-		return false;
+		event->timers_.removeLast();
+	}
+	else if (stop_state_)
+	{
+		if (event->timers_.last().overflow() && event->buttonStop().state())
+		{
+			event->timers_.last().setInterval(200);
+			display_->setPixel(reset_count,0);
+			reset_count++;
+			if (reset_count >= 8)
+			{
+				reset_count = 0;
+				event->timers_.removeLast();
+				return true;
+			}
+			return false;
+		}
 	}
 	// check if processing is required
 	if (event->controlButtonChanged())
