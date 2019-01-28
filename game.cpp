@@ -31,33 +31,61 @@ Game::~Game()
 bool Game::process(Event *event)
 {
 	bool output = false;
+	static bool first_released_ = false;
 	static byte reset_count = 0;
+	/* Stop Button
+	 * Enable Stop directly after push
+	 * Disable Stop after released after second
+	 */
 	if (event->buttonStop().pressed())
 	{
-		stop_state_ = !stop_state_;
-		if (stop_state_)
+		if (!stop_state_) // first time pressed -> stop game
 		{
+			stop_state_ = true;
 			onStop(event);
-			event->addTimer(400);
+			event->addTimer(500); // add timer for reset game
 		}
-		else
+		else // second time pressed
 		{
-			onContinue(event);
+			event->timers_.last().restart();
 		}
 	}
 	else if (event->buttonStop().released())
 	{
-		event->timers_.removeLast();
+		if(reset_count){ // tryed to leave
+			reset_count = 0;
+			first_released_ = false;
+			display_->setRow(0,0);
+			event->timers_.last().setInterval(500);
+		}
+		if (stop_state_)
+		{
+			if (!first_released_) // released first time
+			{
+				first_released_ = true;
+			}
+			else // released second time -> continue game
+			{
+				first_released_ = false;
+				stop_state_ = false;
+				onContinue(event);
+				event->timers_.removeLast();
+				return false;
+			}
+		}
 	}
 	else if (stop_state_)
 	{
 		if (event->timers_.last().overflow() && event->buttonStop().state())
 		{
 			event->timers_.last().setInterval(200);
-			display_->setPixel(reset_count,0);
+			event->timers_.last().restart();
+			display_->setPixel(reset_count, 0);
 			reset_count++;
 			if (reset_count >= 8)
 			{
+				stop_state_ = false;
+				first_released_ = false;
 				reset_count = 0;
 				event->timers_.removeLast();
 				return true;
