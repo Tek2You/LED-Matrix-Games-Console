@@ -49,13 +49,15 @@ bool Game::process(Event *event)
 		{
 			event->timers_.last().restart();
 		}
+		return false;
 	}
 	else if (event->buttonStop().released())
 	{
-		if(reset_count){ // tryed to leave
+		if (reset_count)
+		{ // tryed to leave
 			reset_count = 0;
 			first_released_ = false;
-			display_->setRow(0,0);
+			display_->setRow(0, 0);
 			event->timers_.last().setInterval(500);
 		}
 		if (stop_state_)
@@ -90,8 +92,8 @@ bool Game::process(Event *event)
 				event->timers_.removeLast();
 				return true;
 			}
-			return false;
 		}
+		return false;
 	}
 	// check if processing is required
 	if (event->controlButtonChanged())
