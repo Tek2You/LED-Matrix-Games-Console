@@ -81,6 +81,10 @@ bool Snake::move()
 	}
 
 	vect += body_.last();
+	if (!eat())
+	{
+		body_.removeFirst(); // first remove last item to ensure that there is a correct validation
+	}
 	// check if highscore is broken. Directly save to avoid a not save in case of
 	// reset or poweroff.
 	if (body_.size() - 3 > highscore_)
@@ -95,10 +99,6 @@ bool Snake::move()
 	}
 
 	body_ << vect;
-	if (!eat())
-	{
-		body_.removeFirst();
-	}
 
 	render();
 	return false;
@@ -113,12 +113,12 @@ void Snake::setSpeed(byte v)
 		break;
 	case 1:
 		period_ = 500;
-		return;
+		break;
 	case 3:
-		period_ = 300;
+		period_ = 275;
 		break;
 	case 4:
-		period_ = 200;
+		period_ = 150;
 		break;
 	case 2:
 	default:

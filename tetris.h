@@ -58,7 +58,7 @@ private:
 	bool left();
 	bool down();
 
-	void checkRowsFinished();
+	void clearFullRows();
 	bool newTetromino();
 	void takeOverTetromino();
 	// random tetromino data functions

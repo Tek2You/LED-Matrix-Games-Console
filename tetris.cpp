@@ -83,7 +83,7 @@ void Tetris::onContinue(Event *event)
 {
 	render();
 	event->timer(0).start();
-	// for the second timer, there is no need to restart, because its used for button long pressed
+	// for the second timer, the restart is not required, because its used for button long pressed
 }
 
 bool Tetris::rotate()
@@ -104,7 +104,7 @@ bool Tetris::rotate()
 	Pos tmp_pos = tetromino_->pos();
 	const Shape shape = tetromino_->shape();
 
-	// 2. calculate new direction
+	// 2. calculate new (wanted) direction
 	const Direction new_dir = Tetromino::rotate(tetromino_->direction(), shape);
 
 	// 3. check valid
@@ -141,7 +141,7 @@ bool Tetris::rotate()
 				tmp_pos.pos_y--;
 			}
 		}
-		if (valid_output & COLLIDE) // collides with exiting tetromino
+		if (valid_output & COLLIDE || tetromino_->isValid(shape, new_dir, tmp_pos)) // collides with exiting tetromino
 		{
 			return false;
 		}
@@ -193,7 +193,7 @@ bool Tetris::down()
 	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
 	{
 		takeOverTetromino();
-		checkRowsFinished();
+		clearFullRows();
 		if (newTetromino())
 			return true;
 		return false;
@@ -250,8 +250,6 @@ void Tetris::setSpeed(const byte v)
 	}
 }
 
-
-
 bool Tetris::newTetromino()
 {
 	if (tetromino_)
@@ -261,9 +259,10 @@ bool Tetris::newTetromino()
 	}
 	const Shape shape = randomTetrominoShape();
 	tetromino_ =
-	    new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape), Pos(4, display_->rows() - 1));
+		 new Tetromino(shape, display_->rows(), field_, randomTetrominoDirection(shape), Pos(4, display_->rows() - 1));
 	Pos points[4];
 	tetromino_->getPositions(points);
+	// place tetromino full in the field
 	for (Pos p : points)
 	{
 		if (p.pos_y > display_->rows() - 1)
@@ -301,67 +300,58 @@ void Tetris::resetHighscore()
 bool Tetris::onButtonChange(Event *event)
 {
 	Timer &move_timer = event->timer(1);
-		// Rotation
-		if (event->buttonUp().pressed())
-		{
-			rotate();
-		}
+	// Rotation
+	if (event->buttonUp().pressed())
+	{
+		rotate();
+	}
 
-		// Down(faster)
-		if (event->buttonDown().changed())
+	// Down(faster)
+	if (event->buttonDown().pressed())
+	{
+		if (down()) // check if
 		{
-			if (event->buttonDown().state())
-			{
-				if (down())
-				{
-					return true;
-				}
-				event->timer(0).setInterval(general_down_interval_);
-				event->timer(0).restart();
-			}
-			else
-			{
-				// unset fast down
-				event->timer(0).setInterval(general_step_interval_);
-			}
+			return true;
 		}
+		event->timer(0).setInterval(general_down_interval_);
+		event->timer(0).restart();
+	}
+	else if (event->buttonDown().released())
+	{
+		// unset fast down
+		event->timer(0).setInterval(general_step_interval_);
+	}
 
-		// btn left
-		if (event->buttonLeft().changed())
+	// btn left
+	if (event->buttonLeft().pressed())
+	{
+		if (!event->buttonRight().state())
 		{
-			if (event->buttonLeft().state())
-			{
-				if (!event->buttonRight().state())
-				{
-					left();
-					move_timer.setInterval(general_first_move_interval_);
-					move_timer.start();
-				}
-			}
-			else
-			{
-				move_timer.stop();
-				move_timer.clearOverflow();
-			}
+			left();
+			move_timer.setInterval(general_first_move_interval_);
+			move_timer.start();
 		}
+	}
+	else if (event->buttonLeft().released())
+	{
+		move_timer.stop();
+		move_timer.clearOverflow();
+	}
 
-		// btn right
-		if (event->buttonRight().changed())
+	// btn right
+	if (event->buttonRight().pressed())
+	{
+		if (!event->buttonLeft().state())
 		{
-			if (event->buttonRight().state())
-			{
-				if (!event->buttonLeft().state())
-				{
-					right();
-					move_timer.setInterval(general_first_move_interval_);
-					move_timer.start();
-				}
-			}
-			else
-			{
-				move_timer.stop();
-				move_timer.clearOverflow();
-			}
+			right();
+			move_timer.setInterval(general_first_move_interval_);
+			move_timer.start();
+		}
+	}
+	else if (event->buttonLeft().released())
+	{
+		move_timer.stop();
+		move_timer.clearOverflow();
 	}
 	return false;
 }
@@ -399,7 +389,7 @@ bool Tetris::onTimerOverflow(Event *event)
 	return false;
 }
 
-void Tetris::checkRowsFinished()
+void Tetris::clearFullRows()
 {
 	for (int i = 0; i < display_->rows(); i++)
 	{
