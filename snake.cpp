@@ -79,7 +79,7 @@ void Snake::setSpeed(byte v)
 
 unsigned int Snake::highscore()
 {
-	return highscore_ = eeprom_read_word(&EE_highscore);
+	return highscore_;
 }
 
 void Snake::resetHighscore()
@@ -205,9 +205,9 @@ bool Snake::move()
 	}
 	// check if highscore is broken. Directly save to avoid a not save in case of
 	// reset or poweroff.
-	if (body_.size() - 3 > highscore_)
+	if ((body_.size() - 2) > highscore_)
 	{
-		highscore_ = body_.size() - 3;
+		highscore_ = body_.size() - 2;
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
