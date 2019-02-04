@@ -180,6 +180,7 @@ void Dodge::onContinue(Event *event)
 {
 	event->timer(0).restart();
 	event->timer(1).restart();
+	event->timer(2).restart();
 	render();
 }
 
