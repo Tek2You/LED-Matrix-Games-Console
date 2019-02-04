@@ -83,5 +83,3 @@ private:
 	// highscore of all runs
 	static unsigned int highscore_;
 };
-
-

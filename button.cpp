@@ -28,7 +28,7 @@ void Button::processDebounce()
 	checkChange();
 	if (state_ & (1 << InDebounce))
 	{
-		if (++count_ == debounce_time_)
+		if (++count_ >= debounce_time_)
 		{
 			count_ = 0;
 			bitToggle(state_, State); // only toggle bit because it changed surely(else we need to read)
