@@ -1,4 +1,4 @@
-﻿/* game_sm.cpp : Statemaschine class containing functions for every state
+﻿/* game_sm.cpp : game statemaschine class containing functions for every state
  *
  * Copyright (C) 2019 Felix Haschke
  *
@@ -69,6 +69,9 @@ GameSM::GameSM(Display *display, Event *event)
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
 	brightness_ = (eeprom_read_byte(&EE_brightness));
+	if(brightness_ > 3){
+		brightness_ = 3;
+	}
 	display->setBrightness(brightness_);
 	event->setOnEntry();
 	process(event);
