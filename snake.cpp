@@ -159,15 +159,15 @@ void Snake::render()
 	}
 }
 
-bool Snake::eat()
+bool Snake::eat(Pos pos)
 {
-	if (body_.last() == eat_pos_)
+	if (pos == eat_pos_)
 	{
 		Pos p;
 		do
 		{
 			p = Pos(char(millis() % 8), char(millis() % 16));
-		} while (!isValid(p));
+		} while (!isValid(p) || p == pos);
 
 		eat_pos_ = p;
 		return true;
@@ -197,8 +197,9 @@ bool Snake::move()
 		break;
 	}
 
+	// make the new head position outof the vector and last body pos
 	vect += body_.last();
-	if (!eat())
+	if (!eat(vect))
 	{
 		body_.removeFirst(); // first remove last item to ensure that there is a correct validation
 	}

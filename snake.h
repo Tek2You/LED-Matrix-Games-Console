@@ -51,7 +51,7 @@ private:
 
 	// local declared methods
 	// checks if the snake had touched the eat
-	bool eat();
+	bool eat(Pos pos);
 	// moves the snake by one point
 	bool move();
 	// checks if the current position is valid
