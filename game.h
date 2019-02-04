@@ -28,11 +28,17 @@ class Game
 public:
 	Game(Display *display);
 	virtual ~Game();
+
+	// start the game
 	virtual void start(Event *event) = 0;
+
+	// process timer and buttons(no need to override)
 	virtual bool process(Event *event);
 
+	// set the speed of the game
 	virtual void setSpeed(byte v) = 0;
 
+	// score and highscore methods
 	virtual unsigned int score() const = 0;
 	virtual bool isNewHighscore() const
 	{

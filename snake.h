@@ -26,31 +26,40 @@ class Snake : public Game
 public:
 	Snake(Display *display);
 	~Snake();
-	void start(Event *event);
-	void clear();
 
+	// public game interface
+
+	void start(Event *event);
 	unsigned int score() const
 	{
 		return body_.size() - 3;
 	}
+
 	void setSpeed(byte v) override;
 
+	// static highscore functions
 	static unsigned int highscore();
 	static void resetHighscore();
 
-protected:
+private:
+	// game interface
 	bool onButtonChange(Event *event) override;
 	bool onTimerOverflow(Event *event) override;
 	void onStop(Event *event) override;
 	void onContinue(Event *event) override;
-
-private:
 	void render();
-	bool eat();
-	bool isValid(const Pos &pos);
-	bool validate(Pos &pos);
-	bool move();
 
+	// local declared methods
+	// checks if the snake had touched the eat
+	bool eat();
+	// moves the snake by one point
+	bool move();
+	// checks if the current position is valid
+	bool isValid(const Pos &pos);
+	// moves the position into the game field and checks valibility11
+	bool validate(Pos &pos);
+
+	// datatype abled to store a direction
 	enum Direction
 	{
 		UP,
@@ -60,13 +69,19 @@ private:
 		START
 	};
 
-	int period_;
-
-	// snake values
+	// interval speed
+	unsigned int period_;
+	// saves the current direction of the snake
 	Direction direction_;
+	// saves the wanted direction of the snake
+	// Its only to ensure, that the snake is only rotated by 90° and not more
 	Direction new_direction_;
-	Pos move_vect_;
+	// list storing the hole body data
 	List<Pos> body_;
+	// position of the current point of eat
 	Pos eat_pos_;
+	// highscore of all runs
 	static unsigned int highscore_;
 };
+
+
