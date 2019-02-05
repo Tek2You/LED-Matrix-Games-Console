@@ -19,9 +19,9 @@
 #include "event.h"
 
 Event::Event()
-    : on_entry_(false), flags_(0), button_up_(PortPin(PortPin::C, 2), 100), button_down_(PortPin(PortPin::C, 1), 100),
-      button_right_(PortPin(PortPin::C, 3), 100), button_left_(PortPin(PortPin::C, 0), 100),
-      button_stop_(PortPin(PortPin::B, 1), 100)
+    : on_entry_(false), flags_(0), button_up_(PortPin(PortPin::C, 2), 200), button_down_(PortPin(PortPin::C, 1), 200),
+      button_right_(PortPin(PortPin::C, 3), 200), button_left_(PortPin(PortPin::C, 0), 200),
+      button_stop_(PortPin(PortPin::B, 1), 200)
 
 {
 }
