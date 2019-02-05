@@ -45,7 +45,7 @@ void Dodge::start(Event *event)
 	event->removeAllTimers();
 	event->addTimer(200);
 	event->addTimer(); // not yet start button timer
-	event->addTimer(50);
+	event->addTimer(20);
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 
