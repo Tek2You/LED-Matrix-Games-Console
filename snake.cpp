@@ -52,8 +52,6 @@ void Snake::start(Event *event)
 	event->timer(0).start();
 }
 
-
-
 void Snake::setSpeed(byte v)
 {
 	switch (v)
@@ -163,13 +161,13 @@ bool Snake::eat(Pos pos)
 {
 	if (pos == eat_pos_)
 	{
-		Pos p;
+		unsigned long time = millis();
+		Pos tmp;
 		do
 		{
-			p = Pos(char(millis() % 8), char(millis() % 16));
-		} while (!isValid(p) || p == pos);
-
-		eat_pos_ = p;
+			tmp = Pos((time + char(rand())) % 8, (time + (char(rand()))) % 16);
+		} while (!isValid(tmp) || tmp == pos);
+		eat_pos_ = tmp;
 		return true;
 	}
 	return false;
@@ -198,7 +196,9 @@ bool Snake::move()
 	}
 
 	// make the new head position outof the vector and last body pos
+
 	vect += body_.last();
+	validate(vect);
 	if (!eat(vect))
 	{
 		body_.removeFirst(); // first remove last item to ensure that there is a correct validation
@@ -211,7 +211,7 @@ bool Snake::move()
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
-	if (!validate(vect))
+	if (!isValid(vect))
 	{ // game end
 		return true;
 	}
@@ -252,4 +252,3 @@ bool Snake::validate(Pos &pos)
 		pos.pos_y = 0;
 	return isValid(pos);
 }
-
