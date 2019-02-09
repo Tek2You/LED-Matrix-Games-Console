@@ -78,9 +78,16 @@ protected:
 private:
 	byte randomLineId();
 	byte appendElement(byte element);
-	void appending();
+	void appendElements();
+	bool tick();
 	void right();
 	void left();
+
+	// periods
+	unsigned int period_;
+	unsigned int fast_period_;
+	unsigned int first_move_period_;
+	unsigned int move_period_;
 
 	unsigned int score_;
 	bool dot_state_;

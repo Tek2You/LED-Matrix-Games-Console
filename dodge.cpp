@@ -43,7 +43,7 @@ Dodge::Dodge(Display *display) : Game(display), dot_state_(true)
 void Dodge::start(Event *event)
 {
 	event->removeAllTimers();
-	event->addTimer(200);
+	event->addTimer(period_);
 	event->addTimer(); // not yet start button timer
 	event->addTimer(20);
 	event->setFlag(Event::ProcessPinChanges);
@@ -56,13 +56,47 @@ void Dodge::start(Event *event)
 	{
 		elements_ << 0;
 	}
-	appending();
+	appendElements();
 	render();
 	return;
 }
 
 void Dodge::setSpeed(byte v)
 {
+	switch (v)
+	{
+	case 0: // very slow
+		period_ = 400;
+		fast_period_ = 200;
+		first_move_period_ = 300;
+		move_period_ = 200;
+		break;
+	case 1: // slow
+		period_ = 300;
+		fast_period_ = 150;
+		first_move_period_ = 250;
+		move_period_ = 150;
+		break;
+	case 3: // fast
+		period_ = 200;
+		fast_period_ = 100;
+		first_move_period_ = 200;
+		move_period_ = 100;
+		break;
+	case 4: // ver fast
+		period_ = 150;
+		fast_period_ = 75;
+		first_move_period_ = 150;
+		move_period_ = 75;
+		break;
+	case 2: // medium
+	default:
+		period_ = 250;
+		fast_period_ = 125;
+		first_move_period_ = 200;
+		move_period_ = 125;
+		break;
+	}
 }
 
 void Dodge::resetHighscore()
@@ -74,11 +108,16 @@ bool Dodge::onButtonChange(Event *event)
 {
 	if (event->buttonDown().pressed())
 	{
-		event->timer(0).setInterval(100);
+		// if first pressed, directly execute tick to get a dynamic result
+		if (tick())
+			return true;
+		event->timer(0).setInterval(fast_period_);
+		event->timer(0).restart();
 	}
 	else if (event->buttonDown().released())
 	{
-		event->timer(0).setInterval(200);
+		event->timer(0).setInterval(period_);
+		event->timer(0).restart();
 	}
 
 	Timer &move_timer = event->timer(1);
@@ -90,7 +129,7 @@ bool Dodge::onButtonChange(Event *event)
 			if (!event->buttonRight().state())
 			{
 				left();
-				move_timer.setInterval(200);
+				move_timer.setInterval(first_move_period_);
 				move_timer.start();
 			}
 		}
@@ -109,7 +148,7 @@ bool Dodge::onButtonChange(Event *event)
 			if (!event->buttonLeft().state())
 			{
 				right();
-				move_timer.setInterval(200);
+				move_timer.setInterval(first_move_period_);
 				move_timer.start();
 			}
 		}
@@ -119,46 +158,30 @@ bool Dodge::onButtonChange(Event *event)
 			move_timer.clearOverflow();
 		}
 	}
+	return false;
 }
 
 bool Dodge::onTimerOverflow(Event *event)
 {
 	if (event->timer(0).overflow())
 	{
-		if (pos_.pos_y > 13)
-			pos_.pos_y--;
-		else
-			elements_.removeFirst();
-		score_++;
-		if (score_ > highscore_)
-		{
-			is_new_highscore_ = true;
-		}
-		appending();
-		if (bitRead(elements_.itemAt(15 - pos_.pos_y), pos_.pos_x))
-		{
-			if (score_ > highscore_)
-			{
-				is_new_highscore_ = true;
-				eeprom_write_word(&EE_highscore, highscore_ = score_);
-			}
+		if (tick())
 			return true;
-		}
-		render();
 	}
+
 	Timer &move_timer = event->timer(1);
 	if (move_timer.overflow())
 	{
 		if (event->buttonLeft().state())
 		{
 			left();
-			move_timer.setInterval(100);
+			move_timer.setInterval(move_period_);
 		}
 
 		else if (event->buttonRight().state())
 		{
 			right();
-			move_timer.setInterval(100);
+			move_timer.setInterval(move_period_);
 		}
 	}
 	if (event->timer(2).overflow())
@@ -224,12 +247,37 @@ byte Dodge::appendElement(byte element)
 	}
 }
 
-void Dodge::appending()
+void Dodge::appendElements()
 {
 	while (elements_.size() <= 16)
 	{
 		appendElement(randomLineId());
 	}
+}
+
+bool Dodge::tick()
+{
+	if (pos_.pos_y > 13)
+		pos_.pos_y--;
+	else
+		elements_.removeFirst();
+	score_++;
+	if (score_ > highscore_)
+	{
+		is_new_highscore_ = true;
+	}
+	appendElements();
+	if (bitRead(elements_.itemAt(15 - pos_.pos_y), pos_.pos_x))
+	{
+		if (score_ > highscore_)
+		{
+			is_new_highscore_ = true;
+			eeprom_write_word(&EE_highscore, highscore_ = score_);
+		}
+		return true;
+	}
+	render();
+	return false;
 }
 
 void Dodge::right()
