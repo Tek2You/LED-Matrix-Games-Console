@@ -374,7 +374,9 @@ int MatrixDisplay::width(char ch)
 // determine the width of the given string
 int MatrixDisplay::width(const char *s, char spacing)
 {
-	int column = 0;
+	if(*s == 0)
+		return 0;
+	int column = -1;  // remove one spacing to give the correct size and not append a void row at the end
 	while (*s != 0)
 	{
 		column += spacing + width(*s);
