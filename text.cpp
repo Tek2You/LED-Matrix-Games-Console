@@ -80,8 +80,7 @@ void Text::setNumber(const int &value)
 
 void Text::computeShiftMode()
 {
-
-	shift_mode_ = (display_->width(text_) > (end_col_ - start_col_) + 2 ? SHIFT : NO_SHIFT);
+	shift_mode_ = (display_->width(text_) > (end_col_ - start_col_) + 1 ? SHIFT : NO_SHIFT);
 
 	if (shift_mode_ == SHIFT)
 	{ // when shifting, start in column 7
