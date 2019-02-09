@@ -49,7 +49,7 @@ private:
 	int forward_period_, jump_period_;
 	void newHind();
 	bool isValid(const Pos pos);
-	void forward();
+	void tick();
 	void jump(Event *event);
 	byte *row(const byte n);
 

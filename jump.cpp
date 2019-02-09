@@ -137,7 +137,7 @@ bool Jump::onTimerOverflow(Event *event)
 
 	if (event->timer(0).overflow())
 	{
-		forward();
+		tick();
 	}
 	if (event->timer(1).overflow())
 	{
@@ -175,7 +175,7 @@ void Jump::onContinue(Event *event)
 	Game::onContinue(event);
 }
 
-void Jump::forward()
+void Jump::tick()
 {
 	man_state_ = !man_state_;
 	if (man_pos_.pos_x < 3)
