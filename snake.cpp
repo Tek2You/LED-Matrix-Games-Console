@@ -129,7 +129,7 @@ bool Snake::onTimerOverflow(Event *event)
 {
 	if (event->timer(0).overflow())
 	{
-		return move();
+		return tick();
 	}
 	return false;
 }
@@ -173,7 +173,7 @@ bool Snake::eat(Pos pos)
 	return false;
 }
 
-bool Snake::move()
+bool Snake::tick()
 {
 	Pos vect;
 	switch (direction_ = new_direction_)

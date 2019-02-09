@@ -53,7 +53,7 @@ private:
 	// checks if the snake had touched the eat
 	bool eat(Pos pos);
 	// moves the snake by one point
-	bool move();
+	bool tick();
 	// checks if the current position is valid
 	bool isValid(const Pos &pos);
 	// moves the position into the game field and checks valibility11
