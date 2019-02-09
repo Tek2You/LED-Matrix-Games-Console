@@ -23,7 +23,7 @@
 class Button
 {
 public:
-	Button(PortPin pin, byte debounce_time);
+	Button(PortPin pin, unsigned int debounce_time);
 	void processDebounce();
 	void checkChange();
 	inline bool changed() const
@@ -56,7 +56,7 @@ private:
 	};
 
 	byte state_;
-	byte count_;
+	unsigned int count_;
 	PortPin pin_;
-	const byte debounce_time_;
+	const unsigned int debounce_time_;
 };
