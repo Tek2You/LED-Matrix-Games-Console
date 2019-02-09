@@ -56,7 +56,7 @@ private:
 	bool rotate();
 	bool right();
 	bool left();
-	bool down();
+	bool tick();
 
 	void clearFullRows();
 	bool newTetromino();

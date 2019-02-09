@@ -183,7 +183,7 @@ bool Tetris::left()
 	return true;
 }
 
-bool Tetris::down()
+bool Tetris::tick()
 {
 	if (tetromino_ == nullptr)
 		return false;
@@ -224,25 +224,25 @@ void Tetris::setSpeed(const byte v)
 	case 1:
 		general_step_interval_ = 1400;
 		general_down_interval_ = 140;
-		general_first_move_interval_ = 320;
+		general_first_move_interval_ = 400;
 		general_move_interval_ = 160;
 		break;
 	case 3:
 		general_step_interval_ = 800;
 		general_down_interval_ = 80;
-		general_first_move_interval_ = 240;
+		general_first_move_interval_ = 280;
 		general_move_interval_ = 120;
 		break;
 	case 4:
 		general_step_interval_ = 500;
 		general_down_interval_ = 50;
-		general_first_move_interval_ = 200;
+		general_first_move_interval_ = 240;
 		general_move_interval_ = 100;
 		break;
 	case 2:
 		general_step_interval_ = 1000;
 		general_down_interval_ = 100;
-		general_first_move_interval_ = 280;
+		general_first_move_interval_ = 300;
 		general_move_interval_ = 140;
 		break;
 	default:
@@ -309,7 +309,7 @@ bool Tetris::onButtonChange(Event *event)
 	// Down(faster)
 	if (event->buttonDown().pressed())
 	{
-		if (down()) // check if
+		if (tick()) // check if
 		{
 			return true;
 		}
@@ -377,7 +377,7 @@ bool Tetris::onTimerOverflow(Event *event)
 	Timer &down_timer = event->timer(0);
 	if (down_timer.overflow())
 	{
-		if (down()) // end of the game
+		if (tick()) // end of the game
 		{
 			return true;
 		}
