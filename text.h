@@ -19,8 +19,9 @@
 #pragma once
 #include "avr.h"
 #include "matrixdisplay.h"
+#include "timer.h"
 
-class Text
+class Text : public Timer
 {
 public:
 	Text(MatrixDisplay *display);
@@ -32,18 +33,8 @@ public:
 		OFF = 2
 	};
 
-	enum NumberSize
-	{
-		P5,
-		P7
-	};
-
 	void setText(const char *text);
 	void setNumber(const int &number);
-
-	void shift();
-
-	void update();
 
 	void clear();
 
@@ -66,7 +57,10 @@ public:
 	}
 
 private:
+	void shift();
+	void onOverflow() override;
 	void computeShiftMode();
+
 	MatrixDisplay *display_;
 
 	const char *text_;  // displayed text
@@ -74,9 +68,7 @@ private:
 	int current_shift_start_col_;
 	byte shift_start_col_;
 	ShiftMode shift_mode_;
-	unsigned long shift_next_time_;
 	int speed_; // columns per second
-	int speed_time_;
 	byte offset_;
 	char curser_pos_;
 	byte start_col_, end_col_, start_row_, end_row_;

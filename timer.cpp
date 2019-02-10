@@ -33,6 +33,7 @@ bool Timer::process(const unsigned long &t)
 	{
 		next_time_ = t + interval_;
 		overflow_ = true;
+		onOverflow();
 		return true;
 	}
 	return false;
@@ -57,4 +58,14 @@ unsigned int Timer::interval() const
 void Timer::setInterval(unsigned int interval)
 {
 	interval_ = interval;
+}
+
+bool Timer::overflow()
+{
+	return overflow_;
+}
+
+void Timer::clearOverflow()
+{
+	overflow_ = false;
 }

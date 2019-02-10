@@ -19,23 +19,10 @@
 #include "text.h"
 
 Text::Text(MatrixDisplay *display)
-    : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(7), start_row_(0),
-      end_row_(15), shift_start_col_(3)
+	 : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(7), start_row_(0),
+		end_row_(15), shift_start_col_(3)
 {
 	setShiftSpeed(5);
-}
-
-void Text::update()
-{
-	if (shift_mode_ == SHIFT)
-	{
-		unsigned long now = millis();
-		if (shift_next_time_ <= now)
-		{
-			shift();
-			shift_next_time_ = now + speed_time_;
-		}
-	}
 }
 
 void Text::clear()
@@ -43,6 +30,7 @@ void Text::clear()
 	display_->clearRows(start_row_, end_row_);
 	first_ = text_ = nullptr;
 	shift_mode_ = OFF;
+	Timer::stop();
 }
 
 // shift text by one column and start over if nothing is shown anymore
@@ -85,16 +73,19 @@ void Text::computeShiftMode()
 	if (shift_mode_ == SHIFT)
 	{ // when shifting, start in column 7
 		current_shift_start_col_ = shift_start_col_;
-		shift_next_time_ = millis() + speed_time_;
+		Timer::start();
 	}
-	else // otherwise, start in first column + setString once
+	else
+	{ // otherwise, start in first column + setString once
 		display_->setString(text_, current_shift_start_col_ = 0, curser_pos_, 1, offset_);
+		Timer::stop();
+	}
 }
 
 void Text::setShiftSpeed(const int speed)
 {
 	speed_ = speed;
-	speed_time_ = 1000 / speed_; // from shifts per second to mseconds per shift
+	setInterval(1000/speed_); // from shifts per second to mseconds per shift
 }
 
 void Text::setCursor(const char pos)
@@ -113,4 +104,10 @@ void Text::setOperationCols(const byte start, const byte end)
 	start_col_ = start;
 	end_col_ = end;
 	setText(text_);
+}
+
+void Text::onOverflow()
+{
+	shift();
+	Timer::clearOverflow();
 }

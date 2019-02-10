@@ -36,8 +36,9 @@ void Display::setIcon(uint64_t icon, byte offset)
 
 void Display::update()
 {
-	text1_.update();
-	text2_.update();
+	unsigned long t = millis();
+	text1_.process(t);
+	text2_.process(t);
 }
 
 void Display::loadMenuConfig()

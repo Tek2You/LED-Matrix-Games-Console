@@ -33,8 +33,12 @@ public:
 	unsigned int interval() const;
 	void setInterval(unsigned int interval);
 
-	bool overflow() { return overflow_; }
-	void clearOverflow() { overflow_ = false; }
+	bool overflow();
+	void clearOverflow();
+protected:
+	virtual void onOverflow(){
+
+	}
 
 private:
 	unsigned long next_time_;
