@@ -36,10 +36,10 @@ Snake::~Snake()
 
 void Snake::start(Event *event)
 {
-	body_ << Pos(1, 7);
-	body_ << Pos(2, 7);
-	body_ << Pos(3, 7); // head
-	eat_pos_ = Pos(5, 7);
+	body_ << SmartPos(1, 7);
+	body_ << SmartPos(2, 7);
+	body_ << SmartPos(3, 7); // head
+	eat_pos_ = SmartPos(5, 7);
 	direction_ = START;
 	new_direction_ = START;
 	render();
@@ -216,7 +216,7 @@ bool Snake::tick()
 		return true;
 	}
 
-	body_ << vect;
+	body_ << vect.toSmartPos();
 
 	render();
 	return false;
@@ -229,7 +229,7 @@ bool Snake::isValid(const Pos &pos)
 	//  if colides, return true
 	for (int i = 0; i < body_.size(); i++)
 	{
-		if (body_.itemAt(i) == pos)
+		if (body_.itemAt(i).toPos() == pos)
 		{
 			return false;
 		}

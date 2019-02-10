@@ -28,6 +28,11 @@ Pos::Pos(const SmartPos &pos)
 	pos_y = pos.y();
 }
 
+SmartPos Pos::toSmartPos()
+{
+	return SmartPos(this->pos_x, this->pos_y);
+}
+
 Pos Pos::operator+(const Pos &pos)
 {
 

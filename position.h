@@ -18,7 +18,7 @@
 
 #pragma once
 
-class SmartPos;
+struct SmartPos;
 
 struct Pos
 {
@@ -27,6 +27,7 @@ struct Pos
 	}
 	Pos(char x, char y);
 	Pos(const SmartPos &pos);
+	SmartPos toSmartPos();
 	Pos operator+(const Pos &pos);
 	Pos operator+(const Pos &pos) const;
 	Pos &operator+=(const Pos &pos);

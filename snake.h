@@ -77,7 +77,7 @@ private:
 	// Its only to ensure, that the snake is only rotated by 90° and not more
 	Direction new_direction_;
 	// list storing the hole body data
-	List<Pos> body_;
+	List<SmartPos> body_;
 	// position of the current point of eat
 	Pos eat_pos_;
 	// highscore of all runs
