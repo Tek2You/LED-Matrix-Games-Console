@@ -42,7 +42,8 @@ void initHardware();
 int main(void)
 {
 	initHardware();
-	wdt_enable(WDTO_120MS);
+	wdt_disable();
+	wdt_enable(WDTO_500MS);
 
 	// containing loop for the main librarym
 	while (1)

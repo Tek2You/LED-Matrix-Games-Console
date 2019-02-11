@@ -19,6 +19,7 @@
 #include "snake.h"
 #include "avr/eeprom.h"
 #include "operators.h"
+#include "avr/wdt.h"
 
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
@@ -150,9 +151,9 @@ void Snake::render()
 {
 	display_->clear();
 	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
-	for (int i = 0; i < body_.size(); i++)
+	for (ListNode<SmartPos> * tmp = body_.rootNode(); tmp != nullptr; tmp = tmp->next_)
 	{
-		Pos p = body_.itemAt(i);
+		Pos p = tmp->data_;
 		display_->setPixel(p.pos_x, p.pos_y, true);
 	}
 }
@@ -165,6 +166,7 @@ bool Snake::eat(Pos pos)
 		Pos tmp;
 		do
 		{
+			wdt_reset();
 			tmp = Pos((time + char(rand())) % 8, (time + (char(rand()))) % 16);
 		} while (!isValid(tmp) || tmp == pos);
 		eat_pos_ = tmp;
