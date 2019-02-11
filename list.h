@@ -64,10 +64,23 @@ public:
 	inline List<T> &operator+=(const T &t);
 	inline List<T> &operator>>(T &t);
 
+	ListNode<T> * rootNode() const;
+	ListNode<T> *nodeAt(const unsigned int index) const;
+
+	typedef ListNode<T>* iterator;
+	typedef const ListNode<T>* const_iterator;
+
+	iterator begin() { return root_; }
+	iterator end() { return nullptr; }
+	const_iterator begin() const { return root_; }
+	const_iterator end() const { return nullptr; }
+	T operator*();
+	bool operator!=(iterator);
+	void operator++();
+
 private:
 	T foo_item_;
 
-	ListNode<T> *nodeAt(const unsigned int index) const;
 	ListNode<T> *root_ = nullptr;
 	ListNode<T> *last_ = nullptr;
 	unsigned int size_;
@@ -265,6 +278,12 @@ List<T> &List<T>::operator>>(T &t)
 	return *this;
 }
 
+template<class T>
+ListNode<T> *List<T>::rootNode() const
+{
+	return root_;
+}
+
 template <class T>
 ListNode<T> *List<T>::nodeAt(const unsigned int index) const
 {
@@ -283,3 +302,4 @@ ListNode<T> *List<T>::nodeAt(const unsigned int index) const
 	}
 	return nullptr;
 }
+
