@@ -228,7 +228,7 @@ bool Snake::isValid(const Pos &pos)
 {
 	//  if colides, return true
 	for(SmartPos tmp : body_){
-		if(pos != tmp.toPos()){
+		if(pos == tmp.toPos()){
 			return false;
 		}
 	}
