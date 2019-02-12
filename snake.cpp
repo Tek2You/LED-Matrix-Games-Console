@@ -151,8 +151,6 @@ void Snake::render()
 {
 	display_->clear();
 	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
-//	for (ListNode<SmartPos> * tmp = body_.rootNode(); tmp != nullptr; tmp = tmp->next_)
-//	{
 	for(SmartPos tmp : body_){
 		display_->setPixel(tmp.x(), tmp.y(), true);
 	}
@@ -229,10 +227,8 @@ bool Snake::tick()
 bool Snake::isValid(const Pos &pos)
 {
 	//  if colides, return true
-	for (int i = 0; i < body_.size(); i++)
-	{
-		if (body_.itemAt(i).toPos() == pos)
-		{
+	for(SmartPos tmp : body_){
+		if(pos != tmp.toPos()){
 			return false;
 		}
 	}
