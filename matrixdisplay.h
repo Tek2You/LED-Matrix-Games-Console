@@ -44,6 +44,7 @@ public:
 	void setColumn(byte column, byte value, byte offset = 0);
 	void clearColumns(byte start, byte end, byte offset);
 	void setRow(byte row, int value);
+	void print(bool take_over = true);
 
 	virtual void setBrightness(const byte brightness);
 
@@ -62,7 +63,11 @@ protected:
 	byte mapCol(byte row);
 
 private:
-	byte *rows_;
+	inline byte* getBuffer();
+	inline byte* getPendingBuffer();
+	bool pending_;
+	byte *rows1_;
+	byte *rows2_;
 	const byte height_;
 	const byte width_;
 	int brigthness_;

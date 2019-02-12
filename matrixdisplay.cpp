@@ -185,7 +185,9 @@ const byte row_order[] = {7, 6, 5, 4, 3, 2, 1, 0};
 MatrixDisplay::MatrixDisplay(byte height, byte width) : height_(height), width_(width), brigthness_(9)
 {
 	// allocate memory for (columnwi0,se) display content
-	rows_ = static_cast<byte *>(malloc(height_));
+	// allocate 2 buffer, to have possibility of pending
+	rows1_ = static_cast<byte *>(malloc(height_));
+	rows2_ = static_cast<byte *>(malloc(height_));
 
 	//	// declare selected pins of Port C as OUTPUT
 	//	// set all eight pins of PortD as output
@@ -206,7 +208,8 @@ MatrixDisplay::MatrixDisplay(byte height, byte width) : height_(height), width_(
 
 MatrixDisplay::~MatrixDisplay()
 {
-	free(rows_);
+	free(rows1_);
+	free(rows2_);
 }
 
 void MatrixDisplay::show()
@@ -216,15 +219,17 @@ void MatrixDisplay::show()
 	if (row >= 8)
 	{
 		PORTD = 0;
-		if(row >= brigthness_){
+		if (row >= brigthness_)
+		{
 			row = 0;
 		}
-		else{
+		else
+		{
 			return;
 		}
 	}
 	bitClear(PORTB, 2); // clear latch
-	for (byte *col = rows_ + row, *end = rows_ + height_ + row; col != end; col += 8)
+	for (byte *col = getBuffer() + row, *end = getBuffer() + height_ + row; col != end; col += 8)
 	{
 		SPI_SendByte(~*col);
 	}
@@ -244,7 +249,7 @@ void MatrixDisplay::clear()
 
 void MatrixDisplay::setPixel(byte col, byte row, bool value)
 {
-	bitWrite(rows_[row], col_order[col], value);
+	bitWrite(getPendingBuffer()[row], col_order[col], value);
 }
 
 void MatrixDisplay::setPixel(const Pos &p, bool value)
@@ -264,9 +269,19 @@ byte MatrixDisplay::orderCols(byte value)
 
 void MatrixDisplay::setRow(byte row, int value)
 {
-	if (row > height_)
-		return;
-	rows_[row] = orderCols(value);
+	if (row > height_) return;
+	getPendingBuffer()[row] = orderCols(value);
+}
+
+void MatrixDisplay::print(bool take_over)
+{
+	pending_ = !pending_;
+	if (take_over)
+	{
+		for(int i = 0; i < rows(); i++){
+			getPendingBuffer()[i] = getBuffer()[i];
+		}
+	}
 }
 
 void MatrixDisplay::setBrightness(const byte brightness)
@@ -279,10 +294,19 @@ byte MatrixDisplay::mapCol(byte row)
 	return ((row / 8) * 8) + col_order[row % 8];
 }
 
+byte *MatrixDisplay::getBuffer()
+{
+	return (pending_ ? rows1_ : rows2_);
+}
+
+byte *MatrixDisplay::getPendingBuffer()
+{
+	return (pending_ ? rows2_ : rows1_);
+}
+
 void MatrixDisplay::setColumn(byte column, byte value, byte offset)
 {
-	if (column >= width_)
-		return;
+	if (column >= width_) return;
 	;
 	for (int r = 0; r < 8; r++)
 	{
@@ -301,20 +325,16 @@ void MatrixDisplay::setArray(byte *array)
 // clear content of rows start to end
 void MatrixDisplay::clearRows(byte start, byte end)
 {
-	if (start < 0)
-		start = 0;
-	if (end > height_)
-		end = height_;
+	if (start < 0) start = 0;
+	if (end > height_) end = height_;
 
 	for (; start < end; ++start) setRow(start, 0);
 }
 
 void MatrixDisplay::clearColumns(byte start, byte end, byte offset)
 {
-	if (start < 0)
-		start = 0;
-	if (end > width_)
-		end = width_;
+	if (start < 0) start = 0;
+	if (end > width_) end = width_;
 	for (; start < end; ++start)
 	{
 		setColumn(start, 0, offset);
@@ -325,15 +345,13 @@ void MatrixDisplay::clearColumns(byte start, byte end, byte offset)
 
 inline const byte *MatrixDisplay::letterStart(char ch)
 {
-	if (ch < FIRST_LETTER || ch > LAST_LETTER)
-		ch = '?';
+	if (ch < FIRST_LETTER || ch > LAST_LETTER) ch = '?';
 	return LETTERS + pgm_read_word(PTN_LETTERS + ch - FIRST_LETTER);
 }
 
 const byte MatrixDisplay::letterWidth(char ch)
 {
-	if (ch < FIRST_LETTER || ch > LAST_LETTER)
-		ch = '?';
+	if (ch < FIRST_LETTER || ch > LAST_LETTER) ch = '?';
 	return pgm_read_word(PTN_LETTERS + ch - FIRST_LETTER + 1) - pgm_read_word(PTN_LETTERS + ch - FIRST_LETTER);
 }
 
@@ -361,8 +379,7 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char sp
 		column += spacing;
 		++s;
 	}
-	if (*s)
-		column += 1; // there is more text following that we clipped
+	if (*s) column += 1; // there is more text following that we clipped
 	return column;
 }
 
@@ -374,9 +391,8 @@ int MatrixDisplay::width(char ch)
 // determine the width of the given string
 int MatrixDisplay::width(const char *s, char spacing)
 {
-	if(*s == 0)
-		return 0;
-	int column = -1;  // remove one spacing to give the correct size and not append a void row at the end
+	if (*s == 0) return 0;
+	int column = -1; // remove one spacing to give the correct size and not append a void row at the end
 	while (*s != 0)
 	{
 		column += spacing + width(*s);
@@ -388,8 +404,7 @@ int MatrixDisplay::width(const char *s, char spacing)
 // converts an integer to a string
 char *MatrixDisplay::formatInt(char *digits, byte size, int value)
 {
-	if (size < 3)
-		return digits;
+	if (size < 3) return digits;
 
 	digits[--size] = '\0'; // terminating '\0'
 	digits[--size] = '0';  // zero display if value == 0
