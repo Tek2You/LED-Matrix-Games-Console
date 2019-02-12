@@ -151,10 +151,10 @@ void Snake::render()
 {
 	display_->clear();
 	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
-	for (ListNode<SmartPos> * tmp = body_.rootNode(); tmp != nullptr; tmp = tmp->next_)
-	{
-		Pos p = tmp->data_;
-		display_->setPixel(p.pos_x, p.pos_y, true);
+//	for (ListNode<SmartPos> * tmp = body_.rootNode(); tmp != nullptr; tmp = tmp->next_)
+//	{
+	for(SmartPos tmp : body_){
+		display_->setPixel(tmp.x(), tmp.y(), true);
 	}
 }
 
