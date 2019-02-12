@@ -83,6 +83,7 @@ bool Game::process(Event *event)
 			event->timers_.last().setInterval(200);
 			event->timers_.last().restart();
 			display_->setPixel(reset_count, 0);
+			display_->print();
 			reset_count++;
 			if (reset_count >= 8)
 			{

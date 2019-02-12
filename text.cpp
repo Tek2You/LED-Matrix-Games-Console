@@ -54,16 +54,19 @@ void Text::shift()
 }
 
 // display (and remember) text (for future shifting)
-void Text::setText(const char *text)
+void Text::setText(const char *text, bool print)
 {
 	first_ = text_ = text;
 	display_->clearRows(start_row_, end_row_);
 	computeShiftMode();
+	if(print){
+		display_->print();
+	}
 }
 
-void Text::setNumber(const int &value)
+void Text::setNumber(const int &value, bool print)
 {
-	setText(display_->formatInt(number_buffer_, 10, value));
+	setText(display_->formatInt(number_buffer_, 10, value),print);
 }
 
 void Text::computeShiftMode()

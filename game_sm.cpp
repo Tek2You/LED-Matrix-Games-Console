@@ -417,13 +417,16 @@ void GameSM::stateSpeedMenu(Event *event)
 		return;
 	}
 	display_->clear();
-	display_->text1_.setNumber(item.value_ + 1);
+	display_->text1_.setNumber(item.value_ + 1,false);
 	byte cols = display_->cols() / 5.0 * (item.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
 		display_->setColumn(col, 0xFF);
 	}
+	display_->print();
 }
+
+
 
 void GameSM::stateBrightnessMenu(Event *event)
 {
@@ -460,12 +463,13 @@ void GameSM::stateBrightnessMenu(Event *event)
 		return;
 	}
 	display_->clear();
-	display_->text1_.setNumber(item.value_ + 1);
+	display_->text1_.setNumber(item.value_ + 1,false);
 	byte cols = display_->cols() / 4.0 * (item.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
 		display_->setColumn(col, 0xFF);
 	}
+	display_->print();
 	display_->setBrightness(item.value_);
 }
 
@@ -507,10 +511,10 @@ void GameSM::stateLanguageMenu(Event *event)
 	switch (item.value_)
 	{
 	case 0:
-		display_->text2_.setText("E");
+		display_->text2_.setText("E",false);
 		break;
 	case 1:
-		display_->text2_.setText("D");
+		display_->text2_.setText("D",false);
 		break;
 	default:
 		break;
@@ -554,6 +558,7 @@ void GameSM::stateLoadEffect(Event *event)
 			return;
 		}
 		display_->setRow(count, 0xFF);
+		display_->print();
 		count++;
 		return;
 	}
