@@ -69,7 +69,8 @@ GameSM::GameSM(Display *display, Event *event)
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
 	brightness_ = (eeprom_read_byte(&EE_brightness));
-	if(brightness_ > 3){
+	if (brightness_ > 3)
+	{
 		brightness_ = 3;
 	}
 	display->setBrightness(brightness_);
@@ -92,13 +93,11 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 {
 	if (event->buttonLeft().pressed())
 	{
-		if (--item < min)
-			item = num - 1;
+		if (--item < min) item = num - 1;
 	}
 	else if (event->buttonRight().pressed())
 	{
-		if (++item >= num)
-			item = min;
+		if (++item >= num) item = min;
 	}
 	else if (event->buttonDown().pressed())
 	{
@@ -294,6 +293,7 @@ void GameSM::stateGameOver(Event *event)
 		if (game_ != nullptr)
 		{
 			event->setFlag(Event::ProcessPinChanges);
+			event->setFlag(Event::ProcessStop);
 			display_->loadMenuConfig();
 			if (game_->isNewHighscore())
 			{
@@ -330,6 +330,7 @@ void GameSM::stateSettingsMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(3);
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
@@ -392,6 +393,7 @@ void GameSM::stateSpeedMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(5, speed_);
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
@@ -417,7 +419,7 @@ void GameSM::stateSpeedMenu(Event *event)
 		return;
 	}
 	display_->clear();
-	display_->text1_.setNumber(item.value_ + 1,false);
+	display_->text1_.setNumber(item.value_ + 1, false);
 	byte cols = display_->cols() / 5.0 * (item.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
@@ -425,8 +427,6 @@ void GameSM::stateSpeedMenu(Event *event)
 	}
 	display_->print();
 }
-
-
 
 void GameSM::stateBrightnessMenu(Event *event)
 {
@@ -436,6 +436,7 @@ void GameSM::stateBrightnessMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(4, brightness_);
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
@@ -463,7 +464,7 @@ void GameSM::stateBrightnessMenu(Event *event)
 		return;
 	}
 	display_->clear();
-	display_->text1_.setNumber(item.value_ + 1,false);
+	display_->text1_.setNumber(item.value_ + 1, false);
 	byte cols = display_->cols() / 4.0 * (item.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
@@ -482,6 +483,7 @@ void GameSM::stateLanguageMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(2, (language_ == DE ? 0 : 1));
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
@@ -511,10 +513,10 @@ void GameSM::stateLanguageMenu(Event *event)
 	switch (item.value_)
 	{
 	case 0:
-		display_->text2_.setText("E",false);
+		display_->text2_.setText("E", false);
 		break;
 	case 1:
-		display_->text2_.setText("D",false);
+		display_->text2_.setText("D", false);
 		break;
 	default:
 		break;
@@ -533,6 +535,7 @@ void GameSM::stateLoadEffect(Event *event)
 		event->removeAllTimers();
 		event->addTimer(50);
 		event->setFlag(Event::ProcessTimerOverflows);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
@@ -571,6 +574,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 	{
 		item.init(5, 0);
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
@@ -639,6 +643,7 @@ void GameSM::stateResetMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
+		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{

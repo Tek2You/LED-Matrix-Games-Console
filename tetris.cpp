@@ -55,6 +55,7 @@ void Tetris::start(Event *event)
 	event->addTimer();
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
+	event->setFlag(Event::ProcessStop);
 }
 
 void Tetris::render()

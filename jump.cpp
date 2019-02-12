@@ -59,6 +59,7 @@ void Jump::start(Event *event)
 	event->addTimer();
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
+	event->setFlag(Event::ProcessStop);
 }
 
 unsigned int Jump::score() const
@@ -189,8 +190,7 @@ void Jump::tick()
 		newHind();
 	}
 	*row(0) = 0;
-	if (++current_field_start_ == display_->rows() + 4)
-		current_field_start_ = 0;
+	if (++current_field_start_ == display_->rows() + 4) current_field_start_ = 0;
 	render();
 	score_++;
 }
@@ -233,14 +233,12 @@ bool Jump::isValid(const Pos pos)
 	for (Pos p : man_moving_points)
 	{
 		p += pos;
-		if (bitRead(*row(p.pos_x), p.pos_y))
-			return false;
+		if (bitRead(*row(p.pos_x), p.pos_y)) return false;
 	}
 	for (Pos p : man_points)
 	{
 		p += pos;
-		if (bitRead(*row(p.pos_x), p.pos_y))
-			return false;
+		if (bitRead(*row(p.pos_x), p.pos_y)) return false;
 	}
 	return true;
 }

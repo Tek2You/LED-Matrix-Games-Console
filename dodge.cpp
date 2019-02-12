@@ -48,6 +48,7 @@ void Dodge::start(Event *event)
 	event->addTimer(20);
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
+	event->setFlag(Event::ProcessStop);
 
 	score_ = 0;
 	pos_ = Pos(3, 15);
