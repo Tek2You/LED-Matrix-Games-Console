@@ -52,9 +52,9 @@ void Event::clear()
 	buttonLeft().clear();
 	buttonStop().clear();
 	unsigned int t = millis();
-	for (int i = 0; i < timers_.size(); i++)
+	for(Timer& t : timers_)
 	{
-		timers_.itemAt(i).clearOverflow();
+		t.clearOverflow();
 	}
 	on_entry_ = false;
 	overflow_ = false;
@@ -65,15 +65,16 @@ bool Event::process()
 	processTimers();
 	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && controlButtonChanged()) ||
 	        (flag(Event::ProcessTimerOverflows) && overflow_) ||
-	        (/*flag(Event::ProcessStop) && */ buttonStop().changed()));
+	        (/*flag(Event::ProcessStop) && */buttonStop().changed()));
 }
 
 bool Event::processTimers()
 {
-	unsigned long t = millis();
-	for (int i = 0; i < timers_.size(); i++)
-	{
-		if (timers_.itemAt(i).process(t))
+	unsigned long time = millis();
+	for(Timer& t : timers_){
+//	for (int i = 0; i < timers_.size(); i++)
+//	{
+		if (t.process(time))
 		{
 			overflow_ = true;
 		}

@@ -84,7 +84,7 @@ public:
 		ProcessEveryCycle = (1 << 0),
 		ProcessPinChanges = (1 << 1),
 		ProcessTimerOverflows = (1 << 2),
-		ProcessStop = (1 << 3)
+		ProcessStop = (1 << 3),
 	};
 
 	inline void clearFlags()
