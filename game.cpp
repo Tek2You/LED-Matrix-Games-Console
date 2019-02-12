@@ -114,10 +114,12 @@ void Game::onStop(Event *event)
 	display_->clear();
 	// set stop icon
 	display_->setIcon(0x0000242424240000, 4);
+	display_->print();
 }
 
 void Game::onContinue(Event *event)
 {
+	display_->text1_.clear();
 	render();
 }
 

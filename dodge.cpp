@@ -216,6 +216,7 @@ void Dodge::render()
 	}
 	if (dot_state_)
 		display_->setPixel(pos_);
+	display_->print(false);
 }
 
 byte Dodge::randomLineId()

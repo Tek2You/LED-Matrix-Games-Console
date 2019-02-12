@@ -261,4 +261,5 @@ void Jump::render()
 	Pos p = (man_moving_points[(man_state_ == 1 ? 1 : 0)]);
 	p += man_pos_;
 	display_->setPixel(~p, true);
+	display_->print(false);
 }
