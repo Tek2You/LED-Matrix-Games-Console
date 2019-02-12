@@ -70,6 +70,7 @@ void Tetris::render()
 			display_->setPixel(p.pos_x, p.pos_y, true);
 		}
 	}
+	display_->print(false);
 }
 
 void Tetris::onStop(Event *event)

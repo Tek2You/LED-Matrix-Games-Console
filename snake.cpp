@@ -154,6 +154,7 @@ void Snake::render()
 	for(SmartPos tmp : body_){
 		display_->setPixel(tmp.x(), tmp.y(), true);
 	}
+	display_->print(false);
 }
 
 bool Snake::eat(Pos pos)

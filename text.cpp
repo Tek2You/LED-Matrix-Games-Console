@@ -110,4 +110,5 @@ void Text::onOverflow()
 {
 	shift();
 	Timer::clearOverflow();
+	display_->print();
 }
