@@ -67,6 +67,11 @@ bool Pos::operator==(const Pos &pos)
 	return (pos_x == pos.pos_x && pos_y == pos.pos_y);
 }
 
+bool Pos::operator==(const Pos &pos) const
+{
+	return (pos_x == pos.pos_x && pos_y == pos.pos_y);
+}
+
 Pos &Pos::operator=(const SmartPos &pos)
 {
 	pos_x = pos.x();
@@ -76,7 +81,12 @@ Pos &Pos::operator=(const SmartPos &pos)
 
 bool Pos::operator!=(const Pos &pos)
 {
-	return !operator==(pos);
+	return(pos.pos_x != pos_x || pos.pos_y != pos_y);
+}
+
+bool Pos::operator!=(const Pos &pos) const
+{
+	return(pos.pos_x != pos_x || pos.pos_y != pos_y);
 }
 
 Pos Pos::operator~()

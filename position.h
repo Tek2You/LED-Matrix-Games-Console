@@ -34,8 +34,10 @@ struct Pos
 	Pos operator-(const Pos &pos);
 	Pos &operator-=(const Pos &pos);
 	bool operator==(const Pos &pos);
-	Pos &operator=(const SmartPos &pos);
+	bool operator==(const Pos &pos) const;
 	bool operator!=(const Pos &pos);
+	bool operator!=(const Pos &pos) const;
+	Pos &operator=(const SmartPos &pos);
 	Pos operator~();
 	char pos_x = 0;
 	char pos_y = 0;
