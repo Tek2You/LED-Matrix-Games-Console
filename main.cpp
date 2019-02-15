@@ -54,8 +54,7 @@ int main(void)
 			process_debounce = false;
 			event.processDebounce();
 		}
-		if (check_buttons)
-			event.checkButtons();
+		if (check_buttons) event.checkButtons();
 		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
 		{
 			counter = 0;
@@ -85,7 +84,7 @@ ISR(PCINT0_vect)
 // display-show-/ debounce-checkcounter
 ISR(TIMER2_COMPA_vect)
 {
-	dp.show();
+	dp.processShow();
 	TCNT2 = 255;
 	process_debounce = true;
 }
