@@ -1,4 +1,0 @@
-#ifndef ABSTRACTLIST_H
-#define ABSTRACTLIST_H
-
-#endif // ABSTRACTLIST_H

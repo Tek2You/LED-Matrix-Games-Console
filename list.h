@@ -64,24 +64,23 @@ public:
 	inline List<T> &operator+=(const T &t);
 	inline List<T> &operator>>(T &t);
 
-	ListNode<T> * rootNode() const;
 	ListNode<T> *nodeAt(const unsigned int index) const;
 
 	//	typedef ListNode<T>* iterator;
 	//	typedef const ListNode<T>* const_iterator;
 
-	struct IType {
+	struct Iterator {
 		ListNode<T>* p_;
-		IType(ListNode<T>* p) : p_(p) {}
-		bool operator!=(IType rhs) {return p_ != rhs.p_;}
+		Iterator(ListNode<T>* p) : p_(p) {}
+		bool operator!=(Iterator rhs) {return p_ != rhs.p_;}
 		T& operator*() {return p_->data_;}
 		void operator++() {p_ = p_->next_;}
 	};
 
-	IType begin() {return IType(root_); }
-	IType end() {return IType(nullptr); }
-	IType begin() const { return IType(root_); }
-	IType end() const { return IType(nullptr); }
+	Iterator begin() {return Iterator(root_); }
+	Iterator end() {return Iterator(nullptr); }
+	Iterator begin() const { return Iterator(root_); }
+	Iterator end() const { return Iterator(nullptr); }
 
 private:
 	T foo_item_;
@@ -214,7 +213,7 @@ void List<T>::removeAll()
 {
 	while (size_)
 	{
-		remove(size_ - 1);
+		removeFirst();
 	}
 }
 
@@ -281,12 +280,6 @@ List<T> &List<T>::operator>>(T &t)
 {
 	t = removeFirst();
 	return *this;
-}
-
-template<class T>
-ListNode<T> *List<T>::rootNode() const
-{
-	return root_;
 }
 
 template <class T>
