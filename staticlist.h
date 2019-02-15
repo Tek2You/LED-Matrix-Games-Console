@@ -2,22 +2,22 @@
 #include "avr.h"
 
 template <class T>
-class ConstList
+class StaticList
 {
 public:
-	ConstList(const int max_size_);
+	StaticList(const int max_size_);
 
 	// getter
 	T& itemAt(int index);
-	inline T& operator[](int index){itemAt(index);}
 	T& first();
 	T& last();
+	inline T& operator[](int index){itemAt(index);}
 
 	// expanding functions
 	void append(const T &item);
 	void insert(const unsigned int index, const T &item);
 	inline void prepent(const T &item);
-	inline ConstList<T>& operator<<(T& item);
+	inline StaticList<T>& operator<<(const T& item);
 
 	void shift(const unsigned int index=0); // shifts all items by one, indirection up
 	void backshift(const unsigned int index=0); // shifst all items byte one, in direction down
@@ -26,7 +26,7 @@ public:
 	void remove(const unsigned int index);
 	inline void removeLast();
 	void removeAll();
-	inline ConstList<T>& operator>>(T& item);
+	inline StaticList<T>& operator>>(T& item);
 
 	struct Iterator{
 		Iterator(T*item):item_(item){}
@@ -57,13 +57,13 @@ private:
 };
 
 template<class T>
-ConstList<T>::ConstList(const int size) : max_size_(size)
+StaticList<T>::StaticList(const int size) : max_size_(size)
 {
 	first_ = static_cast<T*>(malloc(sizeof(T)*max_size_));
 }
 
 template<class T>
-T &ConstList<T>::itemAt(int index)
+T &StaticList<T>::itemAt(int index)
 {
 	if(index >= max_size_)
 		return nullptr;
@@ -71,29 +71,29 @@ T &ConstList<T>::itemAt(int index)
 }
 
 template<class T>
-T &ConstList<T>::first()
+T &StaticList<T>::first()
 {
 	return *first_;
 }
 
 template<class T>
-T &ConstList<T>::last()
+T &StaticList<T>::last()
 {
 	return first_[max_size_-1];
 }
 
 template<class T>
-void ConstList<T>::append(const T &item)
+void StaticList<T>::append(const T &item)
 {
 	if(size_ + 1 > max_size_)
 		return;
-	first_[size] = item;
-	size++;
+	first_[size_] = item;
+	size_++;
 	return;
 }
 
 template<class T>
-void ConstList<T>::insert(const unsigned int index, const T &item)
+void StaticList<T>::insert(const unsigned int index, const T &item)
 {
 	if(size_ + 1 > max_size_)
 		return;
@@ -102,13 +102,13 @@ void ConstList<T>::insert(const unsigned int index, const T &item)
 }
 
 template<class T>
-void ConstList<T>::prepent(const T &item)
+void StaticList<T>::prepent(const T &item)
 {
 	insert(0,item);
 }
 
 template<class T>
-ConstList<T> &ConstList<T>::operator<<(T &item)
+StaticList<T> &StaticList<T>::operator<<(const T &item)
 {
 	append(item);
 	return *this;
@@ -116,7 +116,7 @@ ConstList<T> &ConstList<T>::operator<<(T &item)
 
 	// shifts items to the end of the list
 template<class T>
-void ConstList<T>::shift(const unsigned int index)
+void StaticList<T>::shift(const unsigned int index)
 {
 	if(size_ + 1 > max_size_)
 		return;
@@ -130,11 +130,11 @@ void ConstList<T>::shift(const unsigned int index)
 
 	// shifts item to the begin of the list
 template<class T>
-void ConstList<T>::backshift(const unsigned int index)
+void StaticList<T>::backshift(const unsigned int index)
 {
-	if(index >= size_ || size > 0)
+	if(index >= size_ || size_ > 0)
 		return;
-	for(T* tmp = first_[index]; tmp <= first_[size-2]; tmp++){
+	for(T* tmp = first_ + index; tmp <= first_ + size_-2; tmp++){
 		*tmp = *(tmp+1);
 	}
 	first_[size_] = T(); // reset last
@@ -142,26 +142,26 @@ void ConstList<T>::backshift(const unsigned int index)
 }
 
 template<class T>
-void ConstList<T>::removeFirst()
+void StaticList<T>::removeFirst()
 {
 	backshift();
 }
 
 template<class T>
-void ConstList<T>::remove(const unsigned int index)
+void StaticList<T>::remove(const unsigned int index)
 {
 	backshift(index);
 }
 
 template<class T>
-void ConstList<T>::removeLast()
+void StaticList<T>::removeLast()
 {
 	--size_;
 	first_[size_] = T();
 }
 
 template<class T>
-void ConstList<T>::removeAll()
+void StaticList<T>::removeAll()
 {
 	for(; size_ >= 0; --size_)
 		first_[size_] = T();{
@@ -169,7 +169,7 @@ void ConstList<T>::removeAll()
 }
 
 template<class T>
-ConstList<T> &ConstList<T>::operator>>(T &item)
+StaticList<T> &StaticList<T>::operator>>(T &item)
 {
 	item = last();
 	removeLast();
