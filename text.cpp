@@ -60,7 +60,7 @@ void Text::setText(const char *text, bool print)
 	display_->clearRows(start_row_, end_row_);
 	computeShiftMode();
 	if(print){
-		display_->print();
+		display_->show();
 	}
 }
 
@@ -113,5 +113,5 @@ void Text::onOverflow()
 {
 	shift();
 	Timer::clearOverflow();
-	display_->print();
+	display_->show();
 }

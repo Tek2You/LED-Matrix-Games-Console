@@ -425,7 +425,7 @@ void GameSM::stateSpeedMenu(Event *event)
 	{
 		display_->setColumn(col, 0xFF);
 	}
-	display_->print();
+	display_->show();
 }
 
 void GameSM::stateBrightnessMenu(Event *event)
@@ -470,7 +470,7 @@ void GameSM::stateBrightnessMenu(Event *event)
 	{
 		display_->setColumn(col, 0xFF);
 	}
-	display_->print();
+	display_->show();
 	display_->setBrightness(item.value_);
 }
 
@@ -561,7 +561,7 @@ void GameSM::stateLoadEffect(Event *event)
 			return;
 		}
 		display_->setRow(count, 0xFF);
-		display_->print();
+		display_->show();
 		count++;
 		return;
 	}

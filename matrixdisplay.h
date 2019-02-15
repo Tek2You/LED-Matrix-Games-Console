@@ -25,7 +25,7 @@ class MatrixDisplay
 public:
 	MatrixDisplay(byte width, byte height);
 	~MatrixDisplay();
-	void show();
+	void processShow();
 	void clear();
 	void setPixel(byte col, byte row, bool value = true);
 	void setPixel(const Pos &p, bool value = true);
@@ -44,7 +44,7 @@ public:
 	void setColumn(byte column, byte value, byte offset = 0);
 	void clearColumns(byte start, byte end, byte offset);
 	void setRow(byte row, int value);
-	void print(bool take_over = true);
+	void show(bool take_over = true);
 
 	virtual void setBrightness(const byte brightness);
 

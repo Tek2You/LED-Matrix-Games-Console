@@ -154,7 +154,7 @@ void Snake::render()
 	for(SmartPos tmp : body_){
 		display_->setPixel(tmp.x(), tmp.y(), true);
 	}
-	display_->print(false);
+	display_->show(false);
 }
 
 bool Snake::eat(Pos pos)
@@ -242,12 +242,12 @@ bool Snake::validate(Pos &pos)
 {
 	// out of range
 	if (pos.pos_x < 0)
-		pos.pos_x = 7;
-	else if (pos.pos_x > 7)
+		pos.pos_x = display_->cols();
+	else if (pos.pos_x > display_->cols())
 		pos.pos_x = 0;
 	if (pos.pos_y < 0)
-		pos.pos_y = 15;
-	else if (pos.pos_y > 15)
+		pos.pos_y = display_->rows();
+	else if (pos.pos_y > display_->rows())
 		pos.pos_y = 0;
 	return isValid(pos);
 }

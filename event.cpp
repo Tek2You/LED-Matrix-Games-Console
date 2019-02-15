@@ -72,8 +72,6 @@ bool Event::processTimers()
 {
 	unsigned long time = millis();
 	for(Timer& t : timers_){
-//	for (int i = 0; i < timers_.size(); i++)
-//	{
 		if (t.process(time))
 		{
 			overflow_ = true;

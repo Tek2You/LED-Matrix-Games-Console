@@ -212,7 +212,7 @@ MatrixDisplay::~MatrixDisplay()
 	free(rows2_);
 }
 
-void MatrixDisplay::show()
+void MatrixDisplay::processShow()
 {
 	static int row = 0;
 	row++;
@@ -273,7 +273,7 @@ void MatrixDisplay::setRow(byte row, int value)
 	getPendingBuffer()[row] = orderCols(value);
 }
 
-void MatrixDisplay::print(bool take_over)
+void MatrixDisplay::show(bool take_over)
 {
 	pending_ = !pending_;
 	if (take_over)
