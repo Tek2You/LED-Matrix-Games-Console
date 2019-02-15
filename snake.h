@@ -19,6 +19,7 @@
 #pragma once
 #include "game.h"
 #include "list.h"
+#include "staticlist.h"
 #include "position.h"
 
 class Snake : public Game
@@ -77,7 +78,7 @@ private:
 	// Its only to ensure, that the snake is only rotated by 90° and not more
 	Direction new_direction_;
 	// list storing the hole body data
-	List<SmartPos> body_;
+	StaticList <SmartPos> body_;
 	// position of the current point of eat
 	Pos eat_pos_;
 	// highscore of all runs
