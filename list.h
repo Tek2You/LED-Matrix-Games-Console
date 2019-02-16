@@ -6,7 +6,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- 
+
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,28 +33,22 @@ private:
 public:
 	List();
 	~List();
-	
+
 	// expanding functions
 	void append(const T &item);
 	void insert(const unsigned int index, const T &item);
 	void prepent(const T &item);
-	
+
 	// decreasing functions
 	T removeFirst();
 	T remove(const unsigned int index);
 	T removeLast();
 	void removeAll();
-	
+
 	// checker functions
-	inline bool isEmpty() const
-	{
-		return size() == 0;
-	}
-	inline unsigned int size() const
-	{
-		return size_;
-	}
-	
+	inline bool isEmpty() const { return size() == 0; }
+	inline unsigned int size() const { return size_; }
+
 	// getter functions
 	T &itemAt(const unsigned int index);
 	inline T &operator[](const unsigned int index);
@@ -69,22 +63,23 @@ public:
 	//	typedef ListNode<T>* iterator;
 	//	typedef const ListNode<T>* const_iterator;
 
-	struct Iterator {
-		ListNode<T>* p_;
-		Iterator(ListNode<T>* p) : p_(p) {}
-		bool operator!=(Iterator rhs) {return p_ != rhs.p_;}
-		T& operator*() {return p_->data_;}
-		void operator++() {p_ = p_->next_;}
+	struct Iterator
+	{
+		ListNode<T> *p_;
+		Iterator(ListNode<T> *p) : p_(p) {}
+		bool operator!=(Iterator rhs) { return p_ != rhs.p_; }
+		T &operator*() { return p_->data_; }
+		void operator++() { p_ = p_->next_; }
 	};
 
-	Iterator begin() {return Iterator(root_); }
-	Iterator end() {return Iterator(nullptr); }
+	Iterator begin() { return Iterator(root_); }
+	Iterator end() { return Iterator(nullptr); }
 	Iterator begin() const { return Iterator(root_); }
 	Iterator end() const { return Iterator(nullptr); }
 
 private:
 	T foo_item_;
-	
+
 	ListNode<T> *root_ = nullptr;
 	ListNode<T> *last_ = nullptr;
 	unsigned int size_;
@@ -107,10 +102,10 @@ template <class T>
 void List<T>::append(const T &item)
 {
 	ListNode<T> *tmp = new ListNode<T>();
-	
+
 	tmp->data_ = item;
 	tmp->next_ = nullptr;
-	
+
 	if (root_)
 	{
 		// Already have elements inserted
@@ -123,7 +118,7 @@ void List<T>::append(const T &item)
 		root_ = tmp;
 		last_ = tmp;
 	}
-	
+
 	size_++;
 	return;
 }
@@ -131,40 +126,36 @@ void List<T>::append(const T &item)
 template <class T>
 void List<T>::insert(const unsigned int index, const T &item)
 {
-	if (index >= size_)
-		return append(item);
-	
-	if (index == 0)
-		return prepent(item);
-	
+	if (index >= size_) return append(item);
+
+	if (index == 0) return prepent(item);
+
 	ListNode<T> *tmp = new ListNode<T>(), *prev = nodeAt(index - 1);
 	tmp->data_ = item;
 	tmp->next_ = prev->next_;
 	prev->next_ = tmp;
-	
+
 	size_++;
 }
 
 template <class T>
 void List<T>::prepent(const T &item)
 {
-	if (size_ == 0)
-		return append(item);
-	
+	if (size_ == 0) return append(item);
+
 	ListNode<T> *tmp = new ListNode<T>();
 	tmp->next_ = root_;
 	tmp->data_ = item;
 	root_ = tmp;
-	
+
 	size_++;
 }
 
 template <class T>
 T List<T>::removeFirst()
 {
-	if (size_ == 0)
-		return T();
-	
+	if (size_ == 0) return T();
+
 	if (size_ > 1)
 	{
 		ListNode<T> *next = root_->next_;
@@ -183,9 +174,8 @@ T List<T>::removeFirst()
 template <typename T>
 T List<T>::removeLast()
 {
-	if (size_ <= 0)
-		return T();
-	
+	if (size_ <= 0) return T();
+
 	if (size_ > 1)
 	{
 		ListNode<T> *tmp = nodeAt(size_ - 2);
@@ -220,13 +210,10 @@ void List<T>::removeAll()
 template <class T>
 T List<T>::remove(const unsigned int index)
 {
-	if (index < 0 || index >= size_)
-		return T();
-	if (index == 0)
-		return removeFirst();
-	if (index == size_ - 1)
-		return removeLast();
-	
+	if (index < 0 || index >= size_) return T();
+	if (index == 0) return removeFirst();
+	if (index == size_ - 1) return removeLast();
+
 	ListNode<T> *tmp = nodeAt(index - 1);
 	ListNode<T> *toDelete = tmp->next_;
 	T ret = toDelete->data_;
@@ -287,17 +274,16 @@ ListNode<T> *List<T>::nodeAt(const unsigned int index) const
 {
 	int pos = 0;
 	ListNode<T> *current = root_;
-	
+
 	while (pos < index && current)
 	{
 		current = current->next_;
 		pos++;
 	}
-	
+
 	if (pos == index)
 	{
 		return current;
 	}
 	return nullptr;
 }
-
