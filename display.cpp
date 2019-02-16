@@ -24,7 +24,7 @@ Display::Display(byte height, byte width) : MatrixDisplay(height, width), text1_
 	loadMenuConfig();
 }
 
-void Display::setIcon(uint64_t icon, byte offset)
+void Display::setIcon(uint64_t icon, byte offset, bool show)
 {
 	Icon i;
 	i.i64 = icon;
@@ -32,6 +32,8 @@ void Display::setIcon(uint64_t icon, byte offset)
 	{
 		setRow(r, i.array[7 + offset - r]);
 	}
+	if(show)
+		Display::show();
 }
 
 void Display::update()
