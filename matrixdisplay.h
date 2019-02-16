@@ -32,7 +32,7 @@ public:
 	void setArray(byte *array);
 	const byte rows()
 	{
-		return 16;
+		return height_;
 	}
 	const byte cols()
 	{
