@@ -18,8 +18,8 @@
 
 #include "snake.h"
 #include "avr/eeprom.h"
-#include "operators.h"
 #include "avr/wdt.h"
+#include "operators.h"
 
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
@@ -31,8 +31,8 @@ Snake::Snake(Display *display) : Game(display), body_(128)
 	setSpeed(2);
 }
 
-Snake::~Snake()
-{
+Snake::~Snake() {
+
 }
 
 void Snake::start(Event *event)
@@ -76,15 +76,9 @@ void Snake::setSpeed(byte v)
 	}
 }
 
-unsigned int Snake::highscore()
-{
-	return highscore_;
-}
+unsigned int Snake::highscore() { return highscore_; }
 
-void Snake::resetHighscore()
-{
-	eeprom_write_word(&EE_highscore, highscore_ = 0);
-}
+void Snake::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Snake::onButtonChange(Event *event)
 {
@@ -151,7 +145,8 @@ void Snake::render()
 {
 	display_->clear();
 	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
-	for(SmartPos tmp : body_){
+	for (SmartPos tmp : body_)
+	{
 		display_->setPixel(tmp.x(), tmp.y(), true);
 	}
 	display_->show(false);
@@ -206,9 +201,9 @@ bool Snake::tick()
 	}
 	// check if highscore is broken. Directly save to avoid a not save in case of
 	// reset or poweroff.
-	if ((body_.size() - 2) > highscore_)
+	if (score() > highscore_) // + 1 because we didnt add the next vect because of the isValid() function
 	{
-		highscore_ = body_.size() - 2;
+		highscore_ = score();
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
@@ -216,8 +211,8 @@ bool Snake::tick()
 	{ // game end
 		return true;
 	}
-
 	body_ << vect.toSmartPos();
+
 
 	render();
 	return false;
@@ -228,8 +223,10 @@ bool Snake::tick()
 bool Snake::isValid(const Pos &pos)
 {
 	//  if colides, return true
-	for(SmartPos tmp : body_){
-		if(pos == tmp.toPos()){
+	for (SmartPos tmp : body_)
+	{
+		if (pos == tmp.toPos())
+		{
 			return false;
 		}
 	}
@@ -242,12 +239,12 @@ bool Snake::validate(Pos &pos)
 {
 	// out of range
 	if (pos.pos_x < 0)
-		pos.pos_x = display_->cols();
-	else if (pos.pos_x > display_->cols())
+		pos.pos_x = display_->cols()-1;
+	else if (pos.pos_x > display_->cols()-1)
 		pos.pos_x = 0;
 	if (pos.pos_y < 0)
-		pos.pos_y = display_->rows();
-	else if (pos.pos_y > display_->rows())
+		pos.pos_y = display_->rows()-1;
+	else if (pos.pos_y > display_->rows()-1)
 		pos.pos_y = 0;
 	return isValid(pos);
 }
