@@ -671,11 +671,13 @@ void GameSM::stateResetMenu(Event *event)
 	{
 		return;
 	}
+	display_->clear();
 	display_->text1_.setText((language_ == EN ? "reset scores"
 															: "Highscores zur"
 															  "\x1c"
-															  "cksetzen"));
-	display_->setIcon(0x00040a1120408000);
+															  "cksetzen"),false);
+	display_->setIcon(0x00040a1120408000,false);
+	display_->show();
 }
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event)
