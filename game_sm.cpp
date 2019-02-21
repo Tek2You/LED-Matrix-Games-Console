@@ -295,15 +295,23 @@ void GameSM::stateGameOver(Event *event)
 			event->setFlag(Event::ProcessPinChanges);
 			event->setFlag(Event::ProcessStop);
 			display_->loadMenuConfig();
-			if (game_->isNewHighscore())
+			if (game_->type() == Game::SNAKE && game_->score() >= 124)
 			{
-				display_->text1_.setText((language_ == EN ? "new highscore!" : "neuer Highscore!"));
+				display_->text1_.setText((language_ == EN ? "you got it!" : "Geschafft!"),false);
 			}
 			else
 			{
-				display_->text1_.setText("Game Over");
+				if (game_->isNewHighscore())
+				{
+					display_->text1_.setText((language_ == EN ? "new highscore!" : "neuer Highscore!"),false);
+				}
+				else
+				{
+					display_->text1_.setText("Game Over",false);
+				}
 			}
-			display_->text2_.setNumber(game_->score());
+			display_->text2_.setNumber(game_->score(),false);
+			display_->show();
 			// delete game
 			delete game_;
 			game_ = nullptr;
@@ -675,12 +683,10 @@ void GameSM::stateResetMenu(Event *event)
 	display_->text1_.setText((language_ == EN ? "reset scores"
 															: "Highscores zur"
 															  "\x1c"
-															  "cksetzen"),false);
-	display_->setIcon(0x00040a1120408000,false);
+															  "cksetzen"),
+									 false);
+	display_->setIcon(0x00040a1120408000, false);
 	display_->show();
 }
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event)
-{
-	return advance(event, value_, num_);
-}
+GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event) { return advance(event, value_, num_); }
