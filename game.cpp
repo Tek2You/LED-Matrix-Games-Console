@@ -20,7 +20,7 @@
 #include "game.h"
 #include "operators.h"
 
-Game::Game(Display *display) : display_(display), is_new_highscore_(false), stop_state_(false)
+Game::Game(Display *display, GameType game_type) : display_(display), game_type_(game_type), is_new_highscore_(false), stop_state_(false)
 {
 }
 

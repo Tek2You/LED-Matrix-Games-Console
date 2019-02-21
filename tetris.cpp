@@ -23,7 +23,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display) : Game(display)
+Tetris::Tetris(Display *display) : Game(display,TETRIS)
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte *>(malloc(display_->rows()));

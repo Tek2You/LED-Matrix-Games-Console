@@ -24,16 +24,14 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
-Snake::Snake(Display *display) : Game(display), body_(128)
+Snake::Snake(Display *display) : Game(display,SNAKE), body_(display->rows()*display->cols())
 {
 	direction_ = START;
 	new_direction_ = START;
 	setSpeed(2);
 }
 
-Snake::~Snake() {
-
-}
+Snake::~Snake() {}
 
 void Snake::start(Event *event)
 {
@@ -156,6 +154,9 @@ bool Snake::eat(Pos pos)
 {
 	if (pos == eat_pos_)
 	{
+		// ensure that we dont enter a remaining loop if the game is won
+		if (body_.size() >= display_->rows() * display_->cols())
+			return true;
 		unsigned long time = millis();
 		Pos tmp;
 		do
@@ -213,7 +214,6 @@ bool Snake::tick()
 	}
 	body_ << vect.toSmartPos();
 
-
 	render();
 	return false;
 }
@@ -239,12 +239,12 @@ bool Snake::validate(Pos &pos)
 {
 	// out of range
 	if (pos.pos_x < 0)
-		pos.pos_x = display_->cols()-1;
-	else if (pos.pos_x > display_->cols()-1)
+		pos.pos_x = display_->cols() - 1;
+	else if (pos.pos_x > display_->cols() - 1)
 		pos.pos_x = 0;
 	if (pos.pos_y < 0)
-		pos.pos_y = display_->rows()-1;
-	else if (pos.pos_y > display_->rows()-1)
+		pos.pos_y = display_->rows() - 1;
+	else if (pos.pos_y > display_->rows() - 1)
 		pos.pos_y = 0;
 	return isValid(pos);
 }

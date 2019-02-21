@@ -24,7 +24,7 @@
 static uint16_t EE_highscore EEMEM = 0;
 uint16_t Jump::highscore_ = eeprom_read_word(&EE_highscore);
 
-Jump::Jump(Display *display) : Game(display)
+Jump::Jump(Display *display) : Game(display,JUMP)
 {
 	field_ = static_cast<byte *>(malloc(display_->rows() + 4));
 	current_field_start_ = 0;
