@@ -33,7 +33,7 @@ public:
 	void start(Event *event);
 	unsigned int score() const
 	{
-		return body_.size() - 2;
+		return body_.size() - 3;
 	}
 
 	void setSpeed(byte v) override;

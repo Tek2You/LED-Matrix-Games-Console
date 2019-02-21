@@ -210,6 +210,7 @@ bool Snake::tick()
 	}
 	if (!isValid(vect))
 	{ // game end
+		body_ << vect.toSmartPos(); // append the the buffer to ensure correct score(computed out of the size of the list)
 		return true;
 	}
 	body_ << vect.toSmartPos();

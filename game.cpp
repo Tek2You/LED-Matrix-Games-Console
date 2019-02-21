@@ -118,7 +118,7 @@ void Game::onStop(Event *event)
 
 	display_->text1_.setOperationCols(0,7);
 	display_->text1_.setOffset(0);
-	display_->text1_.setNumber(this->score()-1,false);
+	display_->text1_.setNumber(this->score(),false);
 	display_->setIcon(0x0000242424240000, 8,false);
 	display_->show();
 }

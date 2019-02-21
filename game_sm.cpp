@@ -303,7 +303,7 @@ void GameSM::stateGameOver(Event *event)
 			{
 				if (game_->isNewHighscore())
 				{
-					display_->text1_.setText((language_ == EN ? "new highscore!" : "neuer Highscore!"),false);
+					display_->text1_.setText((language_ == EN ? "new highscore!" : "Neuer Highscore!"),false);
 				}
 				else
 				{
