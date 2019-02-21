@@ -19,8 +19,8 @@
 #include "text.h"
 
 Text::Text(MatrixDisplay *display)
-	 : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(7), start_row_(0),
-		end_row_(15), shift_start_col_(3), alignment_(MIDDLE)
+	 : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(display->cols()-1), start_row_(0),
+		end_row_(display->rows()-1), shift_start_col_(3), alignment_(MIDDLE)
 {
 	setShiftSpeed(5);
 }
@@ -110,13 +110,6 @@ void Text::setOperationRows(const byte start, const byte end)
 {
 	start_row_ = start;
 	end_row_ = end;
-}
-
-void Text::setOperationCols(const byte start, const byte end)
-{
-	start_col_ = start;
-	end_col_ = end;
-	setText(text_);
 }
 
 void Text::onOverflow()

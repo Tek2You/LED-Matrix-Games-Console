@@ -50,12 +50,10 @@ void Display::loadMenuConfig()
 	text2_.clear();
 	text1_.setOffset(8);
 	text1_.setOperationRows(8, 16);
-	text1_.setOperationCols(0, 7);
 	text1_.setShiftStartCol(3);
 
 	text2_.setOffset(0);
 	text2_.setOperationRows(0, 8);
-	text2_.setOperationCols(0, 7);
 	text2_.setShiftStartCol(3);
 }
 

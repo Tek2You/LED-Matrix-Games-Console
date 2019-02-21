@@ -57,7 +57,7 @@ bool Game::process(Event *event)
 		{ // tryed to leave
 			reset_count = 0;
 			first_released_ = false;
-			display_->setRow(0, 0);
+			display_->setRow(15, 0);
 			display_->show();
 			event->timers_.last().setInterval(500);
 		}
@@ -83,7 +83,7 @@ bool Game::process(Event *event)
 		{
 			event->timers_.last().setInterval(200);
 			event->timers_.last().restart();
-			display_->setPixel(reset_count, 0);
+			display_->setPixel(reset_count, 15);
 			display_->show();
 			reset_count++;
 			if (reset_count >= 8)
@@ -114,9 +114,6 @@ bool Game::process(Event *event)
 void Game::onStop(Event *event)
 {
 	display_->clear();
-	// set stop icon
-
-	display_->text1_.setOperationCols(0,7);
 	display_->text1_.setOffset(0);
 	display_->text1_.setNumber(this->score(),false);
 	display_->setIcon(0x0000242424240000, 8,false);

@@ -56,7 +56,6 @@ public:
 	char getCursor() const { return curser_pos_; }
 
 	void setOperationRows(const byte start, const byte end);
-	void setOperationCols(const byte start, const byte end);
 
 	void setShiftStartCol(byte col)
 	{
