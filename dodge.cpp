@@ -36,7 +36,7 @@ const Dodge::LineData lines[11] = {
 	 {Dodge::LineData::set(2, 2, 1), {0b00001111, 0b11000000}},
 };
 
-Dodge::Dodge(Display *display) : Game(display), dot_state_(true)
+Dodge::Dodge(Display *display) : Game(display,DODGE), dot_state_(true)
 {
 }
 

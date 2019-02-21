@@ -26,7 +26,14 @@
 class Game
 {
 public:
-	Game(Display *display);
+	enum GameType{
+		TETRIS,
+		SNAKE,
+		JUMP,
+		DODGE
+	};
+
+	Game(Display *display, GameType game_type);
 	virtual ~Game();
 
 	// start the game
@@ -45,6 +52,11 @@ public:
 		return is_new_highscore_;
 	}
 
+
+	GameType type(){
+		return game_type_;
+	}
+
 protected:
 	virtual bool onButtonChange(Event *event);
 	virtual bool onTimerOverflow(Event *event);
@@ -55,4 +67,5 @@ protected:
 	Display *display_;
 	bool is_new_highscore_ = false;
 	bool stop_state_;
+	const GameType game_type_;
 };
