@@ -20,7 +20,7 @@
 
 Text::Text(MatrixDisplay *display)
 	 : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(7), start_row_(0),
-		end_row_(15), shift_start_col_(3)
+		end_row_(15), shift_start_col_(3), alignment_(MIDDLE)
 {
 	setShiftSpeed(5);
 }
@@ -54,24 +54,25 @@ void Text::shift()
 }
 
 // display (and remember) text (for future shifting)
-void Text::setText(const char *text, bool print)
+void Text::setText(const char *text, bool show)
 {
 	first_ = text_ = text;
 	display_->clearRows(start_row_, end_row_);
 	computeShiftMode();
-	if(print){
+	if(show){
 		display_->show();
 	}
 }
 
-void Text::setNumber(const int &value, bool print)
+void Text::setNumber(const int &value, bool show)
 {
-	setText(display_->formatInt(number_buffer_, 10, value),print);
+	setText(display_->formatInt(number_buffer_, 10, value),show);
 }
 
 void Text::computeShiftMode()
 {
-	shift_mode_ = (display_->width(text_) > (end_col_ - start_col_) + 1 ? SHIFT : NO_SHIFT);
+	int width = display_->width(text_);
+	shift_mode_ = (width > (end_col_ - start_col_) + 1 ? SHIFT : NO_SHIFT);
 
 	if (shift_mode_ == SHIFT)
 	{ // when shifting, start in column 7
@@ -79,8 +80,17 @@ void Text::computeShiftMode()
 		Timer::start();
 	}
 	else
-	{ // otherwise, start in first column + setString once
-		display_->setString(text_, current_shift_start_col_ = 0, curser_pos_, 1, offset_);
+	{ // otherwise, start start like the alignment pretends
+		if(alignment_ == RIGHT){
+			current_shift_start_col_ = end_col_ - width + 1;
+		}
+		else if (alignment_ == MIDDLE){
+			current_shift_start_col_ = start_col_ + (end_col_ - start_col_ + 1 - width) / 2;
+		}
+		else { // its left
+			current_shift_start_col_ = 0;
+		}
+		display_->setString(text_, current_shift_start_col_, curser_pos_, 1, offset_);
 		Timer::stop();
 	}
 }

@@ -66,6 +66,8 @@ GameSM::GameSM(Display *display, Event *event)
 {
 	display_->text1_.setShiftSpeed(5);
 	display_->text2_.setShiftSpeed(5);
+	display_->text1_.setAlignment(Text::MIDDLE);
+	display_->text2_.setAlignment(Text::MIDDLE);
 	speed_ = eeprom_read_byte(&EE_speed);
 	language_ = (eeprom_read_byte(&EE_language) ? DE : EN);
 	brightness_ = (eeprom_read_byte(&EE_brightness));
@@ -297,20 +299,20 @@ void GameSM::stateGameOver(Event *event)
 			display_->loadMenuConfig();
 			if (game_->type() == Game::SNAKE && game_->score() >= 124)
 			{
-				display_->text1_.setText((language_ == EN ? "you got it!" : "Geschafft!"),false);
+				display_->text1_.setText((language_ == EN ? "you got it!" : "Geschafft!"), false);
 			}
 			else
 			{
 				if (game_->isNewHighscore())
 				{
-					display_->text1_.setText((language_ == EN ? "new highscore!" : "Neuer Highscore!"),false);
+					display_->text1_.setText((language_ == EN ? "new highscore!" : "Neuer Highscore!"), false);
 				}
 				else
 				{
-					display_->text1_.setText("Game Over",false);
+					display_->text1_.setText("Game Over", false);
 				}
 			}
-			display_->text2_.setNumber(game_->score(),false);
+			display_->text2_.setNumber(game_->score(), false);
 			display_->show();
 			// delete game
 			delete game_;

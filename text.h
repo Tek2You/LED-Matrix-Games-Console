@@ -33,31 +33,27 @@ public:
 		OFF = 2
 	};
 
-	void setText(const char *text, bool print = true);
-	void setNumber(const int &number, bool print = true);
+	enum Align
+	{
+		LEFT,
+		MIDDLE,
+		RIGHT,
+	};
+
+	void setText(const char *text, bool show = true);
+	void setNumber(const int &number, bool show = true);
+	void setAlignment(const Align align) { alignment_ = align; }
 
 	void clear();
 
 	void setShiftSpeed(const int speed);
-	int shiftSpeed() const
-	{
-		return speed_;
-	}
+	int shiftSpeed() const { return speed_; }
 
-	void setOffset(const byte offset)
-	{
-		offset_ = offset;
-	}
-	byte offset() const
-	{
-		return offset_;
-	}
+	void setOffset(const byte offset) { offset_ = offset; }
+	byte offset() const { return offset_; }
 
 	void setCursor(const char pos);
-	char getCursor() const
-	{
-		return curser_pos_;
-	}
+	char getCursor() const { return curser_pos_; }
 
 	void setOperationRows(const byte start, const byte end);
 	void setOperationCols(const byte start, const byte end);
@@ -85,4 +81,5 @@ private:
 	char curser_pos_;
 	byte start_col_, end_col_, start_row_, end_row_;
 	char number_buffer_[10];
+	Align alignment_;
 };
