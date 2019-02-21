@@ -202,10 +202,10 @@ void Dodge::onStop(Event *event)
 }
 void Dodge::onContinue(Event *event)
 {
+	Game::onContinue(event);
 	event->timer(0).restart();
 	event->timer(1).restart();
 	event->timer(2).restart();
-	render();
 }
 
 void Dodge::render()

@@ -85,6 +85,7 @@ void Tetris::onContinue(Event *event)
 {
 	render();
 	event->timer(0).start();
+	Game::onContinue(event);
 	// for the second timer, the restart is not required, because its used for button long pressed
 }
 
