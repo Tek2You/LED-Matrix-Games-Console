@@ -34,7 +34,6 @@ private:
 	void stateDefault(Event *event);
 	void stateTetris(Event *event);
 	void stateSnake(Event *event);
-	void stateJump(Event *event);
 	void stateDodge(Event *event);
 	void stateGameOver(Event *event);
 	void stateLoadEffect(Event *event);

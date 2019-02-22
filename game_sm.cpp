@@ -23,7 +23,6 @@
 #include "operators.h"
 
 #include "dodge.h"
-#include "jump.h"
 #include "snake.h"
 #include "tetris.h"
 
@@ -115,13 +114,13 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 void GameSM::stateDefault(Event *event)
 {
 
-	const char *texts[2][6] = {{"Tetris", "Snake", "Jump", "Dodge", "highscore", "setting"},
-										{"Tetris", "Snake", "Jump", "Dodge", "Highscore", "Einstellungen"}};
+	const char *texts[2][5] = {{"Tetris", "Snake", "Dodge", "highscore", "setting"},
+										{"Tetris", "Snake", "Dodge", "Highscore", "Einstellungen"}};
 
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(6);
+		item.init(5);
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
@@ -145,15 +144,12 @@ void GameSM::stateDefault(Event *event)
 				TRANSITION(stateSnake, event);
 				break;
 			case 2:
-				TRANSITION(stateJump, event);
-				break;
-			case 3:
 				TRANSITION(stateDodge, event);
 				break;
-			case 4:
+			case 3:
 				TRANSITION(stateHighscoreMenu, event);
 				break;
-			case 5:
+			case 4:
 				TRANSITION(stateSettingsMenu, event);
 				break;
 			default:
@@ -177,15 +173,12 @@ void GameSM::stateDefault(Event *event)
 		display_->setIcon(0x3c20203c04045c00);
 		break;
 	case 2:
-		display_->setIcon(0x60600a040e040000);
-		break;
-	case 3:
 		display_->setIcon(0x381003c00e30310);
 		break;
-	case 4:
+	case 3:
 		display_->setIcon(0x00081c2018043810);
 		break;
-	case 5:
+	case 4:
 		display_->setIcon(0x00003c3c3c3c0000);
 		break;
 	default:
@@ -227,29 +220,6 @@ void GameSM::stateSnake(Event *event)
 			game_ = nullptr;
 		}
 		game_ = new Snake(display_);
-		game_->setSpeed(speed_);
-		game_->start(event);
-		return;
-	}
-
-	if (game_->process(event))
-	{
-		TRANSITION(stateGameOver, event);
-		return;
-	}
-}
-
-void GameSM::stateJump(Event *event)
-{
-	if (event->onEntry())
-	{
-		display_->loadsGameCofig();
-		if (game_ != nullptr)
-		{
-			delete game_;
-			game_ = nullptr;
-		}
-		game_ = new Jump(display_);
 		game_->setSpeed(speed_);
 		game_->start(event);
 		return;
@@ -582,7 +552,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(5, 0);
+		item.init(4, 0);
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
 	}
@@ -595,7 +565,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 		byte advanced = item.advance(event);
 		if (advanced)
 		{
-			if (item.value_ == 4)
+			if (item.value_ == 3)
 			{
 				if (advanced == MenuItem::DOWN_BTN)
 				{
@@ -629,14 +599,10 @@ void GameSM::stateHighscoreMenu(Event *event)
 		display_->text1_.setNumber(Snake::highscore());
 		break;
 	case 2:
-		display_->setIcon(0x60600a040e040000);
-		display_->text1_.setNumber(Jump::highscore());
-		break;
-	case 3:
 		display_->setIcon(0x381003c00e30310);
 		display_->text1_.setNumber(Dodge::highscore());
 		break;
-	case 4:
+	case 3:
 		display_->setIcon(0xbd42a59999a542bd);
 		display_->text1_.setText(language_ == EN ? "reset"
 															  : "Zur"
@@ -666,7 +632,6 @@ void GameSM::stateResetMenu(Event *event)
 		{
 			Tetris::resetHighscore();
 			Snake::resetHighscore();
-			Jump::resetHighscore();
 			Dodge::resetHighscore();
 			LOAD_EFFECT_STANDART(stateDefault, event);
 			return;
