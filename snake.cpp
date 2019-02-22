@@ -24,7 +24,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
-Snake::Snake(Display *display) : Game(display,SNAKE), body_(display->rows()*display->cols())
+Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols())
 {
 	direction_ = START;
 	new_direction_ = START;
@@ -75,7 +75,6 @@ void Snake::setSpeed(byte v)
 }
 
 unsigned int Snake::highscore() { return highscore_; }
-
 void Snake::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Snake::onButtonChange(Event *event)
@@ -155,8 +154,7 @@ bool Snake::eat(Pos pos)
 	if (pos == eat_pos_)
 	{
 		// ensure that we dont enter a remaining loop if the game is won
-		if (body_.size() >= display_->rows() * display_->cols())
-			return true;
+		if (body_.size() >= display_->rows() * display_->cols()) return true;
 		unsigned long time = millis();
 		Pos tmp;
 		do
@@ -202,14 +200,14 @@ bool Snake::tick()
 	}
 	// check if highscore is broken. Directly save to avoid a not save in case of
 	// reset or poweroff.
-	if (score() > highscore_) // + 1 because we didnt add the next vect because of the isValid() function
+	if (score() + 1 > highscore_) // + 1 because we didnt add the next vect because of the isValid() function
 	{
-		highscore_ = score();
+		highscore_ = score() + 1;
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
 	if (!isValid(vect))
-	{ // game end
+	{                              // game end
 		body_ << vect.toSmartPos(); // append the the buffer to ensure correct score(computed out of the size of the list)
 		return true;
 	}
