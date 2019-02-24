@@ -55,16 +55,16 @@ int main(void)
 			event.processDebounce();
 		}
 		if (check_buttons) event.checkButtons();
-		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
-		{
-			counter = 0;
+//		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
+//		{
+//			counter = 0;
 			dp.update();
 			if (event.process())
 			{
 				sm.process(&event);
 				event.clear();
 			}
-		}
+//		}
 		check_buttons = false;
 	}
 	return 0;
