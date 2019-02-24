@@ -85,6 +85,11 @@ void Tetris::onContinue(Event *event)
 {
 	render();
 	event->timer(0).start();
+	if (event->buttonDown().state())
+		event->timer(0).setInterval(general_down_interval_);
+	else
+		event->timer(0).setInterval(general_step_interval_);
+
 	Game::onContinue(event);
 	// for the second timer, the restart is not required, because its used for button long pressed
 }
