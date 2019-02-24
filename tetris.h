@@ -71,6 +71,12 @@ private:
 	int general_first_move_interval_;
 	int general_move_interval_;
 
+	enum MoveDirection{
+		NO_MOVE = 0,
+		RIGHT_MOVE = 1,
+		LEFT_MOVE = 2,
+	} move_dir_;
+
 	byte *field_; // field without current tetromino
 	Tetromino *tetromino_;
 	unsigned int points_ = 0;

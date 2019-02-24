@@ -23,7 +23,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display) : Game(display,TETRIS)
+Tetris::Tetris(Display *display) : Game(display, TETRIS), move_dir_(NO_MOVE)
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte *>(malloc(display_->rows()));
@@ -71,7 +71,7 @@ void Tetris::render()
 			display_->setPixel(p.pos_x, p.pos_y, true);
 		}
 	}
-	display_->show(false);
+	display_->show(true);
 }
 
 void Tetris::onStop(Event *event)
@@ -100,8 +100,7 @@ bool Tetris::rotate()
 	 * 4. if not: try to change to a valid position
 	 */
 
-	if (tetromino_ == nullptr)
-		return false;
+	if (tetromino_ == nullptr) return false;
 
 	// 1.	get current values
 	Pos tmp_pos = tetromino_->pos();
@@ -158,8 +157,7 @@ bool Tetris::rotate()
 bool Tetris::right()
 
 {
-	if (!tetromino_)
-		return false;
+	if (!tetromino_) return false;
 	Pos pos = tetromino_->pos();
 	pos.pos_x++;
 	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
@@ -173,8 +171,7 @@ bool Tetris::right()
 
 bool Tetris::left()
 {
-	if (tetromino_ == nullptr)
-		return false;
+	if (tetromino_ == nullptr) return false;
 	Pos pos = tetromino_->pos();
 	pos.pos_x--;
 	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
@@ -188,8 +185,7 @@ bool Tetris::left()
 
 bool Tetris::tick()
 {
-	if (tetromino_ == nullptr)
-		return false;
+	if (tetromino_ == nullptr) return false;
 	Pos pos = tetromino_->pos();
 	pos.pos_y--;
 
@@ -197,8 +193,7 @@ bool Tetris::tick()
 	{
 		takeOverTetromino();
 		clearFullRows();
-		if (newTetromino())
-			return true;
+		if (newTetromino()) return true;
 		return false;
 	}
 	tetromino_->setPos(pos);
@@ -233,13 +228,13 @@ void Tetris::setSpeed(const byte v)
 	case 3:
 		general_step_interval_ = 800;
 		general_down_interval_ = 80;
-		general_first_move_interval_ = 280;
+		general_first_move_interval_ = 350;
 		general_move_interval_ = 120;
 		break;
 	case 4:
 		general_step_interval_ = 500;
 		general_down_interval_ = 50;
-		general_first_move_interval_ = 240;
+		general_first_move_interval_ = 300;
 		general_move_interval_ = 100;
 		break;
 	case 2:
@@ -295,10 +290,7 @@ void Tetris::takeOverTetromino()
 	render();
 }
 
-void Tetris::resetHighscore()
-{
-	eeprom_write_word(&EE_highscore, highscore_ = 0);
-}
+void Tetris::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Tetris::onButtonChange(Event *event)
 {
@@ -323,6 +315,7 @@ bool Tetris::onButtonChange(Event *event)
 	{
 		// unset fast down
 		event->timer(0).setInterval(general_step_interval_);
+		event->timer(0).restart();
 	}
 
 	// btn left
@@ -333,12 +326,14 @@ bool Tetris::onButtonChange(Event *event)
 			left();
 			move_timer.setInterval(general_first_move_interval_);
 			move_timer.start();
+			move_dir_ = LEFT_MOVE;
 		}
 	}
-	else if (event->buttonLeft().released())
+	else if (event->buttonLeft().released() && move_dir_ == LEFT_MOVE)
 	{
-		move_timer.stop();
+		move_dir_ = NO_MOVE;
 		move_timer.clearOverflow();
+		move_timer.stop();
 	}
 
 	// btn right
@@ -349,12 +344,14 @@ bool Tetris::onButtonChange(Event *event)
 			right();
 			move_timer.setInterval(general_first_move_interval_);
 			move_timer.start();
+			move_dir_ = RIGHT_MOVE;
 		}
 	}
-	else if (event->buttonLeft().released())
+	else if (event->buttonRight().released() && move_dir_ == RIGHT_MOVE)
 	{
-		move_timer.stop();
+		move_dir_ = NO_MOVE;
 		move_timer.clearOverflow();
+		move_timer.stop();
 	}
 	return false;
 }
@@ -364,16 +361,18 @@ bool Tetris::onTimerOverflow(Event *event)
 	Timer &move_timer = event->timer(1);
 	if (move_timer.overflow())
 	{
-		if (event->buttonLeft().state())
+		if (move_dir_ == LEFT_MOVE)
 		{
 			left();
 			move_timer.setInterval(general_move_interval_);
+			move_timer.restart();
 		}
 
-		else if (event->buttonRight().state())
+		else if (move_dir_ == RIGHT_MOVE)
 		{
 			right();
 			move_timer.setInterval(general_move_interval_);
+			move_timer.restart();
 		}
 	}
 
@@ -384,10 +383,6 @@ bool Tetris::onTimerOverflow(Event *event)
 		{
 			return true;
 		}
-		if (event->buttonDown().state())
-			down_timer.setInterval(general_down_interval_);
-		else
-			down_timer.setInterval(general_step_interval_);
 	}
 	return false;
 }
@@ -415,10 +410,7 @@ void Tetris::clearFullRows()
 	}
 }
 
-Shape Tetris::randomTetrominoShape()
-{
-	return Shape(millis() % 7);
-}
+Shape Tetris::randomTetrominoShape() { return Shape(millis() % 7); }
 
 Direction Tetris::randomTetrominoDirection(const Shape &shape)
 {
