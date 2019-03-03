@@ -69,32 +69,32 @@ void Dodge::setSpeed(byte v)
 	case 0: // very slow
 		period_ = 400;
 		fast_period_ = 200;
-		first_move_period_ = 300;
+		first_move_period_ = 350;
 		move_period_ = 200;
 		break;
 	case 1: // slow
 		period_ = 300;
 		fast_period_ = 150;
-		first_move_period_ = 250;
+		first_move_period_ = 320;
 		move_period_ = 150;
 		break;
 	case 3: // fast
 		period_ = 200;
 		fast_period_ = 100;
-		first_move_period_ = 200;
+		first_move_period_ = 250;
 		move_period_ = 100;
 		break;
 	case 4: // ver fast
 		period_ = 150;
 		fast_period_ = 75;
-		first_move_period_ = 150;
+		first_move_period_ = 200;
 		move_period_ = 75;
 		break;
 	case 2: // medium
 	default:
 		period_ = 250;
 		fast_period_ = 125;
-		first_move_period_ = 200;
+		first_move_period_ = 300;
 		move_period_ = 125;
 		break;
 	}
