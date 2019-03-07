@@ -87,32 +87,40 @@ bool Snake::onButtonChange(Event *event)
 		// a additinal ste,  what we avoid with dont allow this)
 		if (event->buttonUp().pressed())
 		{
-			if (direction_ != Snake::DOWN)
+			if (direction_ != Snake::DOWN && direction_ != Snake::UP)
 			{
 				new_direction_ = Snake::UP;
+				tick();
+				event->timer(0).restart();
 			}
 		}
 		else if (event->buttonRight().pressed())
 		{
-			if (direction_ != Snake::LEFT)
+			if (direction_ != Snake::LEFT  && direction_ != Snake::RIGHT)
 			{
 				new_direction_ = Snake::RIGHT;
+				tick();
+				event->timer(0).restart();
 			}
 		}
 
 		else if (event->buttonLeft().pressed())
 		{
-			if (direction_ != Snake::RIGHT && direction_ != Snake::START)
+			if (direction_ != Snake::RIGHT  && direction_ != Snake::LEFT && direction_ != Snake::START)
 			{
 				new_direction_ = Snake::LEFT;
+				tick();
+				event->timer(0).restart();
 			}
 		}
 
 		else if (event->buttonDown().pressed())
 		{
-			if (direction_ != Snake::UP)
+			if (direction_ != Snake::UP && direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::DOWN;
+				tick();
+				event->timer(0).restart();
 			}
 		}
 	}
