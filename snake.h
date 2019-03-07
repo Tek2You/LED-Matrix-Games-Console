@@ -83,4 +83,5 @@ private:
 	Pos eat_pos_;
 	// highscore of all runs
 	static unsigned int highscore_;
+	bool eat_state_;
 };

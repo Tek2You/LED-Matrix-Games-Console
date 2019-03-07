@@ -49,6 +49,8 @@ void Snake::start(Event *event)
 	event->removeAllTimers();
 	event->addTimer(period_);
 	event->timer(0).start();
+	event->addTimer(20);
+	event->timer(1).start();
 }
 
 void Snake::setSpeed(byte v)
@@ -119,6 +121,10 @@ bool Snake::onButtonChange(Event *event)
 
 bool Snake::onTimerOverflow(Event *event)
 {
+	if(event->timer(1).overflow()){
+		eat_state_ = !eat_state_;
+		render();
+	}
 	if (event->timer(0).overflow())
 	{
 		return tick();
@@ -141,7 +147,9 @@ void Snake::onContinue(Event *event)
 void Snake::render()
 {
 	display_->clear();
-	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
+	if(eat_state_) {
+		display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
+	}
 	for (SmartPos tmp : body_)
 	{
 		display_->setPixel(tmp.x(), tmp.y(), true);

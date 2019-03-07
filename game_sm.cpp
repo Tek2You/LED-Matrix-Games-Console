@@ -308,7 +308,7 @@ void GameSM::stateSettingsMenu(Event *event)
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		item.init(3);
+		item.init(3,0);
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
 	}
