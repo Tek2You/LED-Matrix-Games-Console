@@ -24,7 +24,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
-Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols())
+Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols()), eat_state_(true)
 {
 	direction_ = START;
 	new_direction_ = START;

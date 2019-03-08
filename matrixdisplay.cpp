@@ -252,10 +252,7 @@ void MatrixDisplay::setPixel(byte col, byte row, bool value)
 	bitWrite(getPendingBuffer()[row], col_order[col], value);
 }
 
-void MatrixDisplay::setPixel(const Pos &p, bool value)
-{
-	setPixel(p.pos_x, p.pos_y);
-}
+void MatrixDisplay::setPixel(const Pos &p, bool value) { setPixel(p.pos_x, p.pos_y); }
 
 byte MatrixDisplay::orderCols(byte value)
 {
@@ -278,31 +275,20 @@ void MatrixDisplay::show(bool take_over)
 	pending_ = !pending_;
 	if (take_over)
 	{
-		for(int i = 0; i < rows(); i++){
+		for (int i = 0; i < rows(); i++)
+		{
 			getPendingBuffer()[i] = getBuffer()[i];
 		}
 	}
 }
 
-void MatrixDisplay::setBrightness(const byte brightness)
-{
-	brigthness_ = (255 - brightness) + 9;
-}
+void MatrixDisplay::setBrightness(const byte brightness) { brigthness_ = (255 - brightness) + 9; }
 
-byte MatrixDisplay::mapCol(byte row)
-{
-	return ((row / 8) * 8) + col_order[row % 8];
-}
+byte MatrixDisplay::mapCol(byte row) { return ((row / 8) * 8) + col_order[row % 8]; }
 
-byte *MatrixDisplay::getBuffer()
-{
-	return (pending_ ? rows1_ : rows2_);
-}
+byte *MatrixDisplay::getBuffer() { return (pending_ ? rows1_ : rows2_); }
 
-byte *MatrixDisplay::getPendingBuffer()
-{
-	return (pending_ ? rows2_ : rows1_);
-}
+byte *MatrixDisplay::getPendingBuffer() { return (pending_ ? rows2_ : rows1_); }
 
 void MatrixDisplay::setColumn(byte column, byte value, byte offset)
 {
@@ -383,10 +369,7 @@ int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char sp
 	return column;
 }
 
-int MatrixDisplay::width(char ch)
-{
-	return letterWidth(ch);
-}
+int MatrixDisplay::width(char ch) { return letterWidth(ch); }
 
 // determine the width of the given string
 int MatrixDisplay::width(const char *s, char spacing)
