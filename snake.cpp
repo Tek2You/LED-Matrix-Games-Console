@@ -24,7 +24,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
-Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols()), eat_state_(true)
+Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols())
 {
 	direction_ = START;
 	new_direction_ = START;
@@ -49,8 +49,6 @@ void Snake::start(Event *event)
 	event->removeAllTimers();
 	event->addTimer(period_);
 	event->timer(0).start();
-	event->addTimer(20);
-	event->timer(1).start();
 }
 
 void Snake::setSpeed(byte v)
@@ -90,7 +88,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::DOWN && direction_ != Snake::UP)
 			{
 				new_direction_ = Snake::UP;
-				tick();
+				return tick();
 				event->timer(0).restart();
 			}
 		}
@@ -99,7 +97,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::LEFT  && direction_ != Snake::RIGHT)
 			{
 				new_direction_ = Snake::RIGHT;
-				tick();
+				return tick();
 				event->timer(0).restart();
 			}
 		}
@@ -109,7 +107,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::RIGHT  && direction_ != Snake::LEFT && direction_ != Snake::START)
 			{
 				new_direction_ = Snake::LEFT;
-				tick();
+				return tick();
 				event->timer(0).restart();
 			}
 		}
@@ -119,7 +117,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::UP && direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::DOWN;
-				tick();
+				return tick();
 				event->timer(0).restart();
 			}
 		}
@@ -129,10 +127,6 @@ bool Snake::onButtonChange(Event *event)
 
 bool Snake::onTimerOverflow(Event *event)
 {
-	if(event->timer(1).overflow()){
-		eat_state_ = !eat_state_;
-		render();
-	}
 	if (event->timer(0).overflow())
 	{
 		return tick();
@@ -155,9 +149,7 @@ void Snake::onContinue(Event *event)
 void Snake::render()
 {
 	display_->clear();
-	if(eat_state_) {
-		display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
-	}
+	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
 	for (SmartPos tmp : body_)
 	{
 		display_->setPixel(tmp.x(), tmp.y(), true);
