@@ -357,7 +357,7 @@ bool Tetris::onButtonChange(Event *event)
 		{
 			right();
 			move_timer.setInterval(general_first_move_interval_);
-			move_timer.start();
+			move_timer.restart();
 			move_dir_ = RIGHT_MOVE;
 		}
 	}
@@ -368,7 +368,7 @@ bool Tetris::onButtonChange(Event *event)
 		{
 			move_dir_ = LEFT_MOVE;
 			move_timer.setInterval(general_first_move_interval_);
-			move_timer.start();
+			move_timer.restart();
 		}
 		else
 		{
