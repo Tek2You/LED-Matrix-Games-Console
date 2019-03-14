@@ -336,9 +336,18 @@ bool Tetris::onButtonChange(Event *event)
 	}
 	else if (event->buttonLeft().released() && move_dir_ == LEFT_MOVE)
 	{
-		move_dir_ = NO_MOVE;
 		move_timer.clearOverflow();
-		move_timer.stop();
+		if (event->buttonRight().state())
+		{
+			move_dir_ = RIGHT_MOVE;
+			move_timer.setInterval(general_first_move_interval_);
+			move_timer.start();
+		}
+		else
+		{
+			move_timer.stop();
+			move_dir_ = NO_MOVE;
+		}
 	}
 
 	// btn right
@@ -354,9 +363,18 @@ bool Tetris::onButtonChange(Event *event)
 	}
 	else if (event->buttonRight().released() && move_dir_ == RIGHT_MOVE)
 	{
-		move_dir_ = NO_MOVE;
 		move_timer.clearOverflow();
-		move_timer.stop();
+		if (event->buttonRight().state())
+		{
+			move_dir_ = LEFT_MOVE;
+			move_timer.setInterval(general_first_move_interval_);
+			move_timer.start();
+		}
+		else
+		{
+			move_timer.stop();
+			move_dir_ = NO_MOVE;
+		};
 	}
 	return false;
 }
