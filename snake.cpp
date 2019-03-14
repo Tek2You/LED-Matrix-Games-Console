@@ -88,8 +88,8 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::DOWN && direction_ != Snake::UP)
 			{
 				new_direction_ = Snake::UP;
-				return tick();
 				event->timer(0).restart();
+				return tick();
 			}
 		}
 		else if (event->buttonRight().pressed())
@@ -97,8 +97,8 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::LEFT  && direction_ != Snake::RIGHT)
 			{
 				new_direction_ = Snake::RIGHT;
-				return tick();
 				event->timer(0).restart();
+				return tick();
 			}
 		}
 
@@ -107,8 +107,8 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::RIGHT  && direction_ != Snake::LEFT && direction_ != Snake::START)
 			{
 				new_direction_ = Snake::LEFT;
-				return tick();
 				event->timer(0).restart();
+				return tick();
 			}
 		}
 
@@ -117,8 +117,8 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::UP && direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::DOWN;
-				return tick();
 				event->timer(0).restart();
+				return tick();
 			}
 		}
 	}
