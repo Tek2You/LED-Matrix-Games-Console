@@ -76,7 +76,8 @@ void Text::computeShiftMode()
 
 	if (shift_mode_ == SHIFT)
 	{ // when shifting, start in column 7
-		current_shift_start_col_ = shift_start_col_;
+		current_shift_start_col_ = shift_start_col_ + 1;
+		shift();
 		Timer::start();
 	}
 	else

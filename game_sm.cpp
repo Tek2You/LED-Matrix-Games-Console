@@ -167,24 +167,25 @@ void GameSM::stateDefault(Event *event)
 	switch (item.value_)
 	{
 	case 0:
-		display_->setIcon(0xfffff7e300081c00,false);
+		display_->setIcon(0xfffff7e300081c00, 0, false);
 		break;
 	case 1:
-		display_->setIcon(0x3c20203c04045c00,false);
+		display_->setIcon(0x3c20203c04045c00, 0, false);
 		break;
 	case 2:
-		display_->setIcon(0x381003c00e30310,false);
+		display_->setIcon(0x381003c00e30310, 0, false);
 		break;
 	case 3:
-		display_->setIcon(0x00081c2018043810,false);
+		display_->setIcon(0x00081c2018043810, 0, false);
 		break;
 	case 4:
-		display_->setIcon(0x00003c3c3c3c0000,false);
+		display_->setIcon(0x00003c3c3c3c0000, 0, false);
 		break;
 	default:
 		break;
 	}
 	display_->text1_.setText(texts[language_][item.value_]);
+	display_->show();
 }
 
 void GameSM::stateTetris(Event *event)
@@ -308,7 +309,7 @@ void GameSM::stateSettingsMenu(Event *event)
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		item.init(3,0);
+		item.init(3, 0);
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
 	}
@@ -351,18 +352,18 @@ void GameSM::stateSettingsMenu(Event *event)
 	switch (item.value_)
 	{
 	case 0:
-		display_->setIcon(0x0000122448241200,false);
+		display_->setIcon(0x0000122448241200, 0, false);
 		break;
 	case 1:
-		display_->setIcon(0x2060ff818181ff00,false);
+		display_->setIcon(0x2060ff818181ff00, 0, false);
 		break;
 	case 2:
-		display_->setIcon(0x0007133558900000,false);
+		display_->setIcon(0x0007133558900000, 0, false);
 		break;
 	default:
 		break;
 	}
-	display_->text1_.setText(menu_text[language_][item.value_]);
+	display_->text1_.setText(menu_text[language_][item.value_]); // contains the showing on display
 }
 
 void GameSM::stateSpeedMenu(Event *event)
@@ -591,19 +592,19 @@ void GameSM::stateHighscoreMenu(Event *event)
 	switch (item.value_)
 	{
 	case 0:
-		display_->setIcon(0xfffff7e300081c00,false);
+		display_->setIcon(0xfffff7e300081c00, 0, false);
 		display_->text1_.setNumber(Tetris::highscore());
 		break;
 	case 1:
-		display_->setIcon(0x3c20203c04045c00,false);
+		display_->setIcon(0x3c20203c04045c00, 0, false);
 		display_->text1_.setNumber(Snake::highscore());
 		break;
 	case 2:
-		display_->setIcon(0x381003c00e30310,false);
+		display_->setIcon(0x381003c00e30310, 0, false);
 		display_->text1_.setNumber(Dodge::highscore());
 		break;
 	case 3:
-		display_->setIcon(0xbd42a59999a542bd,false);
+		display_->setIcon(0xbd42a59999a542bd, 0, false);
 		display_->text1_.setText(language_ == EN ? "reset"
 															  : "Zur"
 																 "\x1c"
