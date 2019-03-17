@@ -507,14 +507,14 @@ void GameSM::stateLanguageMenu(Event *event)
 
 void GameSM::stateLoadEffect(Event *event)
 {
-	static byte count = 0;
+	static int count = 0;
 	if (event->onEntry())
 	{
 		count = 0;
 		display_->text1_.clear();
 		display_->text2_.clear();
 		event->removeAllTimers();
-		event->addTimer(50);
+		event->addTimer(12);
 		event->setFlag(Event::ProcessTimerOverflows);
 		event->setFlag(Event::ProcessStop);
 	}
@@ -524,7 +524,7 @@ void GameSM::stateLoadEffect(Event *event)
 	}
 	if (event->timer(0).overflow())
 	{
-		if (count >= display_->rows())
+		if (count >= display_->rows() * display_->cols() / 2)
 		{
 			if (load_following_state_)
 			{
@@ -541,7 +541,9 @@ void GameSM::stateLoadEffect(Event *event)
 			}
 			return;
 		}
-		display_->setRow(count, 0xFF);
+		display_->setPixel(display_->cols() - 1 - (count % display_->cols()), count / display_->cols(), true);
+		display_->setPixel(count % display_->cols(), display_->rows() - 1 - (count / display_->cols()),
+								 true);
 		display_->show();
 		count++;
 		return;
