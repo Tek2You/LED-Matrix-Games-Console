@@ -56,9 +56,11 @@ private:
 	bool rotate();
 	bool right();
 	bool left();
-	bool tick();
+	bool tick(Event *event);
 
-	void clearFullRows();
+	void clearFullRows(Event *event);
+	bool rowsFull() const;
+
 	bool newTetromino();
 	void takeOverTetromino();
 	// random tetromino data functions
@@ -81,4 +83,9 @@ private:
 	Tetromino *tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
+
+	byte blink_start_row_;
+	byte blink_end_row_;
+	byte blink_cycle_;
+	void clearFullRowsImmediately();
 };

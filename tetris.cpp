@@ -52,7 +52,9 @@ void Tetris::start(Event *event)
 
 	event->removeAllTimers();
 	event->addTimer(general_step_interval_);
-	event->addTimer();
+	event->addTimer();   // move timer
+	event->addTimer(); // blink timer
+	event->timer(2).setInterval(50);
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 	event->setFlag(Event::ProcessStop);
@@ -78,11 +80,14 @@ void Tetris::onStop(Event *event)
 {
 	event->timer(0).stop();
 	event->timer(1).stop();
+	event->timer(2).stop();
+	blink_cycle_ = 0;
 	Game::onStop(event);
 }
 
 void Tetris::onContinue(Event *event)
 {
+	clearFullRowsImmediately(); // clears all rows, if interrupted during clear effect
 	render();
 	event->timer(0).start();
 	if (event->buttonDown().state())
@@ -188,7 +193,7 @@ bool Tetris::left()
 	return true;
 }
 
-bool Tetris::tick()
+bool Tetris::tick(Event *event)
 {
 	if (tetromino_ == nullptr) return false;
 	Pos pos = tetromino_->pos();
@@ -197,7 +202,7 @@ bool Tetris::tick()
 	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
 	{
 		takeOverTetromino();
-		clearFullRows();
+		clearFullRows(event);
 		if (newTetromino()) return true;
 		return false;
 	}
@@ -299,6 +304,10 @@ void Tetris::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0)
 
 bool Tetris::onButtonChange(Event *event)
 {
+	if (blink_cycle_ != 0)
+	{
+		return false;
+	}
 	Timer &move_timer = event->timer(1);
 	// Rotation
 	if (event->buttonUp().pressed())
@@ -309,7 +318,7 @@ bool Tetris::onButtonChange(Event *event)
 	// Down(faster)
 	if (event->buttonDown().pressed())
 	{
-		if (tick()) // check if
+		if (tick(event)) // check if
 		{
 			return true;
 		}
@@ -381,6 +390,14 @@ bool Tetris::onButtonChange(Event *event)
 
 bool Tetris::onTimerOverflow(Event *event)
 {
+	if (blink_cycle_ != 0)
+	{
+		if (event->timer(2).overflow())
+		{
+			clearFullRows(event);
+		}
+		return false;
+	}
 	Timer &move_timer = event->timer(1);
 	if (move_timer.overflow())
 	{
@@ -402,7 +419,7 @@ bool Tetris::onTimerOverflow(Event *event)
 	Timer &down_timer = event->timer(0);
 	if (down_timer.overflow())
 	{
-		if (tick()) // end of the game
+		if (tick(event)) // end of the game
 		{
 			return true;
 		}
@@ -410,7 +427,93 @@ bool Tetris::onTimerOverflow(Event *event)
 	return false;
 }
 
-void Tetris::clearFullRows()
+void Tetris::clearFullRows(Event *event)
+{
+	if (blink_cycle_ == 0)
+	{
+		if (rowsFull())
+		{
+			event->timer(0).stop();
+			event->timer(1).stop();
+			blink_cycle_ = 1;
+		}
+		else{
+			return;
+		}
+	}
+	else if (blink_cycle_ == 4)
+	{
+//		display_->clear();
+//		display_->show();
+		for (int i = blink_start_row_; i < blink_end_row_; i++)
+		{
+			while (field_[i] == 0xFF)
+			{ // row is full
+				field_[i] = 0;
+				points_++;
+				for (int j = i; j < display_->rows() - 1; j++)
+				{
+					field_[j] = field_[j + 1];
+				}
+			}
+		}
+		render();
+		if (points_ > highscore_)
+		{
+			highscore_ = points_;
+			eeprom_write_word(&EE_highscore, highscore_);
+			is_new_highscore_ = true;
+		}
+
+		if (rowsFull())
+		{
+			blink_cycle_ = 1;
+		}
+		else
+		{
+			blink_cycle_ = 0;
+			event->timer(2).stop();
+			event->timer(0).start();
+			return;
+		}
+	}
+	if (blink_cycle_ == 1)
+	{
+		for (byte i = 0; i < display_->rows(); i++)
+		{
+			if (field_[i] == 0xFF)
+			{
+				blink_start_row_ == i;
+				break;
+			}
+		}
+		for (byte i = blink_start_row_ + 1; i < display_->rows(); i++)
+		{
+			if (field_[i] != 0xFF)
+			{
+				blink_end_row_ = i - 1;
+				break;
+			}
+		}
+		blink_cycle_ = 2;
+		event->timer(2).start();
+	}
+	else if (blink_cycle_ == 2 /*|| blink_cycle_ == 4*/)
+	{
+		render();
+		display_->clearRows(blink_start_row_, blink_end_row_);
+		display_->show();
+		blink_cycle_ = 3;
+	}
+	else if (blink_cycle_ == 3 /*|| blink_cycle_ == 5*/)
+	{
+		blink_cycle_ = 4;
+		render();
+	}
+//	blink_cycle_++;
+}
+
+void Tetris::clearFullRowsImmediately()
 {
 	for (int i = 0; i < display_->rows(); i++)
 	{
@@ -431,6 +534,15 @@ void Tetris::clearFullRows()
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
+}
+
+bool Tetris::rowsFull() const
+{
+	for (byte *i = field_; i < field_ + 16; i++)
+	{
+		if (*i == 0xFF) return true;
+	}
+	return false;
 }
 
 Shape Tetris::randomTetrominoShape() { return Shape(millis() % 7); }
