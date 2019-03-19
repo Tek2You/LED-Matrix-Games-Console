@@ -427,6 +427,8 @@ bool Tetris::onTimerOverflow(Event *event)
 	return false;
 }
 
+#include "avr/wdt.h"
+
 void Tetris::clearFullRows(Event *event)
 {
 	if (blink_cycle_ == 0)
@@ -444,26 +446,10 @@ void Tetris::clearFullRows(Event *event)
 	}
 	else if (blink_cycle_ == 6)
 	{
-		display_->clear();
-		display_->text1_.setOffset(0);
-		display_->text1_.setNumber(blink_start_row_);
-		display_->text2_.setOffset(8);
-		display_->text2_.setNumber(blink_end_row_);
-		display_->show();
-		while(true);
 
 		for (int i = blink_start_row_; i < display_->rows(); i++)
 		{
 			field_[i] = field_[i + blink_end_row_ - blink_start_row_];
-			//			while (field_[i] == 0xFF)
-			//			{ // row is full
-			//				field_[i] = 0;
-			//				points_++;
-			//				for (int j = i; j < display_->rows() - 1; j++)
-			//				{
-			//					field_[j] = field_[j + 1];
-			//				}
-			//			}
 		}
 		for (int i = display_->rows() + blink_start_row_ - blink_end_row_ - 1; i < display_->rows(); i++)
 		{
@@ -497,11 +483,11 @@ void Tetris::clearFullRows(Event *event)
 		{
 			if (field_[i] == 0xFF)
 			{
-				blink_start_row_ == i;
+				blink_start_row_ = i;
 				break;
 			}
 		}
-		for (byte i = blink_start_row_ + 1; i < display_->rows(); i++)
+		for (byte i = blink_start_row_; i < display_->rows(); i++)
 		{
 			if (field_[i] != 0xFF)
 			{
@@ -515,7 +501,7 @@ void Tetris::clearFullRows(Event *event)
 	else if (blink_cycle_ == 2 || blink_cycle_ == 4)
 	{
 		render();
-		display_->clearRows(blink_start_row_, blink_end_row_);
+		display_->clearRows(blink_start_row_,blink_end_row_ + 1);
 		display_->show();
 		blink_cycle_++;
 	}
