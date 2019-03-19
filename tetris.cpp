@@ -23,7 +23,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display) : Game(display, TETRIS), move_dir_(NO_MOVE)
+Tetris::Tetris(Display *display) : Game(display, TETRIS), move_dir_(NO_MOVE), blink_cycle_(0)
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte *>(malloc(display_->rows()));
@@ -52,9 +52,9 @@ void Tetris::start(Event *event)
 
 	event->removeAllTimers();
 	event->addTimer(general_step_interval_);
-	event->addTimer();   // move timer
+	event->addTimer(); // move timer
 	event->addTimer(); // blink timer
-	event->timer(2).setInterval(50);
+	event->timer(2).setInterval(100);
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 	event->setFlag(Event::ProcessStop);
@@ -437,26 +437,40 @@ void Tetris::clearFullRows(Event *event)
 			event->timer(1).stop();
 			blink_cycle_ = 1;
 		}
-		else{
+		else
+		{
 			return;
 		}
 	}
-	else if (blink_cycle_ == 4)
+	else if (blink_cycle_ == 6)
 	{
-//		display_->clear();
-//		display_->show();
-		for (int i = blink_start_row_; i < blink_end_row_; i++)
+		display_->clear();
+		display_->text1_.setOffset(0);
+		display_->text1_.setNumber(blink_start_row_);
+		display_->text2_.setOffset(8);
+		display_->text2_.setNumber(blink_end_row_);
+		display_->show();
+		while(true);
+
+		for (int i = blink_start_row_; i < display_->rows(); i++)
 		{
-			while (field_[i] == 0xFF)
-			{ // row is full
-				field_[i] = 0;
-				points_++;
-				for (int j = i; j < display_->rows() - 1; j++)
-				{
-					field_[j] = field_[j + 1];
-				}
-			}
+			field_[i] = field_[i + blink_end_row_ - blink_start_row_];
+			//			while (field_[i] == 0xFF)
+			//			{ // row is full
+			//				field_[i] = 0;
+			//				points_++;
+			//				for (int j = i; j < display_->rows() - 1; j++)
+			//				{
+			//					field_[j] = field_[j + 1];
+			//				}
+			//			}
 		}
+		for (int i = display_->rows() + blink_start_row_ - blink_end_row_ - 1; i < display_->rows(); i++)
+		{
+			field_[i] = 0;
+		}
+		this->clearFullRowsImmediately();
+
 		render();
 		if (points_ > highscore_)
 		{
@@ -473,7 +487,7 @@ void Tetris::clearFullRows(Event *event)
 		{
 			blink_cycle_ = 0;
 			event->timer(2).stop();
-			event->timer(0).start();
+			onContinue(event);
 			return;
 		}
 	}
@@ -498,19 +512,19 @@ void Tetris::clearFullRows(Event *event)
 		blink_cycle_ = 2;
 		event->timer(2).start();
 	}
-	else if (blink_cycle_ == 2 /*|| blink_cycle_ == 4*/)
+	else if (blink_cycle_ == 2 || blink_cycle_ == 4)
 	{
 		render();
 		display_->clearRows(blink_start_row_, blink_end_row_);
 		display_->show();
-		blink_cycle_ = 3;
+		blink_cycle_++;
 	}
-	else if (blink_cycle_ == 3 /*|| blink_cycle_ == 5*/)
+	else if (blink_cycle_ == 3 || blink_cycle_ == 5)
 	{
-		blink_cycle_ = 4;
+		blink_cycle_;
 		render();
+		blink_cycle_++;
 	}
-//	blink_cycle_++;
 }
 
 void Tetris::clearFullRowsImmediately()
