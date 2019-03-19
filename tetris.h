@@ -58,7 +58,7 @@ private:
 	bool left();
 	bool tick(Event *event);
 
-	void clearFullRows(Event *event);
+	bool clearFullRows(Event *event);
 	bool rowsFull() const;
 
 	bool newTetromino();
