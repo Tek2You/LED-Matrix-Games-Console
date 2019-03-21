@@ -29,7 +29,6 @@ public:
 	enum GameType{
 		TETRIS,
 		SNAKE,
-		JUMP,
 		DODGE
 	};
 

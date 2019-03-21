@@ -118,9 +118,13 @@ void GameSM::stateDefault(Event *event)
 										{"Tetris", "Snake", "Dodge", "Highscore", "Einstellungen"}};
 
 	static MenuItem item;
+
+	static Game::GameType last_played_game = Game::TETRIS;
+
 	if (event->onEntry())
 	{
 		item.init(5);
+		item.value_ = last_played_game;
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
@@ -128,6 +132,7 @@ void GameSM::stateDefault(Event *event)
 	else if (event->buttonStop().pressed())
 	{
 		item.value_ = 0;
+		last_played_game = Game::TETRIS;
 		event->clear();
 		stateDefault(event);
 	}
@@ -138,12 +143,15 @@ void GameSM::stateDefault(Event *event)
 			switch (item.value_)
 			{
 			case 0:
+				last_played_game = Game::TETRIS;
 				TRANSITION(stateTetris, event);
 				break;
 			case 1:
+				last_played_game = Game::SNAKE;
 				TRANSITION(stateSnake, event);
 				break;
 			case 2:
+				last_played_game = Game::DODGE;
 				TRANSITION(stateDodge, event);
 				break;
 			case 3:
@@ -155,7 +163,6 @@ void GameSM::stateDefault(Event *event)
 			default:
 				break;
 			}
-			item.value_ = 0;
 			return;
 		}
 	}
