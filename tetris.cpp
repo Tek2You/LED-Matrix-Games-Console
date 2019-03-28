@@ -453,8 +453,7 @@ bool Tetris::clearFullRows(Event *event)
 		{
 			field_[i] = 0;
 		}
-		render();
-//		clearFullRowsImmediately();
+		display_->setArray(field_);
 		points_ += diff;
 		if (points_ > highscore_)
 		{
@@ -471,7 +470,13 @@ bool Tetris::clearFullRows(Event *event)
 		{
 			blink_cycle_ = 0;
 			event->timer(2).stop();
-			onContinue(event);
+			clearFullRowsImmediately();
+			display_->setArray(field_);
+			event->timer(0).start();
+			if (event->buttonDown().state())
+				event->timer(0).setInterval(general_down_interval_);
+			else
+				event->timer(0).setInterval(general_step_interval_);
 			if (newTetromino()) return true;
 			return false;
 		}
@@ -499,13 +504,14 @@ bool Tetris::clearFullRows(Event *event)
 	}
 	else if (blink_cycle_ == 2 || blink_cycle_ == 4 || blink_cycle_ == 6)
 	{
-		render();
+		display_->setArray(field_);
 		display_->clearRows(blink_start_row_, blink_end_row_);
 		display_->show();
 		blink_cycle_++;
 	}
 	else if (blink_cycle_ == 3 || blink_cycle_ == 5)
 	{
+		display_->setArray(field_);
 		blink_cycle_;
 		render();
 		blink_cycle_++;
