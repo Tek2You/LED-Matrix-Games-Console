@@ -1,5 +1,6 @@
 #include "spaceinvaders.h"
 
-SpaceInvaders::SpaceInvaders() : shot_cols_(malloc())
+SpaceInvaders::SpaceInvaders(Display * display) : Game(display, SPACE_INVADERS)
 {
+
 }
