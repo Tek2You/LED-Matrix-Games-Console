@@ -79,13 +79,25 @@ private:
 		LEFT_MOVE = 2,
 	} move_dir_;
 
+
 	byte *field_; // field without current tetromino
 	Tetromino *tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
 
+	enum BlinkCycle {
+		DEFAULT = 0,
+		INIT_BLINK = 1,
+		BLINK_OFF_1 = 2,
+		BLINK_ON_1 = 3,
+		BLINK_OFF_2 = 4,
+		BLINK_ON_2 = 5,
+		BLINK_OFF_3 = 6,
+		FINISHED_CURRENT = 7
+	};
+
+	byte blink_cycle_;
 	byte blink_start_row_;
 	byte blink_end_row_;
-	byte blink_cycle_;
 	void clearFullRowsImmediately();
 };

@@ -428,13 +428,13 @@ bool Tetris::onTimerOverflow(Event *event)
 
 bool Tetris::clearFullRows(Event *event)
 {
-	if (blink_cycle_ == 0)
+	if (blink_cycle_ == DEFAULT)
 	{
 		if (rowsFull())
 		{
 			event->timer(0).stop();
 			event->timer(1).stop();
-			blink_cycle_ = 1;
+			blink_cycle_ = INIT_BLINK;
 		}
 		else
 		{
@@ -442,7 +442,7 @@ bool Tetris::clearFullRows(Event *event)
 			return false;
 		}
 	}
-	else if (blink_cycle_ == 7)
+	else if (blink_cycle_ == FINISHED_CURRENT)
 	{
 		const byte diff = blink_end_row_ - blink_start_row_;
 		for (int i = blink_start_row_; i < display_->rows() - diff; i++)
@@ -464,11 +464,11 @@ bool Tetris::clearFullRows(Event *event)
 
 		if (rowsFull())
 		{
-			blink_cycle_ = 1;
+			blink_cycle_ = INIT_BLINK;
 		}
 		else
 		{
-			blink_cycle_ = 0;
+			blink_cycle_ = DEFAULT;
 			event->timer(2).stop();
 			clearFullRowsImmediately();
 			display_->setArray(field_);
@@ -481,7 +481,7 @@ bool Tetris::clearFullRows(Event *event)
 			return false;
 		}
 	}
-	if (blink_cycle_ == 1)
+	if (blink_cycle_ == INIT_BLINK)
 	{
 		for (byte i = 0; i < display_->rows(); i++)
 		{
@@ -499,20 +499,19 @@ bool Tetris::clearFullRows(Event *event)
 				break;
 			}
 		}
-		blink_cycle_ = 2;
+		blink_cycle_ = BLINK_OFF_1;
 		event->timer(2).start();
 	}
-	else if (blink_cycle_ == 2 || blink_cycle_ == 4 || blink_cycle_ == 6)
+	else if (blink_cycle_ == BLINK_OFF_1 || blink_cycle_ == BLINK_OFF_2 || blink_cycle_ == BLINK_OFF_3)
 	{
 		display_->setArray(field_);
 		display_->clearRows(blink_start_row_, blink_end_row_);
 		display_->show();
 		blink_cycle_++;
 	}
-	else if (blink_cycle_ == 3 || blink_cycle_ == 5)
+	else if (blink_cycle_ == BLINK_ON_1 || blink_cycle_ == BLINK_ON_2)
 	{
 		display_->setArray(field_);
-		blink_cycle_;
 		render();
 		blink_cycle_++;
 	}
