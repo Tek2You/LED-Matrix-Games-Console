@@ -23,7 +23,7 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display) : Game(display, TETRIS), move_dir_(NO_MOVE), blink_cycle_(0)
+Tetris::Tetris(Display *display) : Game(display, TETRIS), move_dir_(NO_MOVE), blink_cycle_(DEFAULT)
 {
 	// allocate memory to the section for gamestate without tetromino
 	field_ = static_cast<byte *>(malloc(display_->rows()));
@@ -81,7 +81,7 @@ void Tetris::onStop(Event *event)
 	event->timer(0).stop();
 	event->timer(1).stop();
 	event->timer(2).stop();
-	blink_cycle_ = 0;
+	blink_cycle_ = DEFAULT;
 	Game::onStop(event);
 }
 
@@ -192,7 +192,6 @@ bool Tetris::left()
 	render();
 	return true;
 }
-
 bool Tetris::tick(Event *event)
 {
 	if (tetromino_ == nullptr) return false;
@@ -201,7 +200,7 @@ bool Tetris::tick(Event *event)
 
 	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
 	{
-		takeOverTetromino();
+		if (blink_cycle_ == DEFAULT) takeOverTetromino();
 		return clearFullRows(event);
 	}
 	tetromino_->setPos(pos);
@@ -302,7 +301,7 @@ void Tetris::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0)
 
 bool Tetris::onButtonChange(Event *event)
 {
-	if (blink_cycle_ != 0)
+	if (blink_cycle_ != DEFAULT)
 	{
 		return false;
 	}
@@ -316,6 +315,7 @@ bool Tetris::onButtonChange(Event *event)
 	// Down(faster)
 	if (event->buttonDown().pressed())
 	{
+		debug = 1;
 		if (tick(event)) // check if
 		{
 			return true;
@@ -388,12 +388,11 @@ bool Tetris::onButtonChange(Event *event)
 
 bool Tetris::onTimerOverflow(Event *event)
 {
-	if (blink_cycle_ != 0)
+	if (blink_cycle_ != DEFAULT)
 	{
 		if (event->timer(2).overflow())
 		{
-			if(clearFullRows(event))
-				return true;
+			if (clearFullRows(event)) return true;
 		}
 		return false;
 	}
@@ -418,6 +417,7 @@ bool Tetris::onTimerOverflow(Event *event)
 	Timer &down_timer = event->timer(0);
 	if (down_timer.overflow())
 	{
+		debug = 0;
 		if (tick(event)) // end of the game
 		{
 			return true;
@@ -428,21 +428,7 @@ bool Tetris::onTimerOverflow(Event *event)
 
 bool Tetris::clearFullRows(Event *event)
 {
-	if (blink_cycle_ == DEFAULT)
-	{
-		if (rowsFull())
-		{
-			event->timer(0).stop();
-			event->timer(1).stop();
-			blink_cycle_ = INIT_BLINK;
-		}
-		else
-		{
-			if (newTetromino()) return true;
-			return false;
-		}
-	}
-	else if (blink_cycle_ == FINISHED_CURRENT)
+	if (blink_cycle_ == FINISHED_CURRENT)
 	{
 		const byte diff = blink_end_row_ - blink_start_row_;
 		for (int i = blink_start_row_; i < display_->rows() - diff; i++)
@@ -454,6 +440,7 @@ bool Tetris::clearFullRows(Event *event)
 			field_[i] = 0;
 		}
 		display_->setArray(field_);
+		display_->show();
 		points_ += diff;
 		if (points_ > highscore_)
 		{
@@ -470,13 +457,29 @@ bool Tetris::clearFullRows(Event *event)
 		{
 			blink_cycle_ = DEFAULT;
 			event->timer(2).stop();
-			clearFullRowsImmediately();
+			//			clearFullRowsImmediately();
 			display_->setArray(field_);
 			event->timer(0).start();
 			if (event->buttonDown().state())
 				event->timer(0).setInterval(general_down_interval_);
 			else
 				event->timer(0).setInterval(general_step_interval_);
+
+			if (newTetromino()) return true;
+			return false;
+		}
+	}
+	else if (blink_cycle_ == DEFAULT)
+	{
+		if (rowsFull())
+		{
+			event->timer(0).stop();
+			event->timer(1).stop();
+			blink_cycle_ = INIT_BLINK;
+		}
+		else
+		{
+			// place a new stone, because all is empty
 			if (newTetromino()) return true;
 			return false;
 		}
@@ -512,7 +515,7 @@ bool Tetris::clearFullRows(Event *event)
 	else if (blink_cycle_ == BLINK_ON_1 || blink_cycle_ == BLINK_ON_2)
 	{
 		display_->setArray(field_);
-		render();
+		display_->show();
 		blink_cycle_++;
 	}
 	return false;

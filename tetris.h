@@ -95,7 +95,7 @@ private:
 		BLINK_OFF_3 = 6,
 		FINISHED_CURRENT = 7
 	};
-
+	bool debug  =0;
 	byte blink_cycle_;
 	byte blink_start_row_;
 	byte blink_end_row_;
