@@ -12,7 +12,10 @@ public:
 	T &itemAt(const int index);
 	T &first();
 	T &last();
+
 	inline T &operator[](const int index) { return itemAt(index); }
+
+	T* toArray() const;
 
 	// expanding functions
 	void append(const T &item);
@@ -83,6 +86,12 @@ template <class T>
 T &StaticList<T>::first()
 {
 	return *first_;
+}
+
+template<class T>
+T *StaticList<T>::toArray() const
+{
+	return first_;
 }
 
 template <class T>

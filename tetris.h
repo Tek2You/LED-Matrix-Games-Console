@@ -21,6 +21,7 @@
 #include "display.h"
 #include "game.h"
 #include "tetromino.h"
+#include "staticlist.h"
 
 class Tetris : public Game
 {
@@ -80,7 +81,7 @@ private:
 	} move_dir_;
 
 
-	byte *field_; // field without current tetromino
+	StaticList<byte> field_; // field without current tetromino
 	Tetromino *tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
