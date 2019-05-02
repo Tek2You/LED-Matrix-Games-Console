@@ -23,14 +23,14 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
-Tetris::Tetris(Display *display) : Game(display, TETRIS), move_dir_(NO_MOVE), blink_cycle_(DEFAULT),field_(display->rows())
+Tetris::Tetris(Display *display)
+	 : Game(display, TETRIS), move_dir_(NO_MOVE), blink_cycle_(DEFAULT), field_(display->rows())
 {
-	// allocate memory to the section for gamestate without tetromino
-//	field_ = static_cast<byte *>(malloc(display_->rows()));
 	tetromino_ = nullptr;
 	setSpeed(2);
 
-	for(int i = 0; i < display->rows(); i++){
+	for (int i = 0; i < display->rows(); i++)
+	{
 		field_ << 0;
 	}
 
@@ -45,7 +45,6 @@ Tetris::~Tetris()
 	{
 		delete tetromino_;
 	}
-//	free(field_);
 
 	points_ = 0;
 }
@@ -214,9 +213,8 @@ bool Tetris::tick(Event *event)
 
 void Tetris::clear()
 {
-	for (byte *ptr =field_.toArray(); ptr < &field_.toArray()[display_->rows()]; ptr++)
-	{
-		*ptr = 0;
+	for(byte &row : field_){
+		row = 0;
 	}
 }
 
@@ -267,8 +265,8 @@ bool Tetris::newTetromino()
 		tetromino_ = nullptr;
 	}
 	const Shape shape = randomTetrominoShape();
-	tetromino_ =
-		 new Tetromino(shape, display_->rows(),field_.toArray(), randomTetrominoDirection(shape), Pos(4, display_->rows() - 1));
+	tetromino_ = new Tetromino(shape, display_->rows(), field_.toArray(), randomTetrominoDirection(shape),
+										Pos(4, display_->rows() - 1));
 	Pos points[4];
 	tetromino_->getPositions(points);
 	// place tetromino full in the field
@@ -435,13 +433,9 @@ bool Tetris::clearFullRows(Event *event)
 	if (blink_cycle_ == FINISHED_CURRENT)
 	{
 		const byte diff = blink_end_row_ - blink_start_row_;
-		for (int i = blink_start_row_; i < display_->rows() - diff; i++)
-		{
-			field_.toArray()[i] =field_.toArray()[i + diff];
-		}
-		for (int i = display_->rows() - diff; i < display_->rows(); i++)
-		{
-			field_.toArray()[i] = 0;
+		for(int i = 0; i < diff; i++){
+			field_.remove(blink_start_row_);
+			field_ << 0;
 		}
 		display_->setArray(field_.toArray());
 		display_->show();
@@ -492,7 +486,7 @@ bool Tetris::clearFullRows(Event *event)
 	{
 		for (byte i = 0; i < display_->rows(); i++)
 		{
-			if (field_.toArray()[i] == 0xFF)
+			if (field_[i] == 0xFF)
 			{
 				blink_start_row_ = i;
 				break;
@@ -500,7 +494,7 @@ bool Tetris::clearFullRows(Event *event)
 		}
 		for (byte i = blink_start_row_ + 1; i < display_->rows(); i++)
 		{
-			if (field_.toArray()[i] != 0xFF)
+			if (field_[i] != 0xFF)
 			{
 				blink_end_row_ = i;
 				break;
@@ -527,14 +521,21 @@ bool Tetris::clearFullRows(Event *event)
 
 void Tetris::clearFullRowsImmediately()
 {
-	for (byte i = 0; i < field_.size(); i++){
-		while(field_[i] == 0xFF){
+	for (byte i = 0; i < field_.size(); i++)
+	{
+		while (field_[i] == 0xFF)
+		{
 			field_.remove(i);
 			field_ << 0;
 			points_++;
 		}
 	}
 	render();
+	display_->show();
+	blink_cycle_ = DEFAULT;
+	takeOverTetromino();
+	newTetromino();
+
 	if (points_ > highscore_)
 	{
 		highscore_ = points_;
@@ -545,7 +546,7 @@ void Tetris::clearFullRowsImmediately()
 
 bool Tetris::rowsFull() const
 {
-	for(byte & i : field_)
+	for (byte &i : field_)
 	{
 		if (i == 0xFF) return true;
 	}

@@ -15,7 +15,7 @@ public:
 
 	inline T &operator[](const int index) { return itemAt(index); }
 
-	T* toArray() const;
+	inline T* toArray() const;
 
 	// expanding functions
 	void append(const T &item);
