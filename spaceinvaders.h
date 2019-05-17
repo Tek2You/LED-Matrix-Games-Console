@@ -22,12 +22,26 @@ protected:
 	void render() override;
 
 private:
-    byte pos_;
+	byte pos_;
 
-	struct Shot
+    int step_interval_;
+    int down_interval_;
+    int first_move_interval_;
+    int move_interval_;
+
+    enum MoveDirection{
+		NO_MOVE = 0,
+		RIGHT_MOVE = 1,
+		LEFT_MOVE = 2,
+	} move_dir_;
+
+    void left();
+    void right();
+
+    struct Shot
 	{
-        Shot();
-        Shot(Event * event);
+		Shot();
+		Shot(Event *event);
 		bool process(int colum_value);
 		byte start_row_;
 		byte end_row_;
