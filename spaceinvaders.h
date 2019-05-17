@@ -22,33 +22,18 @@ protected:
 	void render() override;
 
 private:
+    byte pos_;
+
 	struct Shot
 	{
-        Shot(){
-            t_ = nullptr;
-        }
-        Shot(Event * event){
-            event->addTimer();
-            t_ = &event->timers_.last();
-        }
-		bool process(int colum_value)
-		{
-			if (t_ == nullptr || !t_->overflow()) return false;
-			end_row_++;
-			if (end_row_ - start_row_ >= 4)
-			{
-				start_row_++;
-			}
-			if (bitRead(end_row_, end_row_))
-			{
-				return true;
-			}
-			return false;
-		}
+        Shot();
+        Shot(Event * event);
+		bool process(int colum_value);
 		byte start_row_;
 		byte end_row_;
 		byte col_;
 		Timer *t_;
 	};
+
 	List<Shot> shots_;
 };
