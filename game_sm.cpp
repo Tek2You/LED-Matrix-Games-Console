@@ -24,6 +24,7 @@
 
 #include "dodge.h"
 #include "snake.h"
+#include "spaceinvaders.h"
 #include "tetris.h"
 
 #undef TRANSITION
@@ -119,20 +120,18 @@ void GameSM::stateDefault(Event *event)
 
 	static MenuItem item;
 
-	static Game::GameType last_played_game = Game::TETRIS;
-
 	if (event->onEntry())
 	{
-		item.init(5);
-		item.value_ = last_played_game;
+		item.init(6);
+		item.value_ = last_played_game_ + 2;
 		display_->loadMenuConfig();
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
 	}
 	else if (event->buttonStop().pressed())
 	{
-		item.value_ = 0;
-		last_played_game = Game::TETRIS;
+		last_played_game_ = Game::TETRIS;
+		item.value_ = 2;
 		event->clear();
 		stateDefault(event);
 	}
@@ -142,25 +141,16 @@ void GameSM::stateDefault(Event *event)
 		{
 			switch (item.value_)
 			{
+			// last because we begin counting with 2
 			case 0:
-				last_played_game = Game::TETRIS;
-				TRANSITION(stateTetris, event);
-				break;
-			case 1:
-				last_played_game = Game::SNAKE;
-				TRANSITION(stateSnake, event);
-				break;
-			case 2:
-				last_played_game = Game::DODGE;
-				TRANSITION(stateDodge, event);
-				break;
-			case 3:
 				TRANSITION(stateHighscoreMenu, event);
 				break;
-			case 4:
+			case 1:
 				TRANSITION(stateSettingsMenu, event);
 				break;
 			default:
+				last_played_game_ = Game::GameType(item.value_ - 2);
+				TRANSITION(stateGame, event);
 				break;
 			}
 			return;
@@ -195,7 +185,7 @@ void GameSM::stateDefault(Event *event)
 	display_->show();
 }
 
-void GameSM::stateTetris(Event *event)
+void GameSM::stateGame(Event *event)
 {
 	if (event->onEntry())
 	{
@@ -205,61 +195,30 @@ void GameSM::stateTetris(Event *event)
 			delete game_;
 			game_ = nullptr;
 		}
-		game_ = new Tetris(display_);
-		game_->setSpeed(speed_);
-		game_->start(event);
-		return;
-	}
-	if (game_->process(event))
-	{
-		TRANSITION(stateGameOver, event);
-		return;
-	}
-}
-
-void GameSM::stateSnake(Event *event)
-{
-	if (event->onEntry())
-	{
-		display_->loadsGameCofig();
-		if (game_ != nullptr)
+		switch (last_played_game_)
 		{
-			delete game_;
-			game_ = nullptr;
+		case Game::TETRIS:
+			game_ = new Tetris(display_);
+			break;
+		case Game::SNAKE:
+			game_ = new Snake(display_);
+			break;
+		case Game::DODGE:
+			game_ = new Dodge(display_);
+			break;
+		case Game::SPACE_INVADERS:
+//			game_ = new SpaceInvaders(display_);
+			break;
+		default:
+			return;
 		}
-		game_ = new Snake(display_);
 		game_->setSpeed(speed_);
 		game_->start(event);
 		return;
 	}
-
 	if (game_->process(event))
 	{
 		TRANSITION(stateGameOver, event);
-		return;
-	}
-}
-
-void GameSM::stateDodge(Event *event)
-{
-	if (event->onEntry())
-	{
-		display_->loadsGameCofig();
-		if (game_ != nullptr)
-		{
-			delete game_;
-			game_ = nullptr;
-		}
-		game_ = new Dodge(display_);
-		game_->setSpeed(speed_);
-		game_->start(event);
-		return;
-	}
-
-	if (game_->process(event))
-	{
-		TRANSITION(stateGameOver, event);
-		return;
 	}
 }
 
@@ -549,8 +508,7 @@ void GameSM::stateLoadEffect(Event *event)
 			return;
 		}
 		display_->setPixel(display_->cols() - 1 - (count % display_->cols()), count / display_->cols(), true);
-		display_->setPixel(count % display_->cols(), display_->rows() - 1 - (count / display_->cols()),
-								 true);
+		display_->setPixel(count % display_->cols(), display_->rows() - 1 - (count / display_->cols()), true);
 		display_->show();
 		count++;
 		return;
@@ -664,6 +622,14 @@ void GameSM::stateResetMenu(Event *event)
 									 false);
 	display_->setIcon(0x00040a1120408000, false);
 	display_->show();
+}
+
+void GameSM::processGame(Event *event)
+{
+	if (game_->process(event))
+	{
+		TRANSITION(stateGameOver, event);
+	}
 }
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event) { return advance(event, value_, num_); }

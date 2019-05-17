@@ -29,12 +29,10 @@ public:
 	GameSM(Display *display, Event *event);
 	//	void processStateMaschine(Event *event);
 private:
+
 	bool processMenuStop(Event *event);
 	// states
 	void stateDefault(Event *event);
-	void stateTetris(Event *event);
-	void stateSnake(Event *event);
-	void stateDodge(Event *event);
 	void stateGameOver(Event *event);
 	void stateLoadEffect(Event *event);
 	void stateSettingsMenu(Event *event);
@@ -43,6 +41,9 @@ private:
 	void stateLanguageMenu(Event *event);
 	void stateHighscoreMenu(Event *event);
 	void stateResetMenu(Event *event);
+
+	void stateGame(Event *event);
+	void processGame(Event *event);
 
 	class MenuItem
 	{
@@ -85,4 +86,6 @@ private:
 	byte brightness_ = 0;
 	State load_following_state_; // state load effect need a pointer to the state
 										  // after its
+
+	Game::GameType last_played_game_ = Game::TETRIS;
 };
