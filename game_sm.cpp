@@ -114,9 +114,12 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 
 void GameSM::stateDefault(Event *event)
 {
-
-	const char *texts[2][5] = {{"Tetris", "Snake", "Dodge", "highscore", "setting"},
-										{"Tetris", "Snake", "Dodge", "Highscore", "Einstellungen"}};
+	static const Item items [5] PROGMEM  = {
+	   Item{"highscore", "Highscore", 0x00081c2018043810},
+	   Item{"settings", "Einstellungen", 0x00081c2018043810},
+	   Item{"Tetris", "Tetris", 0xfffff7e300081c00},
+	   Item{"Snake", "Snake", 0x3c20203c04045c00},
+	   Item{"Dodge", "Dodge", 0x381003c00e30310}};
 
 	static MenuItem item;
 
@@ -161,27 +164,9 @@ void GameSM::stateDefault(Event *event)
 		return;
 	}
 
-	switch (item.value_)
-	{
-	case 0:
-		display_->setIcon(0xfffff7e300081c00, 0, false);
-		break;
-	case 1:
-		display_->setIcon(0x3c20203c04045c00, 0, false);
-		break;
-	case 2:
-		display_->setIcon(0x381003c00e30310, 0, false);
-		break;
-	case 3:
-		display_->setIcon(0x00081c2018043810, 0, false);
-		break;
-	case 4:
-		display_->setIcon(0x00003c3c3c3c0000, 0, false);
-		break;
-	default:
-		break;
-	}
-	display_->text1_.setText(texts[language_][item.value_]);
+	display_->setIcon(items[item.value_].icon_,0,false);
+
+	display_->text1_.setText(items[item.value_].text_[language_]);
 	display_->show();
 }
 
@@ -207,7 +192,7 @@ void GameSM::stateGame(Event *event)
 			game_ = new Dodge(display_);
 			break;
 		case Game::SPACE_INVADERS:
-//			game_ = new SpaceInvaders(display_);
+			//			game_ = new SpaceInvaders(display_);
 			break;
 		default:
 			return;

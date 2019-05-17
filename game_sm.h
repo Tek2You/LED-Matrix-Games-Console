@@ -45,6 +45,12 @@ private:
 	void stateGame(Event *event);
 	void processGame(Event *event);
 
+	struct Item
+	{
+		const char *text_[2];
+		const uint64_t icon_;
+	};
+
 	class MenuItem
 	{
 	public:
