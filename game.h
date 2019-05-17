@@ -29,7 +29,8 @@ public:
 	enum GameType{
 		TETRIS,
 		SNAKE,
-		DODGE
+		DODGE,
+		SPACE_INVADERS,
 	};
 
 	Game(Display *display, GameType game_type);
