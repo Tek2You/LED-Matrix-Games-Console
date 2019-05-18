@@ -42,6 +42,7 @@ public:
 	// decreasing functions
 	T removeFirst();
 	T remove(const unsigned int index);
+//	T remove(const T &item);
 	T removeLast();
 	void removeAll();
 
@@ -222,6 +223,24 @@ T List<T>::remove(const unsigned int index)
 	size_--;
 	return ret;
 }
+
+//template<class T>
+//T List<T>::remove(const T &item)
+//{
+////	ListNode<T> ** prev = &root_;
+//	ListNode<T> ** current = &root_;
+//	while(current != nullptr){
+//		if(&item == &(*current)->data_){
+//			T ret = (*current)->data_;
+//			ListNode<T> **tmp = current;
+//			**current = *(*current)->next_;
+//			delete *tmp;
+//			return ret;
+//		}
+//		current = &(*current)->next_;
+//	}
+//	return foo_item_;
+//}
 
 template <class T>
 T &List<T>::itemAt(const unsigned int index)
