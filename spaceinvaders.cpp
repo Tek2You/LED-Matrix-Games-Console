@@ -1,6 +1,7 @@
 #include "spaceinvaders.h"
 
-SpaceInvaders::SpaceInvaders(Display *display) : Game(display, SPACE_INVADERS)
+SpaceInvaders::SpaceInvaders(Display *display)
+	 : Game(display, SPACE_INVADERS), invaders_(StaticList<byte>(display->rows()))
 {
 	display->clear();
 	display->show();
@@ -15,10 +16,14 @@ void SpaceInvaders::start(Event *event)
 	event->setFlag(Event::ProcessStop);
 	event->addTimer();
 	event->addTimer();
+	event->addTimer();
+	event->timer(2).setInterval(50);
+	event->timer(2).start();
 	render();
 }
 
-void SpaceInvaders::setSpeed(byte v) {
+void SpaceInvaders::setSpeed(byte v)
+{
 	switch (v)
 	{
 	case 0:
@@ -60,6 +65,12 @@ unsigned int SpaceInvaders::score() const {}
 
 bool SpaceInvaders::onButtonChange(Event *event)
 {
+	if (event->buttonDown().pressed())
+	{
+		shots_ << Shot(pos_, event);
+		render();
+	}
+
 	Timer &move_timer = event->timer(1);
 	// btn left
 	if (event->buttonLeft().pressed())
@@ -134,20 +145,59 @@ bool SpaceInvaders::onTimerOverflow(Event *event)
 		move_timer.setInterval(move_interval_);
 		move_timer.restart();
 	}
+
+	if (event->timer(0).overflow())
+	{
+	}
+
+	if (event->timer(2).overflow())
+	{
+
+		for (Shot &s : shots_)
+		{
+			if (processShot(s))
+			{
+				shots_.remove(s);
+			}
+			render();
+		}
+	}
+
+	//	render();
+
 	return false;
 }
 
-void SpaceInvaders::onStop(Event *event) {}
+void SpaceInvaders::onStop(Event *event)
+{
+	event->timer(0).stop();
+	event->timer(1).stop();
+	Game::onStop(event);
+}
 
-void SpaceInvaders::onContinue(Event *event) {}
+void SpaceInvaders::onContinue(Event *event)
+{
+	event->timer(0).restart();
+	Game::onContinue(event);
+}
 
 void SpaceInvaders::render()
 {
 	display_->clear();
+
+	for (Shot s : shots_)
+	{
+		for (int i = s.start_row_; i < s.end_row_; i++)
+		{
+			display_->setPixel(s.col_, i);
+		}
+	}
+
 	display_->setPixel(pos_ - 1, 0);
 	display_->setPixel(pos_, 0);
 	display_->setPixel(pos_, 1);
 	display_->setPixel(pos_ + 1, 0);
+
 	display_->show();
 }
 
@@ -165,25 +215,44 @@ void SpaceInvaders::left()
 	render();
 }
 
-SpaceInvaders::Shot::Shot() { t_ = nullptr; }
+Shot::Shot() : t_(nullptr), col_(0) {}
 
-SpaceInvaders::Shot::Shot(Event *event)
+Shot::Shot(byte col, Event *event) : col_(col)
 {
-	event->addTimer();
-	t_ = &event->timers_.last();
+	end_row_ = 2;
+	start_row_ = 2;
+	//	event->addTimer();
+	//	t_ = &event->timers_.last();
+	//	t_->setInterval(100);
+	//	t_->start();
 }
+// Shot::Shot() { t_ = nullptr; }
 
-bool SpaceInvaders::Shot::process(int colum_value)
+// Shot::Shot(byte col, Event *event) : col_(col)
+//{
+//	end_row = 4;
+//}
+
+bool SpaceInvaders::processShot(Shot &s)
 {
-	if (t_ == nullptr || !t_->overflow()) return false;
-	end_row_++;
-	if (end_row_ - start_row_ >= 4)
+	//	if (s.t_ == nullptr || !s.t_->overflow()) return false;
+	if (s.end_row_ < display_->rows()) s.end_row_++;
+	if (s.end_row_ >= 4 && s.start_row_ < display_->rows()) s.start_row_++;
+	if (s.start_row_ == display_->rows())
 	{
-		start_row_++;
-	}
-	if (bitRead(end_row_, end_row_))
-	{
+
+		// shot complete
+		// need to remove
+		//		s.t_->stop();
 		return true;
 	}
+	//	s.t_->restart();
+
+	//		if (bitRead(end_row_, end_row_) || start_row_ > list->maxSize())
+	//		{
+	//			return true;
+	//		}
+	//		return false;
+	//	}
 	return false;
 }

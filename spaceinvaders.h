@@ -2,6 +2,18 @@
 #include "game.h"
 
 #include "list.h"
+#include "staticlist.h"
+
+class Shot
+{
+public:
+    Shot();
+    Shot(byte col, Event *event);
+    Timer *t_;
+    byte start_row_;
+    byte end_row_;
+    byte col_;
+};
 
 class SpaceInvaders : public Game
 {
@@ -22,32 +34,27 @@ protected:
 	void render() override;
 
 private:
+	StaticList<byte> invaders_;
+
+    List<Shot> shots_;
+
+
 	byte pos_;
 
-    int step_interval_;
-    int down_interval_;
-    int first_move_interval_;
-    int move_interval_;
+	int step_interval_;
+	int down_interval_;
+	int first_move_interval_;
+	int move_interval_;
 
-    enum MoveDirection{
+	enum MoveDirection
+	{
 		NO_MOVE = 0,
 		RIGHT_MOVE = 1,
 		LEFT_MOVE = 2,
 	} move_dir_;
 
-    void left();
-    void right();
-
-    struct Shot
-	{
-		Shot();
-		Shot(Event *event);
-		bool process(int colum_value);
-		byte start_row_;
-		byte end_row_;
-		byte col_;
-		Timer *t_;
-	};
-
-	List<Shot> shots_;
+	void left();
+	void right();
+    bool processShot(Shot &s);
 };
+
