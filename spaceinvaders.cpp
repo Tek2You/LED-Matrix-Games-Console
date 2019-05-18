@@ -1,12 +1,31 @@
 #include "spaceinvaders.h"
 
+static unsigned int EE_highscore EEMEM = 0;
+unsigned int SpaceInvaders::highscore_ = eeprom_read_word(&EE_highscore);
+
 SpaceInvaders::SpaceInvaders(Display *display)
 	 : Game(display, SPACE_INVADERS), invaders_(StaticList<byte>(display->rows()))
 {
 	display->clear();
 	display->show();
 	pos_ = 3;
+	for (int i = 0; i < display->rows(); i++)
+	{
+		invaders_ << 0;
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		insertRow();
+	}
 }
+
+void SpaceInvaders::resetHighscore()
+{
+	highscore_ = 0;
+	eeprom_write_word(&EE_highscore, 0);
+}
+
+unsigned int SpaceInvaders::highscore() { return highscore_; }
 
 void SpaceInvaders::start(Event *event)
 {
@@ -17,6 +36,8 @@ void SpaceInvaders::start(Event *event)
 	event->addTimer();
 	event->addTimer();
 	event->addTimer();
+	event->timer(0).setInterval(1000);
+	event->timer(0).start();
 	event->timer(2).setInterval(50);
 	event->timer(2).start();
 	render();
@@ -61,14 +82,22 @@ void SpaceInvaders::setSpeed(byte v)
 	}
 }
 
-unsigned int SpaceInvaders::score() const {}
+void SpaceInvaders::updateHighscore()
+{
+	if (score_ > highscore_)
+	{
+		highscore_ = score_;
+		eeprom_write_word(&EE_highscore, highscore_);
+	}
+}
+
+unsigned int SpaceInvaders::score() const { return score_; }
 
 bool SpaceInvaders::onButtonChange(Event *event)
 {
 	if (event->buttonDown().pressed())
 	{
-		shots_ << Shot(pos_, event);
-		render();
+		shots_ << Shot(pos_);
 	}
 
 	Timer &move_timer = event->timer(1);
@@ -78,6 +107,12 @@ bool SpaceInvaders::onButtonChange(Event *event)
 		if (!event->buttonRight().state())
 		{
 			left();
+			// validation
+			if (bitRead(invaders_[1], pos_))
+			{
+				updateHighscore();
+				return true;
+			}
 			move_timer.setInterval(first_move_interval_);
 			move_timer.restart();
 			move_dir_ = LEFT_MOVE;
@@ -105,6 +140,12 @@ bool SpaceInvaders::onButtonChange(Event *event)
 		if (!event->buttonLeft().state())
 		{
 			right();
+			// validation
+			if (bitRead(invaders_[1], pos_))
+			{
+				updateHighscore();
+				return true;
+			}
 			move_timer.setInterval(first_move_interval_);
 			move_timer.restart();
 			move_dir_ = RIGHT_MOVE;
@@ -125,6 +166,7 @@ bool SpaceInvaders::onButtonChange(Event *event)
 			move_dir_ = NO_MOVE;
 		};
 	}
+	render();
 	return false;
 }
 
@@ -142,29 +184,57 @@ bool SpaceInvaders::onTimerOverflow(Event *event)
 		{
 			right();
 		}
+		// validation
+		if (bitRead(invaders_[1], pos_))
+		{
+			updateHighscore();
+			return true;
+		}
 		move_timer.setInterval(move_interval_);
 		move_timer.restart();
 	}
 
 	if (event->timer(0).overflow())
 	{
+		// new random row
+		insertRow();
+		// check for shots
+		for (int i = 0; i < shots_.size(); i++)
+		{
+			if (processShot(shots_[i]))
+			{
+				shots_.remove(i);
+				i--;
+				score_++;
+				if (score_ > highscore_ + 100)
+				{
+					highscore_ = score_;
+					eeprom_write_word(&EE_highscore, highscore_);
+				}
+			}
+		}
+		// validation
+		if (invaders_[0] || bitRead(invaders_[1], pos_))
+		{
+			updateHighscore();
+			return true;
+		}
 	}
 
 	if (event->timer(2).overflow())
 	{
-
-		for (Shot &s : shots_)
+		for (int i = 0; i < shots_.size(); i++)
 		{
-			if (processShot(s))
+			shots_[i].row_++;
+			if (processShot(shots_[i]))
 			{
-				shots_.remove(s);
+				score_++;
+				shots_.remove(i);
+				i--;
 			}
-			render();
 		}
 	}
-
-	//	render();
-
+	render();
 	return false;
 }
 
@@ -184,13 +254,16 @@ void SpaceInvaders::onContinue(Event *event)
 void SpaceInvaders::render()
 {
 	display_->clear();
+	display_->setArray(invaders_.toArray());
+
+	for (byte row = 0; row < invaders_.size(); row++)
+	{
+		display_->setRow(row, invaders_[row]);
+	}
 
 	for (Shot s : shots_)
 	{
-		for (int i = s.start_row_; i < s.end_row_; i++)
-		{
-			display_->setPixel(s.col_, i);
-		}
+		display_->setPixel(s.col_, s.row_);
 	}
 
 	display_->setPixel(pos_ - 1, 0);
@@ -205,54 +278,40 @@ void SpaceInvaders::right()
 {
 
 	if (pos_ < 7) pos_++;
-	render();
 }
 
 void SpaceInvaders::left()
 {
 
 	if (pos_ != 0) pos_--;
-	render();
 }
 
-Shot::Shot() : t_(nullptr), col_(0) {}
+Shot::Shot() : col_(0) {}
 
-Shot::Shot(byte col, Event *event) : col_(col)
-{
-	end_row_ = 2;
-	start_row_ = 2;
-	//	event->addTimer();
-	//	t_ = &event->timers_.last();
-	//	t_->setInterval(100);
-	//	t_->start();
-}
-// Shot::Shot() { t_ = nullptr; }
-
-// Shot::Shot(byte col, Event *event) : col_(col)
-//{
-//	end_row = 4;
-//}
+Shot::Shot(byte col) : col_(col) { row_ = 2; }
 
 bool SpaceInvaders::processShot(Shot &s)
 {
-	//	if (s.t_ == nullptr || !s.t_->overflow()) return false;
-	if (s.end_row_ < display_->rows()) s.end_row_++;
-	if (s.end_row_ >= 4 && s.start_row_ < display_->rows()) s.start_row_++;
-	if (s.start_row_ == display_->rows())
+	if (bitRead(invaders_[s.row_], s.col_))
 	{
-
-		// shot complete
-		// need to remove
-		//		s.t_->stop();
+		while (bitRead(invaders_[s.row_], s.col_) && s.row_ < display_->rows())
+		{
+			bitClear(invaders_[s.row_], s.col_);
+			s.row_++;
+		}
 		return true;
 	}
-	//	s.t_->restart();
+	if (score_ > highscore_ + 100)
+	{
+		highscore_ = score_;
+		eeprom_write_word(&EE_highscore, highscore_);
+	}
+	return s.row_ >= display_->rows();
+}
 
-	//		if (bitRead(end_row_, end_row_) || start_row_ > list->maxSize())
-	//		{
-	//			return true;
-	//		}
-	//		return false;
-	//	}
-	return false;
+void SpaceInvaders::insertRow()
+{
+	if (invaders_.size() >= display_->rows()) invaders_.removeFirst();
+	byte val = rand() % 256;
+	invaders_.append(val);
 }

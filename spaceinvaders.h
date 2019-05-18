@@ -7,12 +7,10 @@
 class Shot
 {
 public:
-    Shot();
-    Shot(byte col, Event *event);
-    Timer *t_;
-    byte start_row_;
-    byte end_row_;
-    byte col_;
+	Shot();
+	Shot(byte col);
+	byte row_;
+	byte col_;
 };
 
 class SpaceInvaders : public Game
@@ -20,6 +18,8 @@ class SpaceInvaders : public Game
 public:
 	SpaceInvaders(Display *display);
 
+	static void resetHighscore();
+    static unsigned int highscore();
 	// Game interface
 public:
 	void start(Event *event) override;
@@ -35,11 +35,12 @@ protected:
 
 private:
 	StaticList<byte> invaders_;
-
-    List<Shot> shots_;
-
-
+	List<Shot> shots_;
 	byte pos_;
+
+	// score
+	unsigned int score_ = 0;
+	static unsigned int highscore_;
 
 	int step_interval_;
 	int down_interval_;
@@ -55,6 +56,7 @@ private:
 
 	void left();
 	void right();
-    bool processShot(Shot &s);
+	bool processShot(Shot &s);
+	void insertRow();
+    void updateHighscore();
 };
-
