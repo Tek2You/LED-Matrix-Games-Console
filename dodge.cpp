@@ -58,7 +58,7 @@ void Dodge::start(Event *event)
 	return;
 }
 
-const int interval[] = {
+const int interval[] PROGMEM = {
 	 400, 200, 300, 200, // very slow
 	 300, 150, 320, 150, // shlow
 	 250, 125, 300, 125, // medium fast
