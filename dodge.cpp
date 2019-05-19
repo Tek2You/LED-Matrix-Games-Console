@@ -63,7 +63,7 @@ const int interval[] = {
 	 300, 150, 320, 150, // shlow
 	 250, 125, 300, 125, // medium fast
 	 200, 100, 250, 100, // fast
-	 150, 75,  200, 75,  // very fst
+	 150, 75,  200, 75,  // very fast
 };
 
 void Dodge::setSpeed(byte v)
