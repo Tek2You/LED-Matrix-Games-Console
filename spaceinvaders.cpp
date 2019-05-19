@@ -60,12 +60,12 @@ void SpaceInvaders::start(Event *event)
 const unsigned int intervals[] PROGMEM = {
 	 2000, 65, 400, 200, // very slow
 	 1600, 60, 400, 160, // slow
-	 1400, 55, 350, 120, // medium fast
-	 1000, 50, 300, 100, // fast
-	 800,  45, 300, 140, // very fast
+	 1200, 45, 300, 140, //  medium fast
+	 1000, 55, 350, 120, // fast
+	 800,  50, 300, 100, // very fast
 };
 
-void SpaceInvaders::setSpeed(const byte v)
+void SpaceInvaders::setSpeed(byte v)
 {
 	step_interval_ = pgm_read_word(&intervals[4 * v]);
 	shot_interval_ = pgm_read_word(&intervals[4 * v + 1]);
