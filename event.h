@@ -98,11 +98,12 @@ public:
 	}
 	inline void setFlag(Flags flag, bool set = true)
 	{
-		bitWrite(flags_, flag, set);
+		if(set) flags_ |= flag;
+		else flags_ &= ~flag;
 	}
 	inline bool flag(Flags flag)
 	{
-		return bitRead(flags_, flag);
+		return flags_ & flag;
 	}
 	bool generalOverflow() const
 	{
