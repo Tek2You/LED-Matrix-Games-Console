@@ -271,7 +271,7 @@ void SpaceInvaders::right()
 
 	if (pos_ < 7) pos_++;
 }
-<<<<
+
 void SpaceInvaders::left()
 {
 
