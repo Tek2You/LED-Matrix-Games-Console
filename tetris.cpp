@@ -52,25 +52,28 @@ Tetris::~Tetris()
 void Tetris::start(Event *event)
 {
 	event->setupGame();
-	event->addTimer(step_interval_);
-	event->addTimer(); // move timer
+	event->addTimer(step_interval_);  // tick timer
+	event->addTimer();                // move timer
 	event->addTimer(blink_interval_); // blink timer
 
 	newTetromino();
 }
 
 const int interval[] PROGMEM = {
-	 1800, 180, 400, 200, 80,  1400, 140, 400, 160, 90,  1000, 100, 300,
-	 140,  100, 800, 80,  350, 120,  110, 500, 50,  300, 100,  120,
+	 1800, 180, 400, 200, 80,  // very slow
+	 1400, 140, 400, 160, 90,  // slow
+	 1000, 100, 300, 140, 100, // medium fast
+	 800,  80,  350, 120, 110, // fast
+	 500,  50,  300, 100, 120, // very fast
 };
 
 void Tetris::setSpeed(const byte v)
 {
-	step_interval_ = pgm_read_word(v*5);
-	down_interval_ = pgm_read_word(v*5+1);
-	first_move_interval_ = pgm_read_word(v*5+2);
-	move_interval_ = pgm_read_word(v*5+3);
-	blink_interval_ = pgm_read_word(v*5+4);
+	step_interval_ = pgm_read_word(&interval[v * 5]);
+	down_interval_ = pgm_read_word(&interval[v* 5 + 1]);
+	first_move_interval_ = pgm_read_word(&interval[v* 5 + 2]);
+	move_interval_ = pgm_read_word(&interval[v* 5 + 3]);
+	blink_interval_ = pgm_read_word(&interval[v* 5 + 4]);
 }
 
 void Tetris::render()
