@@ -52,12 +52,25 @@ Tetris::~Tetris()
 void Tetris::start(Event *event)
 {
 	event->setupGame();
-	event->addTimer(general_step_interval_);
+	event->addTimer(step_interval_);
 	event->addTimer(); // move timer
-	event->addTimer(); // blink timer
-	event->timer(2).setInterval(100);
+	event->addTimer(blink_interval_); // blink timer
 
 	newTetromino();
+}
+
+const int interval[] PROGMEM = {
+	 1800, 180, 400, 200, 80,  1400, 140, 400, 160, 90,  1000, 100, 300,
+	 140,  100, 800, 80,  350, 120,  110, 500, 50,  300, 100,  120,
+};
+
+void Tetris::setSpeed(const byte v)
+{
+	step_interval_ = pgm_read_word(v*5);
+	down_interval_ = pgm_read_word(v*5+1);
+	first_move_interval_ = pgm_read_word(v*5+2);
+	move_interval_ = pgm_read_word(v*5+3);
+	blink_interval_ = pgm_read_word(v*5+4);
 }
 
 void Tetris::render()
@@ -91,9 +104,9 @@ void Tetris::onContinue(Event *event)
 	render();
 	event->timer(0).start();
 	if (event->buttonDown().state())
-		event->timer(0).setInterval(general_down_interval_);
+		event->timer(0).setInterval(down_interval_);
 	else
-		event->timer(0).setInterval(general_step_interval_);
+		event->timer(0).setInterval(step_interval_);
 
 	Game::onContinue(event);
 	// for the second timer, the restart is not required, because its used for button long pressed
@@ -216,45 +229,6 @@ void Tetris::clear()
 	}
 }
 
-void Tetris::setSpeed(const byte v)
-{
-	switch (v)
-	{
-	case 0:
-		general_step_interval_ = 1800;
-		general_down_interval_ = 180;
-		general_first_move_interval_ = 400;
-		general_move_interval_ = 200;
-		break;
-	case 1:
-		general_step_interval_ = 1400;
-		general_down_interval_ = 140;
-		general_first_move_interval_ = 400;
-		general_move_interval_ = 160;
-		break;
-	case 3:
-		general_step_interval_ = 800;
-		general_down_interval_ = 80;
-		general_first_move_interval_ = 350;
-		general_move_interval_ = 120;
-		break;
-	case 4:
-		general_step_interval_ = 500;
-		general_down_interval_ = 50;
-		general_first_move_interval_ = 300;
-		general_move_interval_ = 100;
-		break;
-	case 2:
-		general_step_interval_ = 1000;
-		general_down_interval_ = 100;
-		general_first_move_interval_ = 300;
-		general_move_interval_ = 140;
-		break;
-	default:
-		break;
-	}
-}
-
 bool Tetris::newTetromino()
 {
 	if (tetromino_)
@@ -320,13 +294,13 @@ bool Tetris::onButtonChange(Event *event)
 		{
 			return true;
 		}
-		event->timer(0).setInterval(general_down_interval_);
+		event->timer(0).setInterval(down_interval_);
 		event->timer(0).restart();
 	}
 	else if (event->buttonDown().released())
 	{
 		// unset fast down
-		event->timer(0).setInterval(general_step_interval_);
+		event->timer(0).setInterval(step_interval_);
 		event->timer(0).restart();
 	}
 
@@ -336,7 +310,7 @@ bool Tetris::onButtonChange(Event *event)
 		if (!event->buttonRight().state())
 		{
 			left();
-			move_timer.setInterval(general_first_move_interval_);
+			move_timer.setInterval(first_move_interval_);
 			move_timer.restart();
 			move_dir_ = LEFT_MOVE;
 		}
@@ -347,7 +321,7 @@ bool Tetris::onButtonChange(Event *event)
 		if (event->buttonRight().state())
 		{
 			move_dir_ = RIGHT_MOVE;
-			move_timer.setInterval(general_first_move_interval_);
+			move_timer.setInterval(first_move_interval_);
 			move_timer.restart();
 		}
 		else
@@ -363,7 +337,7 @@ bool Tetris::onButtonChange(Event *event)
 		if (!event->buttonLeft().state())
 		{
 			right();
-			move_timer.setInterval(general_first_move_interval_);
+			move_timer.setInterval(first_move_interval_);
 			move_timer.restart();
 			move_dir_ = RIGHT_MOVE;
 		}
@@ -374,7 +348,7 @@ bool Tetris::onButtonChange(Event *event)
 		if (event->buttonLeft().state())
 		{
 			move_dir_ = LEFT_MOVE;
-			move_timer.setInterval(general_first_move_interval_);
+			move_timer.setInterval(first_move_interval_);
 			move_timer.restart();
 		}
 		else
@@ -402,14 +376,14 @@ bool Tetris::onTimerOverflow(Event *event)
 		if (move_dir_ == LEFT_MOVE)
 		{
 			left();
-			move_timer.setInterval(general_move_interval_);
+			move_timer.setInterval(move_interval_);
 			move_timer.restart();
 		}
 
 		else if (move_dir_ == RIGHT_MOVE)
 		{
 			right();
-			move_timer.setInterval(general_move_interval_);
+			move_timer.setInterval(move_interval_);
 			move_timer.restart();
 		}
 	}
@@ -458,9 +432,9 @@ bool Tetris::clearFullRows(Event *event)
 			display_->setArray(field_.toArray());
 			event->timer(0).start();
 			if (event->buttonDown().state())
-				event->timer(0).setInterval(general_down_interval_);
+				event->timer(0).setInterval(down_interval_);
 			else
-				event->timer(0).setInterval(general_step_interval_);
+				event->timer(0).setInterval(step_interval_);
 
 			if (newTetromino()) return true;
 			return false;

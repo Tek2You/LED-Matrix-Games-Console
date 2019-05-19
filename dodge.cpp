@@ -36,16 +36,11 @@ const Dodge::LineData lines[11] = {
 	 {Dodge::LineData::set(2, 2, 1), {0b00001111, 0b11000000}},
 };
 
-Dodge::Dodge(Display *display) : Game(display,DODGE), dot_state_(true)
-{
-}
+Dodge::Dodge(Display *display) : Game(display, DODGE), dot_state_(true) {}
 
 void Dodge::start(Event *event)
 {
 	event->setupGame();
-	event->setFlag(Event::ProcessPinChanges);
-	event->setFlag(Event::ProcessTimerOverflows);
-	event->setFlag(Event::ProcessStop);
 
 	event->addTimer(period_);
 	event->addTimer(); // not yet start button timer
@@ -63,56 +58,30 @@ void Dodge::start(Event *event)
 	return;
 }
 
+const int interval[] = {
+	 400, 200, 300, 200, // very slow
+	 300, 150, 320, 150, // shlow
+	 250, 125, 300, 125, // medium fast
+	 200, 100, 250, 100, // fast
+	 150, 75,  200, 75,  // very fst
+};
+
 void Dodge::setSpeed(byte v)
 {
-	switch (v)
-	{
-	case 0: // very slow
-		period_ = 400;
-		fast_period_ = 200;
-		first_move_period_ = 350;
-		move_period_ = 200;
-		break;
-	case 1: // slow
-		period_ = 300;
-		fast_period_ = 150;
-		first_move_period_ = 320;
-		move_period_ = 150;
-		break;
-	case 3: // fast
-		period_ = 200;
-		fast_period_ = 100;
-		first_move_period_ = 250;
-		move_period_ = 100;
-		break;
-	case 4: // ver fast
-		period_ = 150;
-		fast_period_ = 75;
-		first_move_period_ = 200;
-		move_period_ = 75;
-		break;
-	case 2: // medium
-	default:
-		period_ = 250;
-		fast_period_ = 125;
-		first_move_period_ = 300;
-		move_period_ = 125;
-		break;
-	}
+	period_ = pgm_read_word(&interval[v*4]);
+	fast_period_ = pgm_read_word(&interval[v*4+1]);
+	first_move_period_ = pgm_read_word(&interval[v*4+2]);
+	move_period_ = pgm_read_word(&interval[v*4+3]);
 }
 
-void Dodge::resetHighscore()
-{
-	eeprom_write_word(&EE_highscore, highscore_ = 0);
-}
+void Dodge::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Dodge::onButtonChange(Event *event)
 {
 	if (event->buttonDown().pressed())
 	{
 		// if first pressed, directly execute tick to get a dynamic result
-		if (tick())
-			return true;
+		if (tick()) return true;
 		event->timer(0).setInterval(fast_period_);
 		event->timer(0).restart();
 	}
@@ -167,8 +136,7 @@ bool Dodge::onTimerOverflow(Event *event)
 {
 	if (event->timer(0).overflow())
 	{
-		if (tick())
-			return true;
+		if (tick()) return true;
 	}
 
 	Timer &move_timer = event->timer(1);
@@ -216,8 +184,7 @@ void Dodge::render()
 	{
 		display_->setRow(i, elements_.itemAt(15 - i));
 	}
-	if (dot_state_)
-		display_->setPixel(pos_);
+	if (dot_state_) display_->setPixel(pos_);
 	display_->show(false);
 }
 
@@ -287,8 +254,7 @@ void Dodge::right()
 {
 	Pos tmp = pos_;
 	tmp.pos_x += 1;
-	if (tmp.pos_x > 7)
-		return;
+	if (tmp.pos_x > 7) return;
 	if (bitRead(elements_.itemAt(15 - tmp.pos_y), tmp.pos_x))
 	{
 		return;
@@ -301,8 +267,7 @@ void Dodge::left()
 {
 	Pos tmp = pos_;
 	tmp.pos_x -= 1;
-	if (tmp.pos_x < 0)
-		return;
+	if (tmp.pos_x < 0) return;
 	if (bitRead(elements_.itemAt(15 - tmp.pos_y), tmp.pos_x))
 	{
 		return;

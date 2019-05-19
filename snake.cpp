@@ -49,27 +49,11 @@ void Snake::start(Event *event)
 	event->timer(0).start();
 }
 
+const int periods[] PROGMEM = {600, 500, 400, 275, 180};
+
 void Snake::setSpeed(byte v)
 {
-	switch (v)
-	{
-	case 0:
-		period_ = 600;
-		break;
-	case 1:
-		period_ = 500;
-		break;
-	case 3:
-		period_ = 275;
-		break;
-	case 4:
-		period_ = 180;
-		break;
-	case 2:
-	default:
-		period_ = 400;
-		break;
-	}
+	period_ = pgm_read_byte(&periods[v]);
 }
 
 unsigned int Snake::highscore() { return highscore_; }
@@ -92,7 +76,7 @@ bool Snake::onButtonChange(Event *event)
 		}
 		else if (event->buttonRight().pressed())
 		{
-			if (direction_ != Snake::LEFT  && direction_ != Snake::RIGHT)
+			if (direction_ != Snake::LEFT && direction_ != Snake::RIGHT)
 			{
 				new_direction_ = Snake::RIGHT;
 				event->timer(0).restart();
@@ -102,7 +86,7 @@ bool Snake::onButtonChange(Event *event)
 
 		else if (event->buttonLeft().pressed())
 		{
-			if (direction_ != Snake::RIGHT  && direction_ != Snake::LEFT && direction_ != Snake::START)
+			if (direction_ != Snake::RIGHT && direction_ != Snake::LEFT && direction_ != Snake::START)
 			{
 				new_direction_ = Snake::LEFT;
 				event->timer(0).restart();

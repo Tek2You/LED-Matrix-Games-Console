@@ -45,6 +45,7 @@ private:
 	int step_interval_;
 	int first_move_interval_;
 	int move_interval_;
+    int shot_interval_;
 
 	enum MoveDirection
 	{

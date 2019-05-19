@@ -69,10 +69,11 @@ private:
 	Direction randomTetrominoDirection(const Shape &shape);
 
 	// from speed calculated delay intervals
-	int general_step_interval_;
-	int general_down_interval_;
-	int general_first_move_interval_;
-	int general_move_interval_;
+	unsigned int step_interval_;
+	unsigned int down_interval_;
+	unsigned int first_move_interval_;
+	unsigned int move_interval_;
+	unsigned int blink_interval_;
 
 	enum MoveDirection{
 		NO_MOVE = 0,

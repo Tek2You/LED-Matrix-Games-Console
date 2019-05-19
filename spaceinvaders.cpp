@@ -17,6 +17,7 @@ SpaceInvaders::SpaceInvaders(Display *display)
 	{
 		insertRow();
 	}
+	setSpeed(2);
 }
 
 void SpaceInvaders::resetHighscore()
@@ -30,48 +31,28 @@ unsigned int SpaceInvaders::highscore() { return highscore_; }
 void SpaceInvaders::start(Event *event)
 {
 	event->setupGame();
+	event->addTimer(step_interval_);
 	event->addTimer();
-	event->addTimer();
-	event->addTimer();
-	event->timer(0).setInterval(1000);
+	event->addTimer(shot_interval_);
 	event->timer(0).start();
-	event->timer(2).setInterval(50);
-	event->timer(2).start();
+	event->timer(1).start();
 	render();
 }
 
+const unsigned int intervals [] PROGMEM = {
+   2000, 65, 400,200,
+   1600, 60, 400, 160,
+   1400, 55, 350, 120,
+   1000, 50, 300, 100,
+   800, 45, 300, 140,
+};
+
 void SpaceInvaders::setSpeed(byte v)
 {
-	switch (v)
-	{
-	case 0:
-		step_interval_ = 1800;
-		first_move_interval_ = 400;
-		move_interval_ = 200;
-		break;
-	case 1:
-		step_interval_ = 1400;
-		first_move_interval_ = 400;
-		move_interval_ = 160;
-		break;
-	case 3:
-		step_interval_ = 800;
-		first_move_interval_ = 350;
-		move_interval_ = 120;
-		break;
-	case 4:
-		step_interval_ = 500;
-		first_move_interval_ = 300;
-		move_interval_ = 100;
-		break;
-	case 2:
-		step_interval_ = 1000;
-		first_move_interval_ = 300;
-		move_interval_ = 140;
-		break;
-	default:
-		break;
-	}
+	step_interval_ = pgm_read_word(&intervals[4*v]);
+	shot_interval_ = pgm_read_word(&intervals[4*v+1]);
+	first_move_interval_ = pgm_read_word(&intervals[4*v+2]);
+	move_interval_ = pgm_read_word(&intervals[4*v+3]);
 }
 
 void SpaceInvaders::updateHighscore()
@@ -92,7 +73,7 @@ bool SpaceInvaders::onButtonChange(Event *event)
 		shots_ << Shot(pos_);
 	}
 
-	Timer &move_timer = event->timer(1);
+	Timer &move_timer = event->timer(2);
 	// btn left
 	if (event->buttonLeft().pressed())
 	{
@@ -164,7 +145,7 @@ bool SpaceInvaders::onButtonChange(Event *event)
 
 bool SpaceInvaders::onTimerOverflow(Event *event)
 {
-	Timer &move_timer = event->timer(1);
+	Timer &move_timer = event->timer(2);
 	if (move_timer.overflow())
 	{
 		if (move_dir_ == LEFT_MOVE)
@@ -213,7 +194,7 @@ bool SpaceInvaders::onTimerOverflow(Event *event)
 		}
 	}
 
-	if (event->timer(2).overflow())
+	if (event->timer(1).overflow())
 	{
 		for (int i = 0; i < shots_.size(); i++)
 		{
@@ -234,12 +215,14 @@ void SpaceInvaders::onStop(Event *event)
 {
 	event->timer(0).stop();
 	event->timer(1).stop();
+	event->timer(2).stop();
 	Game::onStop(event);
 }
 
 void SpaceInvaders::onContinue(Event *event)
 {
 	event->timer(0).restart();
+	event->timer(1).restart();
 	Game::onContinue(event);
 }
 
