@@ -1,5 +1,7 @@
+CMakeCache.txt
+CMakeFiles
+CMakeLists.txt.user 
 /build
-*CMake*
 Tetris.cbp
 cmake_install.cmake
 cmakeLists.txt.user
