@@ -115,7 +115,7 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 void GameSM::stateDefault(Event *event)
 {
 	static const Item items[6] = {Item{"highscore", "Highscore", 0x00081c2018043810},
-											Item{"settings", "Einstellungen", 0x00081c2018043810},
+											Item{"settings", "Einstellungen", 0x000003c3c3c3c0000},
 											Item{"Tetris", "Tetris", 0xfffff7e300081c00},
 											Item{"Snake", "Snake", 0x3c20203c04045c00},
 											Item{"Dodge", "Dodge", 0x381003c00e30310},
