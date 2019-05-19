@@ -74,9 +74,9 @@ public:
 	bool process();
 	bool processTimers();
 	void addTimer(unsigned long interval = 0);
-	Timer &timer(byte index);
-	bool overflow(byte &index);
-	void removeTimer(byte &index);
+	Timer &timer(const byte index);
+	bool overflow(const byte index);
+	void removeTimer(const byte index);
 	void removeAllTimers();
 
 	enum Flags
@@ -86,6 +86,11 @@ public:
 		ProcessTimerOverflows = (1 << 2),
 		ProcessStop = (1 << 3),
 	};
+
+	void setupGame(){
+		removeAllTimers();
+		flags_ = (Event::ProcessPinChanges | Event::ProcessTimerOverflows | Event:: ProcessStop);
+	}
 
 	inline void clearFlags()
 	{

@@ -29,10 +29,7 @@ unsigned int SpaceInvaders::highscore() { return highscore_; }
 
 void SpaceInvaders::start(Event *event)
 {
-	event->removeAllTimers();
-	event->setFlag(Event::ProcessPinChanges);
-	event->setFlag(Event::ProcessTimerOverflows);
-	event->setFlag(Event::ProcessStop);
+	event->setupGame();
 	event->addTimer();
 	event->addTimer();
 	event->addTimer();
@@ -49,31 +46,26 @@ void SpaceInvaders::setSpeed(byte v)
 	{
 	case 0:
 		step_interval_ = 1800;
-		down_interval_ = 180;
 		first_move_interval_ = 400;
 		move_interval_ = 200;
 		break;
 	case 1:
 		step_interval_ = 1400;
-		down_interval_ = 140;
 		first_move_interval_ = 400;
 		move_interval_ = 160;
 		break;
 	case 3:
 		step_interval_ = 800;
-		down_interval_ = 80;
 		first_move_interval_ = 350;
 		move_interval_ = 120;
 		break;
 	case 4:
 		step_interval_ = 500;
-		down_interval_ = 50;
 		first_move_interval_ = 300;
 		move_interval_ = 100;
 		break;
 	case 2:
 		step_interval_ = 1000;
-		down_interval_ = 100;
 		first_move_interval_ = 300;
 		move_interval_ = 140;
 		break;
@@ -279,7 +271,7 @@ void SpaceInvaders::right()
 
 	if (pos_ < 7) pos_++;
 }
-
+<<<<
 void SpaceInvaders::left()
 {
 

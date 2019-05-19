@@ -51,16 +51,13 @@ Tetris::~Tetris()
 
 void Tetris::start(Event *event)
 {
-	newTetromino();
-
-	event->removeAllTimers();
+	event->setupGame();
 	event->addTimer(general_step_interval_);
 	event->addTimer(); // move timer
 	event->addTimer(); // blink timer
 	event->timer(2).setInterval(100);
-	event->setFlag(Event::ProcessPinChanges);
-	event->setFlag(Event::ProcessTimerOverflows);
-	event->setFlag(Event::ProcessStop);
+
+	newTetromino();
 }
 
 void Tetris::render()
@@ -213,7 +210,8 @@ bool Tetris::tick(Event *event)
 
 void Tetris::clear()
 {
-	for(byte &row : field_){
+	for (byte &row : field_)
+	{
 		row = 0;
 	}
 }
@@ -433,7 +431,8 @@ bool Tetris::clearFullRows(Event *event)
 	if (blink_cycle_ == FINISHED_CURRENT)
 	{
 		const byte diff = blink_end_row_ - blink_start_row_;
-		for(int i = 0; i < diff; i++){
+		for (int i = 0; i < diff; i++)
+		{
 			field_.remove(blink_start_row_);
 			field_ << 0;
 		}

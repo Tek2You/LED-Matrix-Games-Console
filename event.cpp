@@ -86,17 +86,17 @@ void Event::addTimer(unsigned long interval)
 	timers_.append(t);
 }
 
-Timer &Event::timer(byte index)
+Timer &Event::timer(const byte index)
 {
 	return timers_.itemAt(index);
 }
 
-bool Event::overflow(byte &index)
+bool Event::overflow(const byte index)
 {
 	timers_.itemAt(index).overflow();
 }
 
-void Event::removeTimer(byte &index)
+void Event::removeTimer(const byte index)
 {
 	timers_.remove(index);
 }

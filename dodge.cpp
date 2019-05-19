@@ -42,13 +42,14 @@ Dodge::Dodge(Display *display) : Game(display,DODGE), dot_state_(true)
 
 void Dodge::start(Event *event)
 {
-	event->removeAllTimers();
-	event->addTimer(period_);
-	event->addTimer(); // not yet start button timer
-	event->addTimer(20);
+	event->setupGame();
 	event->setFlag(Event::ProcessPinChanges);
 	event->setFlag(Event::ProcessTimerOverflows);
 	event->setFlag(Event::ProcessStop);
+
+	event->addTimer(period_);
+	event->addTimer(); // not yet start button timer
+	event->addTimer(20);
 
 	score_ = 0;
 	pos_ = Pos(3, 15);

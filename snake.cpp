@@ -35,6 +35,8 @@ Snake::~Snake() {}
 
 void Snake::start(Event *event)
 {
+	event->setupGame();
+
 	body_ << SmartPos(1, 7);
 	body_ << SmartPos(2, 7);
 	body_ << SmartPos(3, 7); // head
@@ -43,10 +45,6 @@ void Snake::start(Event *event)
 	new_direction_ = START;
 	render();
 
-	event->setFlag(Event::ProcessPinChanges);
-	event->setFlag(Event::ProcessTimerOverflows);
-	event->setFlag(Event::ProcessStop);
-	event->removeAllTimers();
 	event->addTimer(period_);
 	event->timer(0).start();
 }

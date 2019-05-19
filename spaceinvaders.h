@@ -43,7 +43,6 @@ private:
 	static unsigned int highscore_;
 
 	int step_interval_;
-	int down_interval_;
 	int first_move_interval_;
 	int move_interval_;
 
