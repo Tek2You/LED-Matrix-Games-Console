@@ -114,15 +114,13 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 
 void GameSM::stateDefault(Event *event)
 {
-	static const Item items [6]  = {
-	   Item{"highscore", "Highscore", 0x00081c2018043810},
-	   Item{"settings", "Einstellungen", 0x00081c2018043810},
-	   Item{"Tetris", "Tetris", 0xfffff7e300081c00},
-	   Item{"Snake", "Snake", 0x3c20203c04045c00},
-	   Item{"Dodge", "Dodge", 0x381003c00e30310},
-	   Item{"Space Invaders", "Space Invaders, 989796"}
-	};
-;
+	static const Item items[6] = {Item{"highscore", "Highscore", 0x00081c2018043810},
+											Item{"settings", "Einstellungen", 0x00081c2018043810},
+											Item{"Tetris", "Tetris", 0xfffff7e300081c00},
+											Item{"Snake", "Snake", 0x3c20203c04045c00},
+											Item{"Dodge", "Dodge", 0x381003c00e30310},
+											Item{"Space Invaders", "Space Invaders", 0x1c08000841d46b91}};
+	;
 
 	static MenuItem item;
 
@@ -167,10 +165,7 @@ void GameSM::stateDefault(Event *event)
 		return;
 	}
 
-	display_->setIcon(items[item.value_].icon_,0,false);
-
-	display_->text1_.setText(items[item.value_].text_[language_]);
-	display_->show();
+	showIcon(items[item.value_]);
 }
 
 void GameSM::stateGame(Event *event)
@@ -195,7 +190,7 @@ void GameSM::stateGame(Event *event)
 			game_ = new Dodge(display_);
 			break;
 		case Game::SPACE_INVADERS:
-			//			game_ = new SpaceInvaders(display_);
+			game_ = new SpaceInvaders(display_);
 			break;
 		default:
 			return;
@@ -258,8 +253,10 @@ void GameSM::stateGameOver(Event *event)
 
 void GameSM::stateSettingsMenu(Event *event)
 {
+	static const Item items[3] = {Item{"speed", "Geschwindigkeit", 0x0000122448241200},
+											Item{"language", "Sprache", 0x2060ff818181ff00},
+											Item{"brightness", "Helligkeit", 0x0007133558900000}};
 	static MenuItem item;
-	const char *menu_text[2][3] = {{"speed", "language", "brightness"}, {"Geschwindigkeit", "Sprache", "Helligkeit"}};
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
@@ -302,22 +299,7 @@ void GameSM::stateSettingsMenu(Event *event)
 	{
 		return;
 	}
-
-	switch (item.value_)
-	{
-	case 0:
-		display_->setIcon(0x0000122448241200, 0, false);
-		break;
-	case 1:
-		display_->setIcon(0x2060ff818181ff00, 0, false);
-		break;
-	case 2:
-		display_->setIcon(0x0007133558900000, 0, false);
-		break;
-	default:
-		break;
-	}
-	display_->text1_.setText(menu_text[language_][item.value_]); // contains the showing on display
+	showIcon(items[item.value_]);
 }
 
 void GameSM::stateSpeedMenu(Event *event)
@@ -618,6 +600,14 @@ void GameSM::processGame(Event *event)
 	{
 		TRANSITION(stateGameOver, event);
 	}
+}
+
+void GameSM::showIcon(const GameSM::Item &item)
+{
+	display_->setIcon(item.icon_, 0, false);
+
+	display_->text1_.setText(item.text_[language_]);
+	display_->show();
 }
 
 GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event) { return advance(event, value_, num_); }

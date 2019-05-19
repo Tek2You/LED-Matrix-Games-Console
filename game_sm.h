@@ -29,7 +29,6 @@ public:
 	GameSM(Display *display, Event *event);
 	//	void processStateMaschine(Event *event);
 private:
-
 	bool processMenuStop(Event *event);
 	// states
 	void stateDefault(Event *event);
@@ -49,7 +48,10 @@ private:
 	{
 		const char *text_[2];
 		const uint64_t icon_;
+//		void show(){show(&this);}
 	};
+
+	void showIcon(const Item &item);
 
 	class MenuItem
 	{
@@ -59,10 +61,7 @@ private:
 			num_ = num;
 			value_ = initial;
 		}
-		void init(char num)
-		{
-			num_ = num;
-		}
+		void init(char num) { num_ = num; }
 
 		enum Button
 		{
