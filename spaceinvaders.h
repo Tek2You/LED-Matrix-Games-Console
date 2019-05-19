@@ -41,7 +41,7 @@ public:
 	// Game interface
 public:
 	void start(Event *event) override;
-	void setSpeed(byte v) override;
+	void setSpeed(const byte v) override;
 	unsigned int score() const override;
 
 protected:

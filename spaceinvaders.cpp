@@ -65,7 +65,7 @@ const unsigned int intervals[] PROGMEM = {
 	 800,  45, 300, 140, // very fast
 };
 
-void SpaceInvaders::setSpeed(byte v)
+void SpaceInvaders::setSpeed(const byte v)
 {
 	step_interval_ = pgm_read_word(&intervals[4 * v]);
 	shot_interval_ = pgm_read_word(&intervals[4 * v + 1]);
@@ -79,6 +79,7 @@ void SpaceInvaders::updateHighscore()
 	{
 		highscore_ = score_;
 		eeprom_write_word(&EE_highscore, highscore_);
+		is_new_highscore_ = true;
 	}
 }
 
