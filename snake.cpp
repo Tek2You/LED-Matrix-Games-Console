@@ -26,8 +26,7 @@ unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
 Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols())
 {
-	direction_ = START;
-	new_direction_ = START;
+	// set speed for case that it wouldnt be done
 	setSpeed(2);
 }
 
@@ -35,36 +34,51 @@ Snake::~Snake() {}
 
 void Snake::start(Event *event)
 {
+	// load standard flags
 	event->setupGame();
 
+	// Create initial Snake
 	body_ << SmartPos(1, 7);
 	body_ << SmartPos(2, 7);
 	body_ << SmartPos(3, 7); // head
+
+	// Initial eat
 	eat_pos_ = SmartPos(5, 7);
+
+	// setup directions
 	direction_ = START;
 	new_direction_ = START;
-	render();
 
-	event->addTimer(period_);
+	// Setup timer for moving
+	event->addTimer(interval_);
 	event->timer(0).start();
+
+	// print display first time
+	render();
 }
 
-const int periods[] PROGMEM = {600, 500, 400, 275, 180};
+// stores intervals for diferent speeds in progmem
+const unsigned int periods[] PROGMEM = {600, 500, 400, 275, 180};
 
-void Snake::setSpeed(byte v)
+void Snake::setSpeed(const byte v)
 {
-	period_ = pgm_read_byte(&periods[v]);
+	// read speed out of progmem
+	interval_ = pgm_read_word(&periods[v]);
 }
 
-unsigned int Snake::highscore() { return highscore_; }
-void Snake::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
+void Snake::resetHighscore()
+{
+	// reset highscore
+	highscore_ = 0;
+	// take over to eeprom
+	eeprom_write_word(&EE_highscore, highscore_);
+}
 
 bool Snake::onButtonChange(Event *event)
 {
 	if (event->controlButtonPressed())
 	{
-		// is not 180° rotation or no rotation(in this case the snake will make
-		// a additinal ste,  what we avoid with dont allow this)
+		// ensure that there is not ability to make a rotation by 180°
 		if (event->buttonUp().pressed())
 		{
 			if (direction_ != Snake::DOWN && direction_ != Snake::UP)

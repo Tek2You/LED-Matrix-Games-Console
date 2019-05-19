@@ -1,4 +1,4 @@
-/* snake.cpp : Snake game library
+/* snake.h : Snake game library
  *
  * Copyright (C) 2019 Felix Haschke
  *
@@ -36,10 +36,10 @@ public:
 		return body_.size() - 3;
 	}
 
-	void setSpeed(byte v) override;
+	void setSpeed(const byte v) override;
 
 	// static highscore functions
-	static unsigned int highscore();
+	static unsigned int highscore() { return highscore_; }
 	static void resetHighscore();
 
 private:
@@ -71,7 +71,7 @@ private:
 	};
 
 	// interval speed
-	unsigned int period_;
+	unsigned int interval_;
 	// saves the current direction of the snake
 	Direction direction_;
 	// saves the wanted direction of the snake
