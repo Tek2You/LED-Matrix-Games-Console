@@ -1,3 +1,21 @@
+/* spaceinvaders.cpp : Space Invaders game library
+ *
+ * Copyright (C) 2019 Felix Haschke
+ *
+ * This library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library.  If not, see http://www.gnu.org/licenses/.
+ */
+
 #include "spaceinvaders.h"
 
 static unsigned int EE_highscore EEMEM = 0;
@@ -39,20 +57,20 @@ void SpaceInvaders::start(Event *event)
 	render();
 }
 
-const unsigned int intervals [] PROGMEM = {
-   2000, 65, 400,200,
-   1600, 60, 400, 160,
-   1400, 55, 350, 120,
-   1000, 50, 300, 100,
-   800, 45, 300, 140,
+const unsigned int intervals[] PROGMEM = {
+	 2000, 65, 400, 200, // very slow
+	 1600, 60, 400, 160, // slow
+	 1400, 55, 350, 120, // medium fast
+	 1000, 50, 300, 100, // fast
+	 800,  45, 300, 140, // very fast
 };
 
 void SpaceInvaders::setSpeed(byte v)
 {
-	step_interval_ = pgm_read_word(&intervals[4*v]);
-	shot_interval_ = pgm_read_word(&intervals[4*v+1]);
-	first_move_interval_ = pgm_read_word(&intervals[4*v+2]);
-	move_interval_ = pgm_read_word(&intervals[4*v+3]);
+	step_interval_ = pgm_read_word(&intervals[4 * v]);
+	shot_interval_ = pgm_read_word(&intervals[4 * v + 1]);
+	first_move_interval_ = pgm_read_word(&intervals[4 * v + 2]);
+	move_interval_ = pgm_read_word(&intervals[4 * v + 3]);
 }
 
 void SpaceInvaders::updateHighscore()
