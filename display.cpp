@@ -30,7 +30,7 @@ void Display::setIcon(uint64_t icon, byte offset, bool show)
 	i.i64 = icon;
 	for (int r = offset; r < 8 + offset; r++)
 	{
-		setRow(r, i.array[7 + offset - r]);
+		setRow(r, i.bytes[7 + offset - r]);
 	}
 	if(show)
 		Display::show();

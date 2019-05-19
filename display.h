@@ -33,9 +33,10 @@ public:
 
 	Text text1_, text2_;
 
-private:
+//private:
 	union Icon {
 		uint64_t i64;
-		byte array[8];
+		byte bytes[8];
+		int words[4];
 	};
 };
