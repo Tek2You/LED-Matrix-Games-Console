@@ -247,14 +247,14 @@ void MatrixDisplay::clear()
 	}
 }
 
-void MatrixDisplay::setPixel(byte col, byte row, bool value)
+void MatrixDisplay::setPixel(const byte col, const byte row, const bool value)
 {
 	bitWrite(getPendingBuffer()[row], col_order[col], value);
 }
 
-void MatrixDisplay::setPixel(const Pos &p, bool value) { setPixel(p.pos_x, p.pos_y); }
 
-byte MatrixDisplay::orderCols(byte value)
+
+byte MatrixDisplay::orderCols(const byte value)
 {
 	byte out;
 	for (byte i = 0; i < 8; i++)

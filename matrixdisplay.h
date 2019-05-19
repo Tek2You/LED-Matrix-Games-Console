@@ -27,8 +27,8 @@ public:
 	~MatrixDisplay();
 	void processShow();
 	void clear();
-	void setPixel(byte col, byte row, bool value = true);
-	void setPixel(const Pos &p, bool value = true);
+	void setPixel(byte col, const byte row, const bool value = true);
+	inline void setPixel(const Pos p, const bool value = true) { setPixel(p.pos_x, p.pos_y); }
 	void setArray(byte *array);
 	const byte rows()
 	{
@@ -59,7 +59,7 @@ protected:
 	static const byte *letterStart(char ch);
 	static const byte letterWidth(char ch);
 	byte *columnPtr(byte column) const;
-	byte orderCols(byte value);
+	byte orderCols(const byte value);
 	byte mapCol(byte row);
 
 private:
