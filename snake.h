@@ -52,7 +52,7 @@ private:
 
 	// local declared methods
 	// checks if the snake had touched the eat
-	bool eat(Pos pos);
+	bool eat(const Pos pos);
 	// moves the snake by one point
 	bool tick();
 	// checks if the current position is valid
@@ -63,7 +63,7 @@ private:
 	// datatype abled to store a direction
 	enum Direction
 	{
-		UP,
+		UP ,
 		RIGHT,
 		DOWN,
 		LEFT,

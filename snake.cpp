@@ -132,50 +132,68 @@ bool Snake::onTimerOverflow(Event *event)
 
 void Snake::onStop(Event *event)
 {
+	// stop timer during break
 	event->timer(0).stop();
+	// let the stop symbol and score print
 	Game::onStop(event);
 }
 
 void Snake::onContinue(Event *event)
 {
+	// restart the stopped timer
 	event->timer(0).start();
+	// executes render and clears the score text
 	Game::onContinue(event);
 }
 
 void Snake::render()
 {
+	// first of all, clear the display
 	display_->clear();
-	display_->setPixel(eat_pos_.pos_x, eat_pos_.pos_y, true);
+	// set the eat pixel
+	display_->setPixel(eat_pos_);
+	// interate through all body pixels
 	for (SmartPos tmp : body_)
 	{
-		display_->setPixel(tmp.x(), tmp.y(), true);
+		// now set those pixels
+		display_->setPixel(tmp.toPos());
 	}
+	// finaly, show on display
 	display_->show(false);
 }
 
-bool Snake::eat(Pos pos)
+bool Snake::eat(const Pos pos)
 {
-	if (pos == eat_pos_)
+	// check if eat was received
+	if (pos != eat_pos_) return false;
+
+	// prevent entering a remaining loop when the game is won
+	if (body_.size() >= display_->rows() * display_->cols()) return true;
+	unsigned long time = millis();
+
+	// temporary new pos
+	Pos tmp;
+	do
 	{
-		// ensure that we dont enter a remaining loop if the game is won
-		if (body_.size() >= display_->rows() * display_->cols()) return true;
-		unsigned long time = millis();
-		Pos tmp;
-		do
-		{
-			wdt_reset();
-			tmp = Pos((time + char(rand())) % 8, (time + (char(rand()))) % 16);
-		} while (!isValid(tmp) || tmp == pos);
-		eat_pos_ = tmp;
-		return true;
-	}
-	return false;
+		wdt_reset();
+		// generate a random pos
+		tmp = Pos((time + char(rand())) % 8, (time + (char(rand()))) % 16);
+		// try as long as the position doesnt match
+	} while (!isValid(tmp) || tmp == pos);
+
+	// when free position is found, set it as the new eat
+	eat_pos_ = tmp;
+	return true;
 }
 
 bool Snake::tick()
 {
+	// equalize directions
+	direction_ = new_direction_;
+
+	// figure out move vector
 	Pos vect;
-	switch (direction_ = new_direction_)
+	switch (direction_)
 	{
 	case UP:
 		vect = Pos(0, 1);
@@ -194,25 +212,35 @@ bool Snake::tick()
 		break;
 	}
 
-	// make the new head position outof the vector and last body pos
-
+	// new head
+		// already remove it, to ensure a true validation
 	vect += body_.last();
+
+	// move head inside the game field
 	validate(vect);
+
+	// process eat
 	if (!eat(vect))
 	{
-		body_.removeFirst(); // first remove last item to ensure that there is a correct validation
+		// only remove the Pixel, when we didnt eat, ohterwise the snake will grow
+		body_.removeFirst();
 	}
-	// check if highscore is broken. Directly save to avoid a not save in case of
+	// check for new highscore. Directly save to avoid a not save in case of
 	// reset or poweroff.
 	if (score() + 1 > highscore_) // + 1 because we didnt add the next vect because of the isValid() function
 	{
+		// write new highscore
 		highscore_ = score() + 1;
+		// save new highscore in eeprom
 		eeprom_write_word(&EE_highscore, highscore_);
 		is_new_highscore_ = true;
 	}
+
+	// check for colidation
 	if (!isValid(vect))
-	{                              // game end
-		body_ << vect.toSmartPos(); // append the the buffer to ensure correct score(computed out of the size of the list)
+	{
+		// append the buffer to ensure correct score(computed out of the size of the list)
+		body_ << vect.toSmartPos();
 		return true;
 	}
 	body_ << vect.toSmartPos();
