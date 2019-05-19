@@ -50,8 +50,8 @@ void SpaceInvaders::start(Event *event)
 {
 	event->setupGame();
 	event->addTimer(step_interval_);
-	event->addTimer();
 	event->addTimer(shot_interval_);
+	event->addTimer();
 	event->timer(0).start();
 	event->timer(1).start();
 	render();
