@@ -60,7 +60,7 @@ void Timer::setInterval(unsigned int interval)
 	interval_ = interval;
 }
 
-bool Timer::overflow()
+bool Timer::overflow() const
 {
 	return overflow_;
 }
@@ -68,4 +68,35 @@ bool Timer::overflow()
 void Timer::clearOverflow()
 {
 	overflow_ = false;
+}
+
+
+TimerNew::TimerNew(const unsigned int interval) : Trigger(), interval_(interval), next_time_(0xFFFFFFFE)
+{
+	if (interval_ != 0)
+	{
+		next_time_ = millis() + interval_;
+	}
+}
+
+bool TimerNew::process(const unsigned long &t)
+{
+	if (next_time_ <= t)
+	{
+		next_time_ = t + interval_;
+		triggered_ = true;
+		onTriggered();
+		return true;
+	}
+	return false;
+}
+
+void TimerNew::stop()
+{
+	next_time_ = 0xFFFFFFFE;
+}
+
+void TimerNew::start()
+{
+	next_time_ = millis() + interval_;
 }

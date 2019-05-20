@@ -23,4 +23,6 @@ add_avr_executable(${PROJECT_NAME}
     dodge.cpp
     staticlist.h
     spaceinvaders.cpp
+    buttonautotrigger.cpp
+    trigger.cpp
     )

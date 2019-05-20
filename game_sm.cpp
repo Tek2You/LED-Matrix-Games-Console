@@ -490,7 +490,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(4, 0);
+		item.init(5, 1);
 		event->setFlag(Event::ProcessPinChanges);
 		event->setFlag(Event::ProcessStop);
 	}
@@ -503,7 +503,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 		byte advanced = item.advance(event);
 		if (advanced)
 		{
-			if (item.value_ == 3)
+			if (item.value_ == 0)
 			{
 				if (advanced == MenuItem::DOWN_BTN)
 				{
@@ -529,23 +529,26 @@ void GameSM::stateHighscoreMenu(Event *event)
 	switch (item.value_)
 	{
 	case 0:
-		display_->setIcon(0xfffff7e300081c00, 0, false);
-		display_->text1_.setNumber(Tetris::highscore());
-		break;
-	case 1:
-		display_->setIcon(0x3c20203c04045c00, 0, false);
-		display_->text1_.setNumber(Snake::highscore());
-		break;
-	case 2:
-		display_->setIcon(0x381003c00e30310, 0, false);
-		display_->text1_.setNumber(Dodge::highscore());
-		break;
-	case 3:
 		display_->setIcon(0xbd42a59999a542bd, 0, false);
 		display_->text1_.setText(language_ == EN ? "reset"
 															  : "Zur"
 																 "\x1c"
 																 "cksetzen");
+	case 1:
+		display_->setIcon(0xfffff7e300081c00, 0, false);
+		display_->text1_.setNumber(Tetris::highscore());
+		break;
+	case 2:
+		display_->setIcon(0x3c20203c04045c00, 0, false);
+		display_->text1_.setNumber(Snake::highscore());
+		break;
+	case 3:
+		display_->setIcon(0x381003c00e30310, 0, false);
+		display_->text1_.setNumber(Dodge::highscore());
+		break;
+	case 4:
+		display_->setIcon(0x1c08000841d46b91, 0, false);
+		display_->text1_.setNumber(SpaceInvaders::highscore());
 	default:
 		break;
 	}

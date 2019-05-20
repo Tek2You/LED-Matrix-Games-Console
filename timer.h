@@ -18,6 +18,25 @@
 
 #pragma once
 #include "avr.h"
+#include "trigger.h"
+
+class TimerNew : public Trigger
+{
+public:
+	TimerNew(const unsigned int interval = 0);
+
+	void setInterval(const unsigned int interval) { interval_ = interval; }
+	unsigned int interval() const { return interval_; }
+
+	// Trigger interface
+	bool process(const unsigned long &t) override;
+	void stop() override;
+	void start() override;
+
+private:
+	unsigned int interval_;
+	unsigned long next_time_;
+};
 
 class Timer
 {
@@ -31,17 +50,16 @@ public:
 	inline void stop() { next_time_ = 0xFFFFFFFE; }
 
 	unsigned int interval() const;
-	void setInterval(unsigned int interval);
+	void setInterval(const unsigned int interval);
 
-	bool overflow();
+	bool overflow() const;
 	void clearOverflow();
-protected:
-	virtual void onOverflow(){
 
-	}
+protected:
+	virtual void onOverflow() {}
 
 private:
 	unsigned long next_time_;
-	unsigned long interval_;
+	unsigned int interval_;
 	bool overflow_ = false;
 };

@@ -205,7 +205,6 @@ bool SpaceInvaders::onTimerOverflow(Event *event)
 			shots_[i].row_++;
 			if (processShot(shots_[i]))
 			{
-				score_++;
 				shots_.remove(i);
 				i--;
 			}
