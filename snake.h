@@ -19,8 +19,8 @@
 #pragma once
 #include "game.h"
 #include "list.h"
-#include "staticlist.h"
 #include "position.h"
+#include "staticlist.h"
 
 class Snake : public Game
 {
@@ -28,21 +28,17 @@ public:
 	Snake(Display *display);
 	~Snake();
 
-	// public game interface
-
 	void start(Event *event);
-	unsigned int score() const
-	{
-		return body_.size() - 3;
-	}
+
 
 	void setSpeed(const byte v) override;
 
-	// static highscore functions
+	// score functions
+	unsigned int score() const { return body_.size() - 3; }
 	static unsigned int highscore() { return highscore_; }
 	static void resetHighscore();
 
-private:
+protected:
 	// game interface
 	bool onButtonChange(Event *event) override;
 	bool onTimerOverflow(Event *event) override;
@@ -50,20 +46,21 @@ private:
 	void onContinue(Event *event) override;
 	void render();
 
+private:
 	// local declared methods
 	// checks if the snake had touched the eat
 	bool eat(const Pos pos);
 	// moves the snake by one point
 	bool tick();
 	// checks if the current position is valid
-	bool isValid(const Pos &pos);
+	bool isValid(const Pos &pos) const;
 	// moves the position into the game field and checks valibility11
 	bool validate(Pos &pos);
 
 	// datatype abled to store a direction
 	enum Direction
 	{
-		UP ,
+		UP,
 		RIGHT,
 		DOWN,
 		LEFT,
@@ -78,7 +75,7 @@ private:
 	// Its only to ensure, that the snake is only rotated by 90° and not more
 	Direction new_direction_;
 	// list storing the hole body data
-	StaticList <SmartPos> body_;
+	StaticList<SmartPos> body_;
 	// position of the current point of eat
 	Pos eat_pos_;
 	// highscore of all runs

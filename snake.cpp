@@ -251,7 +251,7 @@ bool Snake::tick()
 
 // check if the given position is valid,
 // so isnt touching any point of the snake
-bool Snake::isValid(const Pos &pos)
+bool Snake::isValid(const Pos &pos) const
 {
 	//  if colides, return true
 	for (SmartPos tmp : body_)
