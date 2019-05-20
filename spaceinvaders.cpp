@@ -197,7 +197,6 @@ bool SpaceInvaders::onTimerOverflow(Event *event)
 			{
 				shots_.remove(i);
 				i--;
-				score_++;
 				if (score_ > highscore_ + 100)
 				{
 					highscore_ = score_;
@@ -290,6 +289,7 @@ bool SpaceInvaders::processShot(Shot &s)
 	{
 		while (bitRead(invaders_[s.row_], s.col_) && s.row_ < display_->rows())
 		{
+			score_++;
 			bitClear(invaders_[s.row_], s.col_);
 			s.row_++;
 		}
