@@ -37,7 +37,7 @@ public:
 	SpaceInvaders(Display *display);
 
 	static void resetHighscore();
-    static unsigned int highscore();
+	static unsigned int highscore() { return highscore_; }
 	// Game interface
 public:
 	void start(Event *event) override;
@@ -76,5 +76,5 @@ private:
 	void right();
 	bool processShot(Shot &s);
 	void insertRow();
-    void updateHighscore();
+    void updateHighscore(const byte offset=0);
 };

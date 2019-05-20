@@ -24,17 +24,22 @@ unsigned int SpaceInvaders::highscore_ = eeprom_read_word(&EE_highscore);
 SpaceInvaders::SpaceInvaders(Display *display)
 	 : Game(display, SPACE_INVADERS), invaders_(StaticList<byte>(display->rows()))
 {
-	display->clear();
-	display->show();
+	// setup position
 	pos_ = 3;
+
+	// fill buffer
 	for (int i = 0; i < display->rows(); i++)
 	{
 		invaders_ << 0;
 	}
+
+	// initial invaders
 	for (int i = 0; i < 3; i++)
 	{
 		insertRow();
 	}
+
+	// set speed for case that it wouldnt be done later
 	setSpeed(2);
 }
 
@@ -44,14 +49,15 @@ void SpaceInvaders::resetHighscore()
 	eeprom_write_word(&EE_highscore, 0);
 }
 
-unsigned int SpaceInvaders::highscore() { return highscore_; }
-
 void SpaceInvaders::start(Event *event)
 {
+	// sets the event flags
 	event->setupGame();
+	// setup timers
 	event->addTimer(step_interval_);
 	event->addTimer(shot_interval_);
 	event->addTimer();
+	// start shot and step timer
 	event->timer(0).start();
 	event->timer(1).start();
 	render();
@@ -60,12 +66,12 @@ void SpaceInvaders::start(Event *event)
 const unsigned int intervals[] PROGMEM = {
 	 2000, 65, 400, 200, // very slow
 	 1600, 60, 400, 160, // slow
-	 1200, 45, 300, 140, //  medium fast
+	 1200, 45, 300, 140, // medium fast
 	 1000, 55, 350, 120, // fast
 	 800,  50, 300, 100, // very fast
 };
 
-void SpaceInvaders::setSpeed(byte v)
+void SpaceInvaders::setSpeed(const byte v)
 {
 	step_interval_ = pgm_read_word(&intervals[4 * v]);
 	shot_interval_ = pgm_read_word(&intervals[4 * v + 1]);
@@ -73,9 +79,9 @@ void SpaceInvaders::setSpeed(byte v)
 	move_interval_ = pgm_read_word(&intervals[4 * v + 3]);
 }
 
-void SpaceInvaders::updateHighscore()
+void SpaceInvaders::updateHighscore(const byte offset)
 {
-	if (score_ > highscore_)
+	if (score_ > highscore_ + offset)
 	{
 		highscore_ = score_;
 		eeprom_write_word(&EE_highscore, highscore_);
@@ -87,13 +93,17 @@ unsigned int SpaceInvaders::score() const { return score_; }
 
 bool SpaceInvaders::onButtonChange(Event *event)
 {
+
+	// when button was pressed, start a shot
 	if (event->buttonDown().pressed())
 	{
 		shots_ << Shot(pos_);
 	}
 
+	// store move timer
 	Timer &move_timer = event->timer(2);
-	// btn left
+
+	// left button
 	if (event->buttonLeft().pressed())
 	{
 		if (!event->buttonRight().state())
@@ -164,6 +174,44 @@ bool SpaceInvaders::onButtonChange(Event *event)
 
 bool SpaceInvaders::onTimerOverflow(Event *event)
 {
+	// step counter (increases invaders)
+	if (event->timer(0).overflow())
+	{
+		// new random row
+		insertRow();
+		// check for shots
+		for (int i = 0; i < shots_.size(); i++)
+		{
+			if (processShot(shots_[i]))
+			{
+				shots_.remove(i);
+				i--;
+				updateHighscore(100);
+			}
+		}
+		// validation
+		if (invaders_[0] || bitRead(invaders_[1], pos_))
+		{
+			updateHighscore();
+			return true;
+		}
+	}
+
+	// timer for shots
+	if (event->timer(1).overflow())
+	{
+		for (int i = 0; i < shots_.size(); i++)
+		{
+			shots_[i].row_++;
+			if (processShot(shots_[i]))
+			{
+				score_++;
+				shots_.remove(i);
+				i--;
+			}
+		}
+	}
+
 	Timer &move_timer = event->timer(2);
 	if (move_timer.overflow())
 	{
@@ -186,45 +234,6 @@ bool SpaceInvaders::onTimerOverflow(Event *event)
 		move_timer.restart();
 	}
 
-	if (event->timer(0).overflow())
-	{
-		// new random row
-		insertRow();
-		// check for shots
-		for (int i = 0; i < shots_.size(); i++)
-		{
-			if (processShot(shots_[i]))
-			{
-				shots_.remove(i);
-				i--;
-				if (score_ > highscore_ + 100)
-				{
-					highscore_ = score_;
-					eeprom_write_word(&EE_highscore, highscore_);
-				}
-			}
-		}
-		// validation
-		if (invaders_[0] || bitRead(invaders_[1], pos_))
-		{
-			updateHighscore();
-			return true;
-		}
-	}
-
-	if (event->timer(1).overflow())
-	{
-		for (int i = 0; i < shots_.size(); i++)
-		{
-			shots_[i].row_++;
-			if (processShot(shots_[i]))
-			{
-				score_++;
-				shots_.remove(i);
-				i--;
-			}
-		}
-	}
 	render();
 	return false;
 }
@@ -246,36 +255,34 @@ void SpaceInvaders::onContinue(Event *event)
 
 void SpaceInvaders::render()
 {
+	// clear display
 	display_->clear();
+	// print invaders to field
 	display_->setArray(invaders_.toArray());
 
-	for (byte row = 0; row < invaders_.size(); row++)
-	{
-		display_->setRow(row, invaders_[row]);
-	}
-
+	// print shots
 	for (Shot s : shots_)
 	{
 		display_->setPixel(s.col_, s.row_);
 	}
 
+	// print shoter
 	display_->setPixel(pos_ - 1, 0);
 	display_->setPixel(pos_, 0);
 	display_->setPixel(pos_, 1);
 	display_->setPixel(pos_ + 1, 0);
 
+	// finaly show all on display
 	display_->show();
 }
 
 void SpaceInvaders::right()
 {
-
 	if (pos_ < 7) pos_++;
 }
 
 void SpaceInvaders::left()
 {
-
 	if (pos_ != 0) pos_--;
 }
 
@@ -285,27 +292,30 @@ Shot::Shot(byte col) : col_(col) { row_ = 2; }
 
 bool SpaceInvaders::processShot(Shot &s)
 {
+	// check for hit
 	if (bitRead(invaders_[s.row_], s.col_))
 	{
+		// delete bit as long as it forms a row
 		while (bitRead(invaders_[s.row_], s.col_) && s.row_ < display_->rows())
 		{
-			score_++;
 			bitClear(invaders_[s.row_], s.col_);
+			score_++;
 			s.row_++;
 		}
 		return true;
 	}
-	if (score_ > highscore_ + 100)
-	{
-		highscore_ = score_;
-		eeprom_write_word(&EE_highscore, highscore_);
-	}
+
+	// update highscore only when it has a difference of 100
+	updateHighscore(100);
 	return s.row_ >= display_->rows();
 }
 
 void SpaceInvaders::insertRow()
 {
-	if (invaders_.size() >= display_->rows()) invaders_.removeFirst();
+	// remove first
+	invaders_.removeFirst();
+	// create random value
 	byte val = rand() % 256;
+	// intert the random seed
 	invaders_.append(val);
 }
