@@ -23,13 +23,13 @@
 class MatrixDisplay
 {
 public:
-	MatrixDisplay(byte width, byte height);
+	MatrixDisplay(const byte width, const byte height);
 	~MatrixDisplay();
 	void processShow();
 	void clear();
 	void setPixel(byte col, const byte row, const bool value = true);
 	inline void setPixel(const Pos p, const bool value = true) { setPixel(p.pos_x, p.pos_y); }
-	void setArray(byte *array);
+	void setArray(const byte *array);
 	const byte rows()
 	{
 		return height_;
@@ -38,11 +38,11 @@ public:
 	{
 		return width_;
 	}
-	int setString(const char *s, int column, char cursor_pos, char spacing = 1, byte offset = 0);
-	byte setChar(char ch, int column, byte offset);
+	int setString(const char *s, int column, char spacing = 1, const byte offset = 0);
+	byte setChar(char ch, int column, const byte offset);
 	void clearRows(byte start, byte end);
-	void setColumn(byte column, byte value, byte offset = 0);
-	void clearColumns(byte start, byte end, byte offset);
+	void setColumn(const byte column, const byte value, const byte offset = 0);
+	void clearColumns(byte start, byte end, byte value);
 	void setRow(byte row, int value);
 	void show(bool take_over = true);
 
@@ -53,18 +53,18 @@ public:
 	// compute width (in columns) of text
 	static int width(const char *s, char spacing = 1);
 	// write integer value into string digits of max size
-	char *formatInt(char *digits, byte size, int value);
+	char *formatInt(char *digits, byte size, const int value);
 
 protected:
-	static const byte *letterStart(char ch);
+	static const byte *letterStart(const char ch);
 	static const byte letterWidth(char ch);
 	byte *columnPtr(byte column) const;
-	byte orderCols(const byte value);
-	byte mapCol(byte row);
+	byte orderCols(const byte value) const;
+	byte mapCol(const byte row) const;
 
 private:
-	inline byte* getBuffer();
-	inline byte* getPendingBuffer();
+	inline byte* getBuffer() const;
+	inline byte* getPendingBuffer() const;
 	bool pending_;
 	byte *rows1_;
 	byte *rows2_;

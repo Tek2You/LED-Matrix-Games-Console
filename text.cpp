@@ -19,7 +19,7 @@
 #include "text.h"
 
 Text::Text(MatrixDisplay *display)
-	 : display_(display), curser_pos_(-1), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(display->cols()-1), start_row_(0),
+	 : display_(display), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(display->cols()-1), start_row_(0),
 		end_row_(display->rows()-1), shift_start_col_(3), alignment_(MIDDLE)
 {
 	setShiftSpeed(5);
@@ -37,7 +37,7 @@ void Text::clear()
 void Text::shift()
 {
 	--current_shift_start_col_;
-	if (display_->setString(first_, current_shift_start_col_, curser_pos_ + text_ - first_, 1, offset_) <= 0)
+	if (display_->setString(first_, current_shift_start_col_, 1, offset_) <= 0)
 	{
 		first_ = text_;
 		current_shift_start_col_ = shift_start_col_;
@@ -54,7 +54,7 @@ void Text::shift()
 }
 
 // display (and remember) text (for future shifting)
-void Text::setText(const char *text, bool show)
+void Text::setText(const char *text, const bool show)
 {
 	first_ = text_ = text;
 	display_->clearRows(start_row_, end_row_);
@@ -64,7 +64,7 @@ void Text::setText(const char *text, bool show)
 	}
 }
 
-void Text::setNumber(const int &value, bool show)
+void Text::setNumber(const int &value, const bool show)
 {
 	setText(display_->formatInt(number_buffer_, 10, value),show);
 }
@@ -91,7 +91,7 @@ void Text::computeShiftMode()
 		else { // its left
 			current_shift_start_col_ = 0;
 		}
-		display_->setString(text_, current_shift_start_col_, curser_pos_, 1, offset_);
+		display_->setString(text_, current_shift_start_col_, 1, offset_);
 		Timer::stop();
 	}
 }
@@ -102,15 +102,16 @@ void Text::setShiftSpeed(const int speed)
 	setInterval(1000/speed_); // from shifts per second to mseconds per shift
 }
 
-void Text::setCursor(const char pos)
-{
-	curser_pos_ = pos;
-}
-
 void Text::setOperationRows(const byte start, const byte end)
 {
 	start_row_ = start;
 	end_row_ = end;
+}
+
+void Text::setShiftStartCol(const byte col)
+{
+	shift_start_col_ = col;
+	setText(text_);
 }
 
 void Text::onOverflow()

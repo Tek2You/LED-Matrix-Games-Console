@@ -182,7 +182,7 @@ const int PTN_LETTERS[] PROGMEM{
 const byte col_order[] = {5, 0, 2, 3, 1, 4, 6, 7};
 const byte row_order[] = {7, 6, 5, 4, 3, 2, 1, 0};
 
-MatrixDisplay::MatrixDisplay(byte height, byte width) : height_(height), width_(width), brigthness_(9)
+MatrixDisplay::MatrixDisplay(const byte height, const byte width) : height_(height), width_(width), brigthness_(9)
 {
 	// allocate memory for (columnwi0,se) display content
 	// allocate 2 buffer, to have possibility of pending
@@ -252,9 +252,7 @@ void MatrixDisplay::setPixel(const byte col, const byte row, const bool value)
 	bitWrite(getPendingBuffer()[row], col_order[col], value);
 }
 
-
-
-byte MatrixDisplay::orderCols(const byte value)
+byte MatrixDisplay::orderCols(const byte value) const
 {
 	byte out;
 	for (byte i = 0; i < 8; i++)
@@ -282,15 +280,15 @@ void MatrixDisplay::show(bool take_over)
 	}
 }
 
-void MatrixDisplay::setBrightness(const byte brightness) { brigthness_ = (255 - brightness) + 9; }
+void MatrixDisplay::setBrightness(const byte brightness) { brigthness_ = (264 - brightness); }
 
-byte MatrixDisplay::mapCol(byte row) { return ((row / 8) * 8) + col_order[row % 8]; }
+byte MatrixDisplay::mapCol(const byte row) const { return ((row / 8) * 8) + col_order[row % 8]; }
 
-byte *MatrixDisplay::getBuffer() { return (pending_ ? rows1_ : rows2_); }
+byte *MatrixDisplay::getBuffer() const { return (pending_ ? rows1_ : rows2_); }
 
-byte *MatrixDisplay::getPendingBuffer() { return (pending_ ? rows2_ : rows1_); }
+byte *MatrixDisplay::getPendingBuffer() const { return (pending_ ? rows2_ : rows1_); }
 
-void MatrixDisplay::setColumn(byte column, byte value, byte offset)
+void MatrixDisplay::setColumn(const byte column, const byte value, const byte offset)
 {
 	if (column >= width_) return;
 	;
@@ -300,7 +298,7 @@ void MatrixDisplay::setColumn(byte column, byte value, byte offset)
 	}
 }
 
-void MatrixDisplay::setArray(byte *array)
+void MatrixDisplay::setArray(const byte *array)
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -317,13 +315,13 @@ void MatrixDisplay::clearRows(byte start, byte end)
 	for (; start < end; ++start) setRow(start, 0);
 }
 
-void MatrixDisplay::clearColumns(byte start, byte end, byte offset)
+void MatrixDisplay::clearColumns(byte start, byte end, byte value)
 {
 	if (start < 0) start = 0;
 	if (end > width_) end = width_;
 	for (; start < end; ++start)
 	{
-		setColumn(start, 0, offset);
+		setColumn(start, 0, value);
 	}
 }
 
@@ -342,7 +340,7 @@ const byte MatrixDisplay::letterWidth(char ch)
 }
 
 // write a sing-le char, starting at column
-byte MatrixDisplay::setChar(char ch, int column, byte offset)
+byte MatrixDisplay::setChar(char ch, int column, const byte offset)
 {
 	const byte *end;
 	const byte *start = letterStart(ch);
@@ -355,7 +353,7 @@ byte MatrixDisplay::setChar(char ch, int column, byte offset)
 	return width;
 }
 
-int MatrixDisplay::setString(const char *s, int column, char cursor_pos, char spacing, byte offset)
+int MatrixDisplay::setString(const char *s, int column, char spacing, const byte offset)
 {
 	while (*s != 0 && column < width_)
 	{

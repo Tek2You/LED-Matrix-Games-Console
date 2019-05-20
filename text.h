@@ -40,8 +40,8 @@ public:
 		RIGHT,
 	};
 
-	void setText(const char *text, bool show = true);
-	void setNumber(const int &number, bool show = true);
+	void setText(const char *text, const bool show = true);
+	void setNumber(const int &number, const bool show = true);
 	void setAlignment(const Align align) { alignment_ = align; }
 
 	void clear();
@@ -50,18 +50,11 @@ public:
 	int shiftSpeed() const { return speed_; }
 
 	void setOffset(const byte offset) { offset_ = offset; }
-	byte offset() const { return offset_; }
-
-	void setCursor(const char pos);
-	char getCursor() const { return curser_pos_; }
+	const byte offset() const { return offset_; }
 
 	void setOperationRows(const byte start, const byte end);
 
-	void setShiftStartCol(byte col)
-	{
-		shift_start_col_ = col;
-		setText(text_);
-	}
+	void setShiftStartCol(const byte col);
 
 private:
 	void shift();
@@ -77,7 +70,6 @@ private:
 	ShiftMode shift_mode_;
 	int speed_; // columns per second
 	byte offset_;
-	char curser_pos_;
 	byte start_col_, end_col_, start_row_, end_row_;
 	char number_buffer_[10];
 	Align alignment_;
