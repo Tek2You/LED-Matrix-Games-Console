@@ -48,10 +48,9 @@ private:
 	{
 		const char *text_[2];
 		const uint64_t icon_;
-//		void show(){show(&this);}
 	};
 
-	void showIcon(const Item &item);
+	void showItem(const Item &item);
 
 	class MenuItem
 	{

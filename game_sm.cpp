@@ -165,7 +165,7 @@ void GameSM::stateDefault(Event *event)
 		return;
 	}
 
-	showIcon(items[item.value_]);
+	showItem(items[item.value_]);
 }
 
 void GameSM::stateGame(Event *event)
@@ -299,7 +299,7 @@ void GameSM::stateSettingsMenu(Event *event)
 	{
 		return;
 	}
-	showIcon(items[item.value_]);
+	showItem(items[item.value_]);
 }
 
 void GameSM::stateSpeedMenu(Event *event)
@@ -605,7 +605,7 @@ void GameSM::processGame(Event *event)
 	}
 }
 
-void GameSM::showIcon(const GameSM::Item &item)
+void GameSM::showItem(const GameSM::Item &item)
 {
 	display_->setIcon(item.icon_, 0, false);
 
