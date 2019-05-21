@@ -23,6 +23,14 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
+const int speeds[] PROGMEM = {
+    1800, 180, 400, 200, 80,  // very slow
+    1400, 140, 400, 160, 90,  // slow
+    1000, 100, 300, 140, 100, // medium fast
+    800,  80,  350, 120, 110, // fast
+    500,  50,  300, 100, 120, // very fast
+};
+
 Tetris::Tetris(Display *display)
 	 : Game(display, TETRIS), blink_cycle_(DEFAULT), field_(display->rows()), tetromino_(nullptr), points_(0)
 {
@@ -50,33 +58,19 @@ Tetris::~Tetris()
 void Tetris::start(Event *event)
 {
 	event->setupGame();
-	step_timer_ = new Timer(step_interval_);
+	step_timer_ = new Timer(readSpeed(StepInterval));
 	event->addTrigger(step_timer_);
-	blink_timer_ = new Timer(blink_interval_);
+	blink_timer_ = new Timer(readSpeed(BlinkInterval));
 	event->addTrigger(blink_timer_);
 	move_trigger_ =
-		 new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), first_move_interval_, move_interval_);
+		 new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), readSpeed(FirstMoveInterval), readSpeed(MoveInterval));
 	event->addTrigger(move_trigger_);
 
 	newTetromino();
 }
 
-const int interval[] PROGMEM = {
-	 1800, 180, 400, 200, 80,  // very slow
-	 1400, 140, 400, 160, 90,  // slow
-	 1000, 100, 300, 140, 100, // medium fast
-	 800,  80,  350, 120, 110, // fast
-	 500,  50,  300, 100, 120, // very fast
-};
 
-void Tetris::setSpeed(const byte v)
-{
-	step_interval_ = pgm_read_word(&interval[v * 5]);
-	down_interval_ = pgm_read_word(&interval[v * 5 + 1]);
-	first_move_interval_ = pgm_read_word(&interval[v * 5 + 2]);
-	move_interval_ = pgm_read_word(&interval[v * 5 + 3]);
-	blink_interval_ = pgm_read_word(&interval[v * 5 + 4]);
-}
+
 
 void Tetris::render()
 {
@@ -106,7 +100,7 @@ void Tetris::onStop(Event *event)
 void Tetris::onContinue(Event *event)
 {
 	clearFullRowsImmediately(); // clears all rows, if interrupted during clear effect
-	step_timer_->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
+	step_timer_->setInterval((event->buttonDown().state() ? readSpeed(DownInterval) : readSpeed(StepInterval)));
 	step_timer_->start();
 
 	Game::onContinue(event);
@@ -282,20 +276,17 @@ bool Tetris::onButtonChange(Event *event)
 		rotate();
 	}
 
-	// Down(faster)
-	if (event->buttonDown().pressed())
-	{
-		if (tick(event)) // check if
-		{
-			return true;
+	// Down(faster and lower)
+	if(event->buttonDown().changed()){
+		unsigned int interval;
+		if(event->buttonDown().state()){
+			if(tick(event))
+				return true;
+			interval = readSpeed(DownInterval);
 		}
-		step_timer_->setInterval(down_interval_);
-		step_timer_->restart();
-	}
-	else if (event->buttonDown().released())
-	{
-		// unset fast down
-		step_timer_->setInterval(step_interval_);
+		else
+			interval = readSpeed(StepInterval);
+		step_timer_->setInterval(interval);
 		step_timer_->restart();
 	}
 	return false;
@@ -362,7 +353,7 @@ bool Tetris::clearFullRows(Event *event)
 			//			clearFullRowsImmediately();
 			display_->setArray(field_.toArray());
 			step_timer_->start();
-			step_timer_->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
+			step_timer_->setInterval((event->buttonDown().state() ? readSpeed(DownInterval) : readSpeed(StepInterval)));
 
 			if (newTetromino()) return true;
 			return false;
@@ -432,7 +423,6 @@ void Tetris::clearFullRowsImmediately()
 		}
 	}
 	render();
-	display_->show();
 	blink_cycle_ = DEFAULT;
 	takeOverTetromino();
 	newTetromino();
@@ -478,4 +468,9 @@ Direction Tetris::randomTetrominoDirection(const Shape &shape)
 			j++;
 		}
 	}
+}
+
+unsigned int Tetris::readSpeed(const Tetris::SpeedFlag flag) const
+{
+	return pgm_read_word(&speeds[flag+speed_*5]);
 }

@@ -31,7 +31,10 @@ public:
 	~Tetris();
 
 	void start(Event *event);
-	void setSpeed(const byte v) override;
+	void setSpeed(const byte v) override
+	{
+		speed_ = v;
+	}
 
 	// score functions
 	unsigned int score() const
@@ -73,12 +76,16 @@ private:
 	Timer * blink_timer_;
 	ButtonAutoTrigger * move_trigger_;
 
-	// from speed calculated delay intervals
-	unsigned int step_interval_;
-	unsigned int down_interval_;
-	unsigned int first_move_interval_;
-	unsigned int move_interval_;
-	unsigned int blink_interval_;
+	byte speed_;
+	enum SpeedFlag{
+		StepInterval = 0,
+		DownInterval = 1,
+		FirstMoveInterval = 2,
+		MoveInterval = 3,
+		BlinkInterval = 4
+	};
+
+	unsigned int readSpeed(const SpeedFlag flag) const;
 
 	StaticList<byte> field_; // field without current tetromino
 	Tetromino *tetromino_;
