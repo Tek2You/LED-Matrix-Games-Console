@@ -19,6 +19,8 @@
 #pragma once
 #include "avr.h"
 #include "game.h"
+#include "time.h"
+#include "buttonautotrigger.h"
 
 class Dodge : public Game
 {
@@ -80,14 +82,22 @@ private:
 	byte appendElement(byte element);
 	void appendElements();
 	bool tick();
-	void right();
-	void left();
+	void move(ButtonAutoTrigger::Direction dir);
 
-	// periods
-	unsigned int period_;
-	unsigned int fast_period_;
-	unsigned int first_move_period_;
-	unsigned int move_period_;
+	enum SpeedFlag{
+		StepInterval,
+		FastStepInterval,
+		FirstMoveInterval,
+		MoveInterval,
+	};
+
+	Timer * step_timer_;
+	Timer * blink_timer_;
+	ButtonAutoTrigger * auto_move_;
+
+	unsigned int readSpeed(const SpeedFlag flag);
+
+	byte speed_;
 
 	unsigned int score_;
 	bool dot_state_;

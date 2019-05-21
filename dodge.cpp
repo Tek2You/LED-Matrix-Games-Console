@@ -36,17 +36,20 @@ const Dodge::LineData lines[11] = {
 	 {Dodge::LineData::set(2, 2, 1), {0b00001111, 0b11000000}},
 };
 
-Dodge::Dodge(Display *display) : Game(display, DODGE), dot_state_(true) {}
+Dodge::Dodge(Display *display) : Game(display, DODGE), dot_state_(true), score_(0) {}
 
 void Dodge::start(Event *event)
 {
 	event->setupGame();
 
-	event->addTrigger(new Timer(period_));
-	event->addTrigger(new Timer); // not yet start button timer
-	event->addTrigger(new Timer(20));
+	step_timer_ = new Timer(readSpeed(StepInterval));
+	event->addTrigger(step_timer_);
+	blink_timer_ = new Timer(20);
+	event->addTrigger(blink_timer_);
+	auto_move_ = new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), readSpeed(FirstMoveInterval),
+												  readSpeed(MoveInterval));
+	event->addTrigger(auto_move_);
 
-	score_ = 0;
 	pos_ = Pos(3, 15);
 	elements_.removeAll();
 	for (byte i = 0; i < 12; i++)
@@ -58,7 +61,7 @@ void Dodge::start(Event *event)
 	return;
 }
 
-const int interval[] PROGMEM = {
+const int speeds_[] PROGMEM = {
 	 400, 200, 300, 200, // very slow
 	 300, 150, 320, 150, // shlow
 	 250, 125, 300, 125, // medium fast
@@ -66,115 +69,61 @@ const int interval[] PROGMEM = {
 	 150, 75,  200, 75,  // very fast
 };
 
-void Dodge::setSpeed(byte v)
-{
-	period_ = pgm_read_word(&interval[v*4]);
-	fast_period_ = pgm_read_word(&interval[v*4+1]);
-	first_move_period_ = pgm_read_word(&interval[v*4+2]);
-	move_period_ = pgm_read_word(&interval[v*4+3]);
-}
+void Dodge::setSpeed(byte v) { speed_ = v; }
 
 void Dodge::resetHighscore() { eeprom_write_word(&EE_highscore, highscore_ = 0); }
 
 bool Dodge::onButtonChange(Event *event)
 {
-	if (event->buttonDown().pressed())
+	if (event->buttonDown().changed())
 	{
-		// if first pressed, directly execute tick to get a dynamic result
-		if (tick()) return true;
-		static_cast<Timer*>(event->trigger(0))->setInterval(fast_period_);
-		event->trigger(0)->restart();
-	}
-	else if (event->buttonDown().released())
-	{
-		static_cast<Timer*>(event->trigger(0))->setInterval(period_);
-		event->trigger(0)->restart();
-	}
-
-	Timer * move_timer = static_cast<Timer*>(event->trigger(1));
-	// btn left
-	if (event->buttonLeft().changed())
-	{
-		if (event->buttonLeft().state())
+		unsigned int interval;
+		if (event->buttonDown().state())
 		{
-			if (!event->buttonRight().state())
-			{
-				left();
-				move_timer->setInterval(first_move_period_);
-				move_timer->start();
-			}
+			if (tick()) return true;
+			interval = readSpeed(FastStepInterval);
 		}
 		else
-		{
-			move_timer->stop();
-			move_timer->clear();
-		}
+			interval = readSpeed(StepInterval);
+		step_timer_->setInterval(interval);
+		step_timer_->restart();
 	}
-
-	// btn right
-	if (event->buttonRight().changed())
-	{
-		if (event->buttonRight().state())
-		{
-			if (!event->buttonLeft().state())
-			{
-				right();
-				move_timer->setInterval(first_move_period_);
-				move_timer->start();
-			}
-		}
-		else
-		{
-			move_timer->stop();
-			move_timer->clear();
-		}
-	}
-	return false;
 }
 
 bool Dodge::onTriggered(Event *event)
 {
-	if (event->trigger(0)->triggered())
+	if (step_timer_->triggered())
 	{
 		if (tick()) return true;
 	}
 
-	Timer * move_timer = static_cast<Timer*>(event->trigger(1));
-	if (move_timer->triggered())
+	if (auto_move_->triggered())
 	{
-		if (event->buttonLeft().state())
-		{
-			left();
-			move_timer->setInterval(move_period_);
-		}
-
-		else if (event->buttonRight().state())
-		{
-			right();
-			move_timer->setInterval(move_period_);
-		}
+		ButtonAutoTrigger::Direction dir = auto_move_->direction();
+		move(dir);
 	}
-	if (event->trigger(2)->triggered())
+
+	if (step_timer_->triggered())
 	{
 		dot_state_ = !dot_state_;
-		render();
 	}
+	render();
 	return false;
 }
 
 void Dodge::onStop(Event *event)
 {
 	Game::onStop(event);
-	event->trigger(0)->stop();
-	event->trigger(1)->stop();
-	event->trigger(2)->stop();
+	step_timer_->stop();
+	blink_timer_->stop();
+	auto_move_->stop();
 }
 void Dodge::onContinue(Event *event)
 {
 	Game::onContinue(event);
-	event->trigger(0)->restart();
-	event->trigger(1)->restart();
-	event->trigger(2)->restart();
+	step_timer_->restart();
+	blink_timer_->restart();
+	auto_move_->restart();
 }
 
 void Dodge::render()
@@ -250,28 +199,17 @@ bool Dodge::tick()
 	return false;
 }
 
-void Dodge::right()
+void Dodge::move(ButtonAutoTrigger::Direction dir)
 {
 	Pos tmp = pos_;
-	tmp.pos_x += 1;
+	tmp.pos_x += (dir == ButtonAutoTrigger::BTN_1 ? 1 : -1);
 	if (tmp.pos_x > 7) return;
-	if (bitRead(elements_.itemAt(15 - tmp.pos_y), tmp.pos_x))
-	{
-		return;
-	}
-	pos_ = tmp;
-	render();
-}
-
-void Dodge::left()
-{
-	Pos tmp = pos_;
-	tmp.pos_x -= 1;
 	if (tmp.pos_x < 0) return;
 	if (bitRead(elements_.itemAt(15 - tmp.pos_y), tmp.pos_x))
 	{
 		return;
 	}
 	pos_ = tmp;
-	render();
 }
+
+unsigned int Dodge::readSpeed(const SpeedFlag flag) { return pgm_read_word(&speeds_[flag + speed_ * 4]); }
