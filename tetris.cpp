@@ -53,8 +53,9 @@ void Tetris::start(Event *event)
 {
 	event->setupGame();
 	event->addTrigger(new Timer(step_interval_));  // tick timer
-	event->addTrigger(new Timer);                  // move timer
+	event->addTrigger(new Timer);
 	event->addTrigger(new Timer(blink_interval_)); // blink timer
+	event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), first_move_interval_, move_interval_));
 
 	newTetromino();
 }
@@ -280,7 +281,6 @@ bool Tetris::onButtonChange(Event *event)
 		return false;
 	}
 	Timer *down_timer = static_cast<Timer *>(event->trigger(0));
-	Timer *move_timer = static_cast<Timer *>(event->trigger(1));
 	// Rotation
 	if (event->buttonUp().pressed())
 	{
@@ -303,65 +303,22 @@ bool Tetris::onButtonChange(Event *event)
 		down_timer->setInterval(step_interval_);
 		down_timer->restart();
 	}
-
-	// btn left
-	if (event->buttonLeft().pressed())
-	{
-		if (!event->buttonRight().state())
-		{
-			left();
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-			move_dir_ = LEFT_MOVE;
-		}
-	}
-	else if (event->buttonLeft().released() && move_dir_ == LEFT_MOVE)
-	{
-		move_timer->clear();
-		if (event->buttonRight().state())
-		{
-			move_dir_ = RIGHT_MOVE;
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-		}
-		else
-		{
-			move_timer->stop();
-			move_dir_ = NO_MOVE;
-		}
-	}
-
-	// btn right
-	if (event->buttonRight().pressed())
-	{
-		if (!event->buttonLeft().state())
-		{
-			right();
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-			move_dir_ = RIGHT_MOVE;
-		}
-	}
-	else if (event->buttonRight().released() && move_dir_ == RIGHT_MOVE)
-	{
-		move_timer->clear();
-		if (event->buttonLeft().state())
-		{
-			move_dir_ = LEFT_MOVE;
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-		}
-		else
-		{
-			move_timer->stop();
-			move_dir_ = NO_MOVE;
-		};
-	}
 	return false;
 }
 
-bool Tetris::onTimerOverflow(Event *event)
+
+
+bool Tetris::onTriggered(Event *event)
 {
+	if (event->trigger(3)->triggered())
+	{
+		ButtonAutoTrigger::Direction dir = static_cast<ButtonAutoTrigger *>(event->trigger(3))->getDirection();
+		if (dir == ButtonAutoTrigger::BTN_1)
+			left();
+		else if (dir == ButtonAutoTrigger::BTN_2)
+			right();
+	}
+
 	if (blink_cycle_ != DEFAULT)
 	{
 		if (event->trigger(2)->triggered())
@@ -369,23 +326,6 @@ bool Tetris::onTimerOverflow(Event *event)
 			if (clearFullRows(event)) return true;
 		}
 		return false;
-	}
-	Timer *move_timer = static_cast<Timer *>(event->trigger(1));
-	if (move_timer->triggered())
-	{
-		if (move_dir_ == LEFT_MOVE)
-		{
-			left();
-			move_timer->setInterval(move_interval_);
-			move_timer->restart();
-		}
-
-		else if (move_dir_ == RIGHT_MOVE)
-		{
-			right();
-			move_timer->setInterval(move_interval_);
-			move_timer->restart();
-		}
 	}
 
 	if (event->trigger(0)->triggered())
@@ -397,6 +337,8 @@ bool Tetris::onTimerOverflow(Event *event)
 	}
 	return false;
 }
+
+
 
 bool Tetris::clearFullRows(Event *event)
 {

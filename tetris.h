@@ -22,6 +22,7 @@
 #include "game.h"
 #include "tetromino.h"
 #include "staticlist.h"
+#include "buttonautotrigger.h"
 
 class Tetris : public Game
 {
@@ -46,7 +47,7 @@ public:
 protected:
 	// game interface
 	bool onButtonChange(Event *event) override;
-	bool onTimerOverflow(Event *event) override;
+	bool onTriggered(Event *event) override;
 	void onStop(Event *event) override;
 	void onContinue(Event *event) override;
 	void render();
