@@ -43,11 +43,11 @@ bool Game::process(Event *event)
 		{
 			stop_state_ = true;
 			onStop(event);
-			event->addTimer(500); // add timer for reset game
+			event->addTrigger(new Timer(500)); // add timer for reset game
 		}
 		else // second time pressed
 		{
-			event->timers_.last().restart();
+			event->triggers_.last()->restart();
 		}
 		return false;
 	}
@@ -59,7 +59,7 @@ bool Game::process(Event *event)
 			first_released_ = false;
 			display_->setRow(15, 0);
 			display_->show();
-			event->timers_.last().setInterval(500);
+			(static_cast<Timer*>(event->triggers_.last()))->setInterval(500);
 		}
 		if (stop_state_)
 		{
@@ -72,17 +72,17 @@ bool Game::process(Event *event)
 				first_released_ = false;
 				stop_state_ = false;
 				onContinue(event);
-				event->timers_.removeLast();
+				event->triggers_.removeLast();
 				return false;
 			}
 		}
 	}
 	else if (stop_state_)
 	{
-		if (event->timers_.last().overflow() && event->buttonStop().state())
+		if (event->triggers_.last()->triggered() && event->buttonStop().state())
 		{
-			event->timers_.last().setInterval(200);
-			event->timers_.last().restart();
+			(static_cast<Timer*>(event->triggers_.last()))->setInterval(200);
+			event->triggers_.last()->restart();
 			display_->setPixel(reset_count, 15);
 			display_->show();
 			reset_count++;
@@ -91,7 +91,7 @@ bool Game::process(Event *event)
 				stop_state_ = false;
 				first_released_ = false;
 				reset_count = 0;
-				event->timers_.removeLast();
+				event->triggers_.removeLast();
 				return true;
 			}
 		}

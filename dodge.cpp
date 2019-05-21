@@ -42,9 +42,9 @@ void Dodge::start(Event *event)
 {
 	event->setupGame();
 
-	event->addTimer(period_);
-	event->addTimer(); // not yet start button timer
-	event->addTimer(20);
+	event->addTrigger(new Timer(period_));
+	event->addTrigger(new Timer); // not yet start button timer
+	event->addTrigger(new Timer(20));
 
 	score_ = 0;
 	pos_ = Pos(3, 15);
@@ -82,16 +82,16 @@ bool Dodge::onButtonChange(Event *event)
 	{
 		// if first pressed, directly execute tick to get a dynamic result
 		if (tick()) return true;
-		event->timer(0).setInterval(fast_period_);
-		event->timer(0).restart();
+		static_cast<Timer*>(event->trigger(0))->setInterval(fast_period_);
+		event->trigger(0)->restart();
 	}
 	else if (event->buttonDown().released())
 	{
-		event->timer(0).setInterval(period_);
-		event->timer(0).restart();
+		static_cast<Timer*>(event->trigger(0))->setInterval(period_);
+		event->trigger(0)->restart();
 	}
 
-	Timer &move_timer = event->timer(1);
+	Timer * move_timer = static_cast<Timer*>(event->trigger(1));
 	// btn left
 	if (event->buttonLeft().changed())
 	{
@@ -100,14 +100,14 @@ bool Dodge::onButtonChange(Event *event)
 			if (!event->buttonRight().state())
 			{
 				left();
-				move_timer.setInterval(first_move_period_);
-				move_timer.start();
+				move_timer->setInterval(first_move_period_);
+				move_timer->start();
 			}
 		}
 		else
 		{
-			move_timer.stop();
-			move_timer.clearOverflow();
+			move_timer->stop();
+			move_timer->clear();
 		}
 	}
 
@@ -119,14 +119,14 @@ bool Dodge::onButtonChange(Event *event)
 			if (!event->buttonLeft().state())
 			{
 				right();
-				move_timer.setInterval(first_move_period_);
-				move_timer.start();
+				move_timer->setInterval(first_move_period_);
+				move_timer->start();
 			}
 		}
 		else
 		{
-			move_timer.stop();
-			move_timer.clearOverflow();
+			move_timer->stop();
+			move_timer->clear();
 		}
 	}
 	return false;
@@ -134,27 +134,27 @@ bool Dodge::onButtonChange(Event *event)
 
 bool Dodge::onTimerOverflow(Event *event)
 {
-	if (event->timer(0).overflow())
+	if (event->trigger(0)->triggered())
 	{
 		if (tick()) return true;
 	}
 
-	Timer &move_timer = event->timer(1);
-	if (move_timer.overflow())
+	Timer * move_timer = static_cast<Timer*>(event->trigger(1));
+	if (move_timer->triggered())
 	{
 		if (event->buttonLeft().state())
 		{
 			left();
-			move_timer.setInterval(move_period_);
+			move_timer->setInterval(move_period_);
 		}
 
 		else if (event->buttonRight().state())
 		{
 			right();
-			move_timer.setInterval(move_period_);
+			move_timer->setInterval(move_period_);
 		}
 	}
-	if (event->timer(2).overflow())
+	if (event->trigger(2)->triggered())
 	{
 		dot_state_ = !dot_state_;
 		render();
@@ -165,16 +165,16 @@ bool Dodge::onTimerOverflow(Event *event)
 void Dodge::onStop(Event *event)
 {
 	Game::onStop(event);
-	event->timer(0).stop();
-	event->timer(1).stop();
-	event->timer(2).stop();
+	event->trigger(0)->stop();
+	event->trigger(1)->stop();
+	event->trigger(2)->stop();
 }
 void Dodge::onContinue(Event *event)
 {
 	Game::onContinue(event);
-	event->timer(0).restart();
-	event->timer(1).restart();
-	event->timer(2).restart();
+	event->trigger(0)->restart();
+	event->trigger(1)->restart();
+	event->trigger(2)->restart();
 }
 
 void Dodge::render()

@@ -450,15 +450,15 @@ void GameSM::stateLoadEffect(Event *event)
 		display_->text1_.clear();
 		display_->text2_.clear();
 		event->removeAllTimers();
-		event->addTimer(12);
-		event->setFlag(Event::ProcessTimerOverflows);
+		event->addTrigger(new Timer(12));
+		event->setFlag(Event::ProcessTriggers);
 		event->setFlag(Event::ProcessStop);
 	}
 	else if (processMenuStop(event))
 	{
 		return;
 	}
-	if (event->timer(0).overflow())
+	if (event->trigger(0)->triggered())
 	{
 		if (count >= display_->rows() * display_->cols() / 2)
 		{

@@ -52,9 +52,9 @@ Tetris::~Tetris()
 void Tetris::start(Event *event)
 {
 	event->setupGame();
-	event->addTimer(step_interval_);  // tick timer
-	event->addTimer();                // move timer
-	event->addTimer(blink_interval_); // blink timer
+	event->addTrigger(new Timer(step_interval_));  // tick timer
+	event->addTrigger(new Timer);                  // move timer
+	event->addTrigger(new Timer(blink_interval_)); // blink timer
 
 	newTetromino();
 }
@@ -70,10 +70,10 @@ const int interval[] PROGMEM = {
 void Tetris::setSpeed(const byte v)
 {
 	step_interval_ = pgm_read_word(&interval[v * 5]);
-	down_interval_ = pgm_read_word(&interval[v* 5 + 1]);
-	first_move_interval_ = pgm_read_word(&interval[v* 5 + 2]);
-	move_interval_ = pgm_read_word(&interval[v* 5 + 3]);
-	blink_interval_ = pgm_read_word(&interval[v* 5 + 4]);
+	down_interval_ = pgm_read_word(&interval[v * 5 + 1]);
+	first_move_interval_ = pgm_read_word(&interval[v * 5 + 2]);
+	move_interval_ = pgm_read_word(&interval[v * 5 + 3]);
+	blink_interval_ = pgm_read_word(&interval[v * 5 + 4]);
 }
 
 void Tetris::render()
@@ -94,9 +94,9 @@ void Tetris::render()
 
 void Tetris::onStop(Event *event)
 {
-	event->timer(0).stop();
-	event->timer(1).stop();
-	event->timer(2).stop();
+	event->trigger(0)->stop();
+	event->trigger(1)->stop();
+	event->trigger(2)->stop();
 	blink_cycle_ = DEFAULT;
 	Game::onStop(event);
 }
@@ -104,12 +104,9 @@ void Tetris::onStop(Event *event)
 void Tetris::onContinue(Event *event)
 {
 	clearFullRowsImmediately(); // clears all rows, if interrupted during clear effect
-	render();
-	event->timer(0).start();
-	if (event->buttonDown().state())
-		event->timer(0).setInterval(down_interval_);
-	else
-		event->timer(0).setInterval(step_interval_);
+	(static_cast<Timer *>(event->trigger(0)))
+		 ->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
+	event->trigger(0)->start();
 
 	Game::onContinue(event);
 	// for the second timer, the restart is not required, because its used for button long pressed
@@ -282,7 +279,8 @@ bool Tetris::onButtonChange(Event *event)
 	{
 		return false;
 	}
-	Timer &move_timer = event->timer(1);
+	Timer *down_timer = static_cast<Timer *>(event->trigger(0));
+	Timer *move_timer = static_cast<Timer *>(event->trigger(1));
 	// Rotation
 	if (event->buttonUp().pressed())
 	{
@@ -292,19 +290,18 @@ bool Tetris::onButtonChange(Event *event)
 	// Down(faster)
 	if (event->buttonDown().pressed())
 	{
-		debug = 1;
 		if (tick(event)) // check if
 		{
 			return true;
 		}
-		event->timer(0).setInterval(down_interval_);
-		event->timer(0).restart();
+		down_timer->setInterval(down_interval_);
+		down_timer->restart();
 	}
 	else if (event->buttonDown().released())
 	{
 		// unset fast down
-		event->timer(0).setInterval(step_interval_);
-		event->timer(0).restart();
+		down_timer->setInterval(step_interval_);
+		down_timer->restart();
 	}
 
 	// btn left
@@ -313,23 +310,23 @@ bool Tetris::onButtonChange(Event *event)
 		if (!event->buttonRight().state())
 		{
 			left();
-			move_timer.setInterval(first_move_interval_);
-			move_timer.restart();
+			move_timer->setInterval(first_move_interval_);
+			move_timer->restart();
 			move_dir_ = LEFT_MOVE;
 		}
 	}
 	else if (event->buttonLeft().released() && move_dir_ == LEFT_MOVE)
 	{
-		move_timer.clearOverflow();
+		move_timer->clear();
 		if (event->buttonRight().state())
 		{
 			move_dir_ = RIGHT_MOVE;
-			move_timer.setInterval(first_move_interval_);
-			move_timer.restart();
+			move_timer->setInterval(first_move_interval_);
+			move_timer->restart();
 		}
 		else
 		{
-			move_timer.stop();
+			move_timer->stop();
 			move_dir_ = NO_MOVE;
 		}
 	}
@@ -340,23 +337,23 @@ bool Tetris::onButtonChange(Event *event)
 		if (!event->buttonLeft().state())
 		{
 			right();
-			move_timer.setInterval(first_move_interval_);
-			move_timer.restart();
+			move_timer->setInterval(first_move_interval_);
+			move_timer->restart();
 			move_dir_ = RIGHT_MOVE;
 		}
 	}
 	else if (event->buttonRight().released() && move_dir_ == RIGHT_MOVE)
 	{
-		move_timer.clearOverflow();
+		move_timer->clear();
 		if (event->buttonLeft().state())
 		{
 			move_dir_ = LEFT_MOVE;
-			move_timer.setInterval(first_move_interval_);
-			move_timer.restart();
+			move_timer->setInterval(first_move_interval_);
+			move_timer->restart();
 		}
 		else
 		{
-			move_timer.stop();
+			move_timer->stop();
 			move_dir_ = NO_MOVE;
 		};
 	}
@@ -367,34 +364,32 @@ bool Tetris::onTimerOverflow(Event *event)
 {
 	if (blink_cycle_ != DEFAULT)
 	{
-		if (event->timer(2).overflow())
+		if (event->trigger(2)->triggered())
 		{
 			if (clearFullRows(event)) return true;
 		}
 		return false;
 	}
-	Timer &move_timer = event->timer(1);
-	if (move_timer.overflow())
+	Timer *move_timer = static_cast<Timer *>(event->trigger(1));
+	if (move_timer->triggered())
 	{
 		if (move_dir_ == LEFT_MOVE)
 		{
 			left();
-			move_timer.setInterval(move_interval_);
-			move_timer.restart();
+			move_timer->setInterval(move_interval_);
+			move_timer->restart();
 		}
 
 		else if (move_dir_ == RIGHT_MOVE)
 		{
 			right();
-			move_timer.setInterval(move_interval_);
-			move_timer.restart();
+			move_timer->setInterval(move_interval_);
+			move_timer->restart();
 		}
 	}
 
-	Timer &down_timer = event->timer(0);
-	if (down_timer.overflow())
+	if (event->trigger(0)->triggered())
 	{
-		debug = 0;
 		if (tick(event)) // end of the game
 		{
 			return true;
@@ -430,14 +425,12 @@ bool Tetris::clearFullRows(Event *event)
 		else
 		{
 			blink_cycle_ = DEFAULT;
-			event->timer(2).stop();
+			event->trigger(2)->stop();
 			//			clearFullRowsImmediately();
 			display_->setArray(field_.toArray());
-			event->timer(0).start();
-			if (event->buttonDown().state())
-				event->timer(0).setInterval(down_interval_);
-			else
-				event->timer(0).setInterval(step_interval_);
+			event->trigger(0)->start();
+			static_cast<Timer *>(event->trigger(0))
+				 ->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
 
 			if (newTetromino()) return true;
 			return false;
@@ -447,8 +440,8 @@ bool Tetris::clearFullRows(Event *event)
 	{
 		if (rowsFull())
 		{
-			event->timer(0).stop();
-			event->timer(1).stop();
+			event->trigger(0)->stop();
+			event->trigger(1)->stop();
 			blink_cycle_ = INIT_BLINK;
 		}
 		else
@@ -477,7 +470,7 @@ bool Tetris::clearFullRows(Event *event)
 			}
 		}
 		blink_cycle_ = BLINK_OFF_1;
-		event->timer(2).start();
+		event->trigger(2)->start();
 	}
 	else if (blink_cycle_ == BLINK_OFF_1 || blink_cycle_ == BLINK_OFF_2 || blink_cycle_ == BLINK_OFF_3)
 	{

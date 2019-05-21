@@ -50,8 +50,8 @@ void Snake::start(Event *event)
 	new_direction_ = START;
 
 	// Setup timer for moving
-	event->addTimer(interval_);
-	event->timer(0).start();
+	event->addTrigger(new Timer(interval_));
+	event->trigger(0)->start();
 
 	// print display first time
 	render();
@@ -84,7 +84,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::DOWN && direction_ != Snake::UP)
 			{
 				new_direction_ = Snake::UP;
-				event->timer(0).restart();
+				event->trigger(0)->restart();
 				return tick();
 			}
 		}
@@ -93,7 +93,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::LEFT && direction_ != Snake::RIGHT)
 			{
 				new_direction_ = Snake::RIGHT;
-				event->timer(0).restart();
+				event->trigger(0)->restart();
 				return tick();
 			}
 		}
@@ -103,7 +103,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::RIGHT && direction_ != Snake::LEFT && direction_ != Snake::START)
 			{
 				new_direction_ = Snake::LEFT;
-				event->timer(0).restart();
+				event->trigger(0)->restart();
 				return tick();
 			}
 		}
@@ -113,7 +113,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::UP && direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::DOWN;
-				event->timer(0).restart();
+				event->trigger(0)->restart();
 				return tick();
 			}
 		}
@@ -123,7 +123,7 @@ bool Snake::onButtonChange(Event *event)
 
 bool Snake::onTimerOverflow(Event *event)
 {
-	if (event->timer(0).overflow())
+	if (event->trigger(0)->triggered())
 	{
 		return tick();
 	}
@@ -133,7 +133,7 @@ bool Snake::onTimerOverflow(Event *event)
 void Snake::onStop(Event *event)
 {
 	// stop timer during break
-	event->timer(0).stop();
+	event->trigger(0)->stop();
 	// let the stop symbol and score print
 	Game::onStop(event);
 }
@@ -141,7 +141,7 @@ void Snake::onStop(Event *event)
 void Snake::onContinue(Event *event)
 {
 	// restart the stopped timer
-	event->timer(0).start();
+	event->trigger(0)->start();
 	// executes render and clears the score text
 	Game::onContinue(event);
 }
@@ -213,7 +213,7 @@ bool Snake::tick()
 	}
 
 	// new head
-		// already remove it, to ensure a true validation
+	// already remove it, to ensure a true validation
 	vect += body_.last();
 
 	// move head inside the game field
