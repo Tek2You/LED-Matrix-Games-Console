@@ -16,7 +16,7 @@ public:
 	virtual void clear() { triggered_ = false; }
 
 protected:
-	virtual bool onTriggered() {}
+	virtual void onTriggered() {}
 
 	bool triggered_ = false;
 };
