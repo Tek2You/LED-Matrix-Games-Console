@@ -37,29 +37,3 @@ private:
 	unsigned int interval_;
 	unsigned long next_time_;
 };
-
-class TimerOld
-{
-public:
-	TimerOld(unsigned long interval = 0);
-	bool process(const unsigned long &t);
-	bool process();
-
-	void start();
-	inline void restart() { start(); }
-	inline void stop() { next_time_ = 0xFFFFFFFE; }
-
-	unsigned int interval() const;
-	void setInterval(const unsigned int interval);
-
-	bool overflow() const;
-	void clearOverflow();
-
-protected:
-	virtual void onOverflow() {}
-
-private:
-	unsigned long next_time_;
-	unsigned int interval_;
-	bool overflow_ = false;
-};

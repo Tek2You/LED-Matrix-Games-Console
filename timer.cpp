@@ -18,7 +18,7 @@
 
 #include "timer.h"
 
-Timer::Timer(unsigned long interval) : interval_(interval), overflow_(false), next_time_(0xFFFFFFFE)
+Timer::Timer(const unsigned int interval) : Trigger(), interval_(interval), next_time_(0xFFFFFFFE)
 {
 	if (interval_ != 0)
 	{
@@ -27,59 +27,6 @@ Timer::Timer(unsigned long interval) : interval_(interval), overflow_(false), ne
 }
 
 bool Timer::process(const unsigned long &t)
-{
-	// overgive current time, if use more timers(effiziently)
-	if (next_time_ <= t)
-	{
-		next_time_ = t + interval_;
-		overflow_ = true;
-		onOverflow();
-		return true;
-	}
-	return false;
-}
-
-bool Timer::process()
-{
-	unsigned long t = millis();
-	return process(t);
-}
-
-void Timer::start()
-{
-	next_time_ = millis() + interval_;
-}
-
-unsigned int Timer::interval() const
-{
-	return interval_;
-}
-
-void Timer::setInterval(unsigned int interval)
-{
-	interval_ = interval;
-}
-
-bool Timer::overflow() const
-{
-	return overflow_;
-}
-
-void Timer::clearOverflow()
-{
-	overflow_ = false;
-}
-
-
-TimerNew::TimerNew(const unsigned int interval) : Trigger(), interval_(interval), next_time_(0xFFFFFFFE)
-{
-	if (interval_ != 0)
-	{
-		next_time_ = millis() + interval_;
-	}
-}
-
-bool TimerNew::process(const unsigned long &t)
 {
 	if (next_time_ <= t)
 	{
@@ -91,12 +38,12 @@ bool TimerNew::process(const unsigned long &t)
 	return false;
 }
 
-void TimerNew::stop()
+void Timer::stop()
 {
 	next_time_ = 0xFFFFFFFE;
 }
 
-void TimerNew::start()
+void Timer::start()
 {
 	next_time_ = millis() + interval_;
 }
