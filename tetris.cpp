@@ -52,10 +52,13 @@ Tetris::~Tetris()
 void Tetris::start(Event *event)
 {
 	event->setupGame();
-	event->addTrigger(new Timer(step_interval_));  // tick timer
-	event->addTrigger(new Timer);
-	event->addTrigger(new Timer(blink_interval_)); // blink timer
-	event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), first_move_interval_, move_interval_));
+	step_timer_ = new Timer(step_interval_);
+	event->addTrigger(step_timer_);
+	blink_timer_ = new Timer(blink_interval_);
+	event->addTrigger(blink_timer_);
+	move_trigger_ =
+		 new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), first_move_interval_, move_interval_);
+	event->addTrigger(move_trigger_);
 
 	newTetromino();
 }
@@ -95,9 +98,9 @@ void Tetris::render()
 
 void Tetris::onStop(Event *event)
 {
-	event->trigger(0)->stop();
-	event->trigger(1)->stop();
-	event->trigger(2)->stop();
+	step_timer_->stop();
+	blink_timer_->stop();
+	move_trigger_->stop();
 	blink_cycle_ = DEFAULT;
 	Game::onStop(event);
 }
@@ -105,9 +108,8 @@ void Tetris::onStop(Event *event)
 void Tetris::onContinue(Event *event)
 {
 	clearFullRowsImmediately(); // clears all rows, if interrupted during clear effect
-	(static_cast<Timer *>(event->trigger(0)))
-		 ->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
-	event->trigger(0)->start();
+	step_timer_->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
+	step_timer_->start();
 
 	Game::onContinue(event);
 	// for the second timer, the restart is not required, because its used for button long pressed
@@ -280,7 +282,6 @@ bool Tetris::onButtonChange(Event *event)
 	{
 		return false;
 	}
-	Timer *down_timer = static_cast<Timer *>(event->trigger(0));
 	// Rotation
 	if (event->buttonUp().pressed())
 	{
@@ -294,25 +295,23 @@ bool Tetris::onButtonChange(Event *event)
 		{
 			return true;
 		}
-		down_timer->setInterval(down_interval_);
-		down_timer->restart();
+		step_timer_->setInterval(down_interval_);
+		step_timer_->restart();
 	}
 	else if (event->buttonDown().released())
 	{
 		// unset fast down
-		down_timer->setInterval(step_interval_);
-		down_timer->restart();
+		step_timer_->setInterval(step_interval_);
+		step_timer_->restart();
 	}
 	return false;
 }
 
-
-
 bool Tetris::onTriggered(Event *event)
 {
-	if (event->trigger(3)->triggered())
+	if (move_trigger_->triggered())
 	{
-		ButtonAutoTrigger::Direction dir = static_cast<ButtonAutoTrigger *>(event->trigger(3))->getDirection();
+		ButtonAutoTrigger::Direction dir = move_trigger_->getDirection();
 		if (dir == ButtonAutoTrigger::BTN_1)
 			left();
 		else if (dir == ButtonAutoTrigger::BTN_2)
@@ -321,14 +320,14 @@ bool Tetris::onTriggered(Event *event)
 
 	if (blink_cycle_ != DEFAULT)
 	{
-		if (event->trigger(2)->triggered())
+		if (blink_timer_->triggered())
 		{
 			if (clearFullRows(event)) return true;
 		}
 		return false;
 	}
 
-	if (event->trigger(0)->triggered())
+	if (step_timer_->triggered())
 	{
 		if (tick(event)) // end of the game
 		{
@@ -337,8 +336,6 @@ bool Tetris::onTriggered(Event *event)
 	}
 	return false;
 }
-
-
 
 bool Tetris::clearFullRows(Event *event)
 {
@@ -367,12 +364,11 @@ bool Tetris::clearFullRows(Event *event)
 		else
 		{
 			blink_cycle_ = DEFAULT;
-			event->trigger(2)->stop();
+			blink_timer_->stop();
 			//			clearFullRowsImmediately();
 			display_->setArray(field_.toArray());
-			event->trigger(0)->start();
-			static_cast<Timer *>(event->trigger(0))
-				 ->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
+			step_timer_->start();
+			step_timer_->setInterval((event->buttonDown().state() ? down_interval_ : step_interval_));
 
 			if (newTetromino()) return true;
 			return false;
@@ -382,8 +378,7 @@ bool Tetris::clearFullRows(Event *event)
 	{
 		if (rowsFull())
 		{
-			event->trigger(0)->stop();
-			event->trigger(1)->stop();
+			step_timer_->stop();
 			blink_cycle_ = INIT_BLINK;
 		}
 		else
@@ -412,7 +407,7 @@ bool Tetris::clearFullRows(Event *event)
 			}
 		}
 		blink_cycle_ = BLINK_OFF_1;
-		event->trigger(2)->start();
+		blink_timer_->start();
 	}
 	else if (blink_cycle_ == BLINK_OFF_1 || blink_cycle_ == BLINK_OFF_2 || blink_cycle_ == BLINK_OFF_3)
 	{

@@ -69,6 +69,10 @@ private:
 	Shape randomTetrominoShape();
 	Direction randomTetrominoDirection(const Shape &shape);
 
+	Timer * step_timer_;
+	Timer * blink_timer_;
+	ButtonAutoTrigger * move_trigger_;
+
 	// from speed calculated delay intervals
 	unsigned int step_interval_;
 	unsigned int down_interval_;
