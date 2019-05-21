@@ -48,6 +48,12 @@ protected:
 	void render();
 
 private:
+	// saves the wanted direction of the snake
+	// list storing the hole body data
+	StaticList<SmartPos> body_;
+	// position of the current point of eat
+	Pos eat_pos_;
+
 	// local declared methods
 	// checks if the snake had touched the eat
 	bool eat(const Pos pos);
@@ -67,19 +73,17 @@ private:
 		LEFT,
 		START
 	};
-
-	Timer * timer_;
-
-	byte speed_;
-	// saves the current direction of the snake
+	// Saves the current snake position
 	Direction direction_;
-	// saves the wanted direction of the snake
 	// Its only to ensure, that the snake is only rotated by 90° and not more
 	Direction new_direction_;
-	// list storing the hole body data
-	StaticList<SmartPos> body_;
-	// position of the current point of eat
-	Pos eat_pos_;
-	// highscore of all runs
+
+	// timer
+	Timer * timer_;
+
+	// speed
+	byte speed_;
+
+	// highscore
 	static unsigned int highscore_;
 };
