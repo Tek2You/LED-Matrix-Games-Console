@@ -20,7 +20,7 @@ public:
 		NO_BTN,
 	} dir_;
 
-	Direction getDirection() { return dir_; }
+	Direction direction() { return dir_; }
 
 	void setInterval(const unsigned int interval) { interval_ = interval; }
 	void setFirstInterval(const unsigned int interval) { first_interval_ = interval; }
