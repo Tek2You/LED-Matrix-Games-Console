@@ -24,9 +24,10 @@ static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
 Tetris::Tetris(Display *display)
-	 : Game(display, TETRIS), move_dir_(NO_MOVE), blink_cycle_(DEFAULT), field_(display->rows())
+	 : Game(display, TETRIS), blink_cycle_(DEFAULT), field_(display->rows()), tetromino_(nullptr), points_(0)
 {
-	tetromino_ = nullptr;
+	display_->clear();
+	display->show();
 	setSpeed(2);
 
 	for (int i = 0; i < display->rows(); i++)
@@ -34,9 +35,6 @@ Tetris::Tetris(Display *display)
 		field_ << 0;
 	}
 
-	clear();
-	display_->clear();
-	points_ = 0;
 }
 
 Tetris::~Tetris()
@@ -256,11 +254,7 @@ bool Tetris::newTetromino()
 		}
 	}
 	render();
-	if (tetromino_->isValid() & COLLIDE)
-	{ // not valid
-		return true;
-	}
-	return false;
+	return tetromino_->isValid() & COLLIDE;
 }
 
 void Tetris::takeOverTetromino()
