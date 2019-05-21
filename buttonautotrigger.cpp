@@ -1,13 +1,15 @@
 #include "buttonautotrigger.h"
 
-ButtonAutoTrigger::ButtonAutoTrigger(const Button *button1, const Button *button2, unsigned int first_interval, unsigned int interval)
+ButtonAutoTrigger::ButtonAutoTrigger(const Button *button1, const Button *button2, const unsigned int first_interval,
+												 const unsigned int interval)
 	 : dir_(NO_BTN), button1_(button1), button2_(button2), first_interval_(first_interval), interval_(interval)
 {
 }
 
 bool ButtonAutoTrigger::process(const unsigned long &t)
 {
-	if (activated_ = false){
+	if (activated_ = false)
+	{
 		timer_.clear();
 		return false;
 	}

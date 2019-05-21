@@ -6,8 +6,8 @@
 class ButtonAutoTrigger : public Trigger
 {
 public:
-	ButtonAutoTrigger(const Button *button1, const Button *button2, unsigned int first_interval = 200,
-							unsigned int interval = 150);
+	ButtonAutoTrigger(const Button *button1, const Button *button2, const unsigned int first_interval = 200,
+							const unsigned int interval = 150);
 	// trigger public interface
 
 	void stop() override;
