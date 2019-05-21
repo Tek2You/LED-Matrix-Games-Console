@@ -132,7 +132,7 @@ bool Dodge::onButtonChange(Event *event)
 	return false;
 }
 
-bool Dodge::onTimerOverflow(Event *event)
+bool Dodge::onTriggered(Event *event)
 {
 	if (event->trigger(0)->triggered())
 	{

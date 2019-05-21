@@ -121,7 +121,7 @@ bool Snake::onButtonChange(Event *event)
 	return false;
 }
 
-bool Snake::onTimerOverflow(Event *event)
+bool Snake::onTriggered(Event *event)
 {
 	if (event->trigger(0)->triggered())
 	{

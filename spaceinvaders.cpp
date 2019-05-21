@@ -172,7 +172,7 @@ bool SpaceInvaders::onButtonChange(Event *event)
 	return false;
 }
 
-bool SpaceInvaders::onTimerOverflow(Event *event)
+bool SpaceInvaders::onTriggered(Event *event)
 {
 	// step counter (increases invaders)
 	if (event->trigger(0)->triggered())

@@ -59,7 +59,7 @@ public:
 
 protected:
 	virtual bool onButtonChange(Event *event);
-	virtual bool onTimerOverflow(Event *event);
+	virtual bool onTriggered(Event *event);
 	virtual void onStop(Event *event);
 	virtual void onContinue(Event *event);
 	virtual void render() = 0;

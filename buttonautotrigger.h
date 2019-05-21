@@ -1,22 +1,29 @@
 #pragma once
-#include "trigger.h"
-#include "timer.h"
 #include "button.h"
+#include "timer.h"
+#include "trigger.h"
 
 class ButtonAutoTrigger : public Trigger
 {
 public:
-	ButtonAutoTrigger();
+	ButtonAutoTrigger(const Button *button1, const Button *button2, unsigned int first_interval = 200,
+							unsigned int interval = 150);
+	// trigger public interface
 
-	enum Direction{
+	enum Direction
+	{
 		BTN_1,
 		BTN_2,
 		NO_BTN,
 	} dir_;
 
+	Direction getDirection() { return dir_; }
+
+	void setInterval(const unsigned int interval) { interval_ = interval; }
+	void setFirstInterval(const unsigned int interval) { first_interval_ = interval; }
+
 	// Trigger interface
 protected:
-
 	bool process(const unsigned long &timer_);
 	void stop() override;
 	void start() override;
@@ -24,11 +31,11 @@ protected:
 private:
 	Timer timer_;
 
-	int first_interval_;
-	int interval_;
+	unsigned int first_interval_;
+	unsigned int interval_;
 
 	bool activated_ = true;
 
-	Button * button1_;
-	Button * button2_;
+	const Button *button1_;
+	const Button *button2_;
 };

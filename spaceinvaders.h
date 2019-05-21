@@ -46,7 +46,7 @@ public:
 
 protected:
 	bool onButtonChange(Event *event) override;
-	bool onTimerOverflow(Event *event) override;
+	bool onTriggered(Event *event) override;
 	void onStop(Event *event) override;
 	void onContinue(Event *event) override;
 	void render() override;

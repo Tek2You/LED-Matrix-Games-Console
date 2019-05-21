@@ -105,7 +105,7 @@ bool Game::process(Event *event)
 	}
 	if (event->generalOverflow())
 	{
-		if (onTimerOverflow(event))
+		if (onTriggered(event))
 			output = true;
 	}
 	return output;
@@ -130,7 +130,7 @@ bool Game::onButtonChange(Event *event)
 {
 }
 
-bool Game::onTimerOverflow(Event *event)
+bool Game::onTriggered(Event *event)
 {
 }
 
