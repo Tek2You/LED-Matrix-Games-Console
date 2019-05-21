@@ -114,9 +114,9 @@ void Text::setShiftStartCol(const byte col)
 	setText(text_);
 }
 
-void Text::onOverflow()
+void Text::onTriggered()
 {
 	shift();
-	Timer::clearOverflow();
+	Timer::clear();
 	display_->show();
 }

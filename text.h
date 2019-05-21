@@ -58,7 +58,7 @@ public:
 
 private:
 	void shift();
-	void onOverflow() override;
+	void onTriggered() override;
 	void computeShiftMode();
 
 	MatrixDisplay *display_;
