@@ -19,10 +19,10 @@
 #pragma once
 #include "game.h"
 
+#include "buttonautotrigger.h"
 #include "list.h"
 #include "staticlist.h"
 #include "timer.h"
-#include "buttonautotrigger.h"
 
 class Shot
 {
@@ -40,8 +40,9 @@ public:
 
 	static void resetHighscore();
 	static unsigned int highscore() { return highscore_; }
-	// Game interface
+
 public:
+	// Game interface
 	void start(Event *event) override;
 	void setSpeed(const byte v) override { speed_ = v; }
 	unsigned int score() const override { return score_; }
@@ -58,14 +59,22 @@ private:
 	List<Shot> shots_;
 	byte pos_;
 
+	void left();
+	void right();
+	bool processShot(Shot &s);
+	void insertRow();
+
 	// score
 	unsigned int score_ = 0;
 	static unsigned int highscore_;
+	void updateHighscore(const byte offset = 0);
 
-	Timer * step_timer_;
-	Timer * shot_timer_;
-	ButtonAutoTrigger * auto_move_;
+	// timers
+	Timer *step_timer_;
+	Timer *shot_timer_;
+	ButtonAutoTrigger *auto_move_;
 
+	// speed
 	enum SpeedFlag
 	{
 		StepInterval = 0,
@@ -73,14 +82,6 @@ private:
 		FirstMoveInterval = 2,
 		MoveInterval = 3,
 	};
-
-	void left();
-	void right();
-	bool processShot(Shot &s);
-	void insertRow();
-	void updateHighscore(const byte offset = 0);
-
 	byte speed_;
 	unsigned int readSpeed(const SpeedFlag flag) const;
-
 };
