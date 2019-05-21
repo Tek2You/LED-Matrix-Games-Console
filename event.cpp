@@ -19,10 +19,9 @@
 #include "event.h"
 
 Event::Event()
-    : on_entry_(false), flags_(0), button_up_(PortPin(PortPin::C, 2), 100), button_down_(PortPin(PortPin::C, 1), 100),
-      button_right_(PortPin(PortPin::C, 3), 100), button_left_(PortPin(PortPin::C, 0), 100),
-      button_stop_(PortPin(PortPin::B, 1), 100)
-
+	 : on_entry_(false), flags_(0), button_up_(PortPin(PortPin::C, 2), 100), button_down_(PortPin(PortPin::C, 1), 100),
+		button_right_(PortPin(PortPin::C, 3), 100), button_left_(PortPin(PortPin::C, 0), 100),
+		button_stop_(PortPin(PortPin::B, 1), 100)
 {
 }
 
@@ -52,56 +51,51 @@ void Event::clear()
 	buttonLeft().clear();
 	buttonStop().clear();
 	unsigned int t = millis();
-	for(Timer& t : timers_)
+	for (Trigger *t : triggers_)
 	{
-		t.clearOverflow();
+		t->clear();
 	}
 	on_entry_ = false;
-	overflow_ = false;
+	triggered_ = false;
 }
 
 bool Event::process()
 {
-	processTimers();
+	processTriggers();
 	return (flag(Event::ProcessEveryCycle) || (flag(Event::ProcessPinChanges) && controlButtonChanged()) ||
-	        (flag(Event::ProcessTimerOverflows) && overflow_) ||
-	        (flag(Event::ProcessStop) && buttonStop().changed()));
+			  (flag(Event::ProcessTriggers) && triggered_) || (flag(Event::ProcessStop) && buttonStop().changed()));
 }
 
-bool Event::processTimers()
+bool Event::processTriggers()
 {
 	unsigned long time = millis();
-	for(Timer& t : timers_){
-		if (t.process(time))
+	for (Trigger *t : triggers_)
+	{
+		if (t->process(time))
 		{
-			overflow_ = true;
+			triggered_ = true;
 		}
 	}
-	return overflow_;
+	return triggered_;
 }
 
-void Event::addTimer(unsigned long interval)
-{
-	Timer t(interval);
-	timers_.append(t);
-}
+void Event::addTrigger(Trigger *trigger) { triggers_.append(trigger); }
 
-Timer &Event::timer(const byte index)
-{
-	return timers_.itemAt(index);
-}
+Trigger *Event::trigger(const byte index) { return triggers_.itemAt(index); }
 
-bool Event::overflow(const byte index)
-{
-	timers_.itemAt(index).overflow();
-}
+bool Event::overflow(const byte index) { triggers_.itemAt(index)->triggered(); }
 
 void Event::removeTimer(const byte index)
 {
-	timers_.remove(index);
+	delete triggers_.itemAt(index);
+	triggers_.remove(index);
 }
 
 void Event::removeAllTimers()
 {
-	timers_.removeAll();
+	for (Trigger *t : triggers_)
+	{
+		delete t;
+	}
+	triggers_.removeAll();
 }

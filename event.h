@@ -27,26 +27,11 @@ class Event
 public:
 	Event();
 
-	inline Button &buttonUp()
-	{
-		return button_up_;
-	}
-	inline Button &buttonDown()
-	{
-		return button_down_;
-	}
-	inline Button &buttonRight()
-	{
-		return button_right_;
-	}
-	inline Button &buttonLeft()
-	{
-		return button_left_;
-	}
-	inline Button &buttonStop()
-	{
-		return button_stop_;
-	}
+	inline Button &buttonUp() { return button_up_; }
+	inline Button &buttonDown() { return button_down_; }
+	inline Button &buttonRight() { return button_right_; }
+	inline Button &buttonLeft() { return button_left_; }
+	inline Button &buttonStop() { return button_stop_; }
 
 	void processDebounce();
 	void checkButtons();
@@ -62,19 +47,12 @@ public:
 
 	void clear();
 
-	const inline bool onEntry() const
-	{
-		return on_entry_;
-	}
-	inline void setOnEntry()
-	{
-		on_entry_ = true;
-	}
+	const inline bool onEntry() const { return on_entry_; }
+	inline void setOnEntry() { on_entry_ = true; }
 
 	bool process();
-	bool processTimers();
-	void addTimer(unsigned long interval = 0);
-	Timer &timer(const byte index);
+	void addTrigger(Trigger *trigger);
+	Trigger *trigger(const byte index);
 	bool overflow(const byte index);
 	void removeTimer(const byte index);
 	void removeAllTimers();
@@ -83,35 +61,32 @@ public:
 	{
 		ProcessEveryCycle = (1 << 0),
 		ProcessPinChanges = (1 << 1),
-		ProcessTimerOverflows = (1 << 2),
+		ProcessTriggers = (1 << 2),
 		ProcessStop = (1 << 3),
 	};
 
-	void setupGame(){
+	void setupGame()
+	{
 		removeAllTimers();
-		flags_ = (Event::ProcessPinChanges | Event::ProcessTimerOverflows | Event:: ProcessStop);
+		flags_ = (Event::ProcessPinChanges | Event::ProcessTriggers | Event::ProcessStop);
 	}
 
-	inline void clearFlags()
-	{
-		flags_ = 0;
-	}
+	inline void clearFlags() { flags_ = 0; }
 	inline void setFlag(Flags flag, bool set = true)
 	{
-		if(set) flags_ |= flag;
-		else flags_ &= ~flag;
+		if (set)
+			flags_ |= flag;
+		else
+			flags_ &= ~flag;
 	}
-	inline bool flag(Flags flag)
-	{
-		return flags_ & flag;
-	}
-	bool generalOverflow() const
-	{
-		return overflow_;
-	}
+	inline bool flag(Flags flag) { return flags_ & flag; }
+	bool generalOverflow() const { return triggered_; }
 
-	List<Timer> timers_;
+	List<Trigger*> triggers_;
+
 private:
+	bool processTriggers();
+
 	bool on_entry_;
 	Button button_up_;
 	Button button_down_;
@@ -119,5 +94,5 @@ private:
 	Button button_right_;
 	Button button_stop_;
 	byte flags_;
-	bool overflow_ = false;
+	bool triggered_ = false;
 };
