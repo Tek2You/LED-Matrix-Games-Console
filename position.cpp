@@ -99,7 +99,7 @@ SmartPos::SmartPos(unsigned char x, unsigned char y)
 	setXy(x, y);
 }
 
-Pos SmartPos::toPos()
+Pos SmartPos::toPos() const
 {
 	return Pos(x(), y());
 }

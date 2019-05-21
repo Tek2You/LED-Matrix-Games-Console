@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "avr.h"
 
 struct SmartPos;
 
@@ -48,10 +49,10 @@ struct SmartPos
 	SmartPos()
 	{
 	}
-	SmartPos(unsigned char x, unsigned char y);
-	Pos toPos();
-	unsigned char x() const;
-	unsigned char y() const;
-	inline unsigned char setXy(unsigned char x, unsigned char y);
-	unsigned char compact_pos_;
+	SmartPos(byte x, byte y);
+	Pos toPos() const;
+	byte x() const;
+	byte y() const;
+	inline byte setXy(byte x, byte y);
+	byte compact_pos_;
 };
