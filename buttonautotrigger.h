@@ -10,6 +10,9 @@ public:
 							unsigned int interval = 150);
 	// trigger public interface
 
+	void stop() override;
+	void start() override;
+
 	enum Direction
 	{
 		BTN_1,
@@ -25,8 +28,6 @@ public:
 	// Trigger interface
 protected:
 	bool process(const unsigned long &timer_);
-	void stop() override;
-	void start() override;
 
 private:
 	Timer timer_;
