@@ -21,6 +21,8 @@
 
 #include "list.h"
 #include "staticlist.h"
+#include "timer.h"
+#include "buttonautotrigger.h"
 
 class Shot
 {
@@ -41,8 +43,8 @@ public:
 	// Game interface
 public:
 	void start(Event *event) override;
-	void setSpeed(const byte v) override;
-	unsigned int score() const override;
+	void setSpeed(const byte v) override { speed_ = v; }
+	unsigned int score() const override { return score_; }
 
 protected:
 	bool onButtonChange(Event *event) override;
@@ -60,21 +62,25 @@ private:
 	unsigned int score_ = 0;
 	static unsigned int highscore_;
 
-	int step_interval_;
-	int first_move_interval_;
-	int move_interval_;
-    int shot_interval_;
+	Timer * step_timer_;
+	Timer * shot_timer_;
+	ButtonAutoTrigger * auto_move_;
 
-	enum MoveDirection
+	enum SpeedFlag
 	{
-		NO_MOVE = 0,
-		RIGHT_MOVE = 1,
-		LEFT_MOVE = 2,
-	} move_dir_;
+		StepInterval = 0,
+		ShotInterval = 1,
+		FirstMoveInterval = 2,
+		MoveInterval = 3,
+	};
 
 	void left();
 	void right();
 	bool processShot(Shot &s);
 	void insertRow();
-    void updateHighscore(const byte offset=0);
+	void updateHighscore(const byte offset = 0);
+
+	byte speed_;
+	unsigned int readSpeed(const SpeedFlag flag) const;
+
 };

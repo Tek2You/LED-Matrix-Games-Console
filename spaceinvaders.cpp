@@ -21,8 +21,16 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int SpaceInvaders::highscore_ = eeprom_read_word(&EE_highscore);
 
+const unsigned int speeds[] PROGMEM = {
+	 2000, 65, 400, 200, // very slow
+	 1600, 60, 400, 160, // slow
+	 1200, 45, 300, 140, // medium fast
+	 1000, 55, 350, 120, // fast
+	 800,  50, 300, 100, // very fast
+};
+
 SpaceInvaders::SpaceInvaders(Display *display)
-	 : Game(display, SPACE_INVADERS), invaders_(StaticList<byte>(display->rows()))
+	 : Game(display, SPACE_INVADERS), invaders_(StaticList<byte>(display->rows())), speed_(2)
 {
 	// setup position
 	pos_ = 3;
@@ -38,9 +46,6 @@ SpaceInvaders::SpaceInvaders(Display *display)
 	{
 		insertRow();
 	}
-
-	// set speed for case that it wouldnt be done later
-	setSpeed(2);
 }
 
 void SpaceInvaders::resetHighscore()
@@ -54,29 +59,15 @@ void SpaceInvaders::start(Event *event)
 	// sets the event flags
 	event->setupGame();
 	// setup timers
-	event->addTrigger(new Timer(step_interval_));
-	event->addTrigger(new Timer(shot_interval_));
-	event->addTrigger(new Timer);
-	// start shot and step timer
-	event->trigger(0)->start();
-	event->trigger(1)->start();
+	step_timer_ = new Timer(readSpeed(StepInterval));
+	event->addTrigger(step_timer_);
+	shot_timer_ = new Timer(readSpeed(ShotInterval));
+	event->addTrigger(shot_timer_);
+	auto_move_ = new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), readSpeed(FirstMoveInterval),
+												  readSpeed(MoveInterval));
+	event->addTrigger(auto_move_);
+
 	render();
-}
-
-const unsigned int intervals[] PROGMEM = {
-	 2000, 65, 400, 200, // very slow
-	 1600, 60, 400, 160, // slow
-	 1200, 45, 300, 140, // medium fast
-	 1000, 55, 350, 120, // fast
-	 800,  50, 300, 100, // very fast
-};
-
-void SpaceInvaders::setSpeed(const byte v)
-{
-	step_interval_ = pgm_read_word(&intervals[4 * v]);
-	shot_interval_ = pgm_read_word(&intervals[4 * v + 1]);
-	first_move_interval_ = pgm_read_word(&intervals[4 * v + 2]);
-	move_interval_ = pgm_read_word(&intervals[4 * v + 3]);
 }
 
 void SpaceInvaders::updateHighscore(const byte offset)
@@ -89,7 +80,10 @@ void SpaceInvaders::updateHighscore(const byte offset)
 	}
 }
 
-unsigned int SpaceInvaders::score() const { return score_; }
+unsigned int SpaceInvaders::readSpeed(const SpaceInvaders::SpeedFlag flag) const
+{
+	return pgm_read_word(&speeds[flag + 4 * speed_]);
+}
 
 bool SpaceInvaders::onButtonChange(Event *event)
 {
@@ -100,74 +94,6 @@ bool SpaceInvaders::onButtonChange(Event *event)
 		shots_ << Shot(pos_);
 	}
 
-	// store move timer
-	Timer *move_timer = static_cast<Timer *>(event->trigger(2));
-
-	// left button
-	if (event->buttonLeft().pressed())
-	{
-		if (!event->buttonRight().state())
-		{
-			left();
-			// validation
-			if (bitRead(invaders_[1], pos_))
-			{
-				updateHighscore();
-				return true;
-			}
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-			move_dir_ = LEFT_MOVE;
-		}
-	}
-	else if (event->buttonLeft().released() && move_dir_ == LEFT_MOVE)
-	{
-		move_timer->clear();
-		if (event->buttonRight().state())
-		{
-			move_dir_ = RIGHT_MOVE;
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-		}
-		else
-		{
-			move_timer->stop();
-			move_dir_ = NO_MOVE;
-		}
-	}
-
-	// btn right
-	if (event->buttonRight().pressed())
-	{
-		if (!event->buttonLeft().state())
-		{
-			right();
-			// validation
-			if (bitRead(invaders_[1], pos_))
-			{
-				updateHighscore();
-				return true;
-			}
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-			move_dir_ = RIGHT_MOVE;
-		}
-	}
-	else if (event->buttonRight().released() && move_dir_ == RIGHT_MOVE)
-	{
-		move_timer->clear();
-		if (event->buttonLeft().state())
-		{
-			move_dir_ = LEFT_MOVE;
-			move_timer->setInterval(first_move_interval_);
-			move_timer->restart();
-		}
-		else
-		{
-			move_timer->stop();
-			move_dir_ = NO_MOVE;
-		};
-	}
 	render();
 	return false;
 }
@@ -175,7 +101,7 @@ bool SpaceInvaders::onButtonChange(Event *event)
 bool SpaceInvaders::onTriggered(Event *event)
 {
 	// step counter (increases invaders)
-	if (event->trigger(0)->triggered())
+	if (step_timer_->triggered())
 	{
 		// new random row
 		insertRow();
@@ -186,7 +112,6 @@ bool SpaceInvaders::onTriggered(Event *event)
 			{
 				shots_.remove(i);
 				i--;
-				updateHighscore(100);
 			}
 		}
 		// validation
@@ -198,7 +123,7 @@ bool SpaceInvaders::onTriggered(Event *event)
 	}
 
 	// timer for shots
-	if (event->trigger(1)->triggered())
+	if (shot_timer_->triggered())
 	{
 		for (int i = 0; i < shots_.size(); i++)
 		{
@@ -211,26 +136,20 @@ bool SpaceInvaders::onTriggered(Event *event)
 		}
 	}
 
-	Timer *move_timer = static_cast<Timer*>(event->trigger(2));
-	if (move_timer->triggered())
+	if (auto_move_->triggered())
 	{
-		if (move_dir_ == LEFT_MOVE)
-		{
+		ButtonAutoTrigger::Direction dir = auto_move_->direction();
+		if (dir == ButtonAutoTrigger::BTN_1)
 			left();
-		}
-
-		else if (move_dir_ == RIGHT_MOVE)
-		{
+		else if (dir == ButtonAutoTrigger::BTN_2)
 			right();
-		}
+
 		// validation
 		if (bitRead(invaders_[1], pos_))
 		{
 			updateHighscore();
 			return true;
 		}
-		move_timer->setInterval(move_interval_);
-		move_timer->restart();
 	}
 
 	render();
@@ -239,16 +158,17 @@ bool SpaceInvaders::onTriggered(Event *event)
 
 void SpaceInvaders::onStop(Event *event)
 {
-	event->trigger(0)->stop();
-	event->trigger(1)->stop();
-	event->trigger(2)->stop();
+	step_timer_->stop();
+	shot_timer_->stop();
+	auto_move_->stop();
 	Game::onStop(event);
 }
 
 void SpaceInvaders::onContinue(Event *event)
 {
-	event->trigger(0)->restart();
-	event->trigger(1)->restart();
+	step_timer_->restart();
+	shot_timer_->restart();
+	auto_move_->restart();
 	Game::onContinue(event);
 }
 
