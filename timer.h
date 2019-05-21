@@ -20,10 +20,10 @@
 #include "avr.h"
 #include "trigger.h"
 
-class TimerNew : public Trigger
+class Timer : public Trigger
 {
 public:
-	TimerNew(const unsigned int interval = 0);
+	Timer(const unsigned int interval = 0);
 
 	void setInterval(const unsigned int interval) { interval_ = interval; }
 	unsigned int interval() const { return interval_; }
@@ -38,10 +38,10 @@ private:
 	unsigned long next_time_;
 };
 
-class Timer
+class TimerOld
 {
 public:
-	Timer(unsigned long interval = 0);
+	TimerOld(unsigned long interval = 0);
 	bool process(const unsigned long &t);
 	bool process();
 

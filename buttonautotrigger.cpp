@@ -74,6 +74,6 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 	return triggered_;
 }
 
-void ButtonAutoTrigger::stop() { activated_ = false; }
+void ButtonAutoTrigger::stop() { activated_ = false; timer_.stop();}
 
 void ButtonAutoTrigger::start() { activated_ = true; }
