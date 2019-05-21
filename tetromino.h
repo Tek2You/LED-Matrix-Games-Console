@@ -42,6 +42,7 @@ enum Direction : byte
 
 enum VALIDATION_ERROR : byte
 {
+	VALID = 0,
 	OVER_BELOW = (1 << 0),
 	OVER_ABOVE = (1 << 1),
 	OVER_RIGHT = (1 << 2),
