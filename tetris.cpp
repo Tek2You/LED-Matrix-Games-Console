@@ -172,34 +172,19 @@ bool Tetris::rotate()
 	return true;
 }
 
-bool Tetris::right()
+void Tetris::move(const ButtonAutoTrigger::Direction dir)
 
 {
-	if (!tetromino_) return false;
+	if (!tetromino_) return;
 	Pos pos = tetromino_->pos();
-	pos.pos_x++;
-	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
-	{ // not valid
-		return false;
+	pos.pos_x+= (dir == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos) == VALID)
+	{ // valid
+		tetromino_->setPos(pos);
+		render();
 	}
-	tetromino_->setPos(pos);
-	render();
-	return true;
 }
 
-bool Tetris::left()
-{
-	if (tetromino_ == nullptr) return false;
-	Pos pos = tetromino_->pos();
-	pos.pos_x--;
-	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
-	{
-		return false;
-	}
-	tetromino_->setPos(pos);
-	render();
-	return true;
-}
 bool Tetris::tick(Event *event)
 {
 	if (tetromino_ == nullptr) return false;
@@ -296,11 +281,7 @@ bool Tetris::onTriggered(Event *event)
 {
 	if (move_trigger_->triggered())
 	{
-		ButtonAutoTrigger::Direction dir = move_trigger_->direction();
-		if (dir == ButtonAutoTrigger::BTN_1)
-			left();
-		else if (dir == ButtonAutoTrigger::BTN_2)
-			right();
+		move(move_trigger_->direction());
 	}
 
 	if (blink_cycle_ != DEFAULT)

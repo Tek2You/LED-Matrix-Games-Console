@@ -59,8 +59,7 @@ private:
 	// private functions only for tetris
 	void clear();
 	bool rotate();
-	bool right();
-	bool left();
+	void move(const ButtonAutoTrigger::Direction dir);
 	bool tick(Event *event);
 
 	bool clearFullRows(Event *event);
