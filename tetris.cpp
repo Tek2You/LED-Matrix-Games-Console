@@ -296,7 +296,7 @@ bool Tetris::onTriggered(Event *event)
 {
 	if (move_trigger_->triggered())
 	{
-		ButtonAutoTrigger::Direction dir = move_trigger_->getDirection();
+		ButtonAutoTrigger::Direction dir = move_trigger_->direction();
 		if (dir == ButtonAutoTrigger::BTN_1)
 			left();
 		else if (dir == ButtonAutoTrigger::BTN_2)
