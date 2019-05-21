@@ -24,6 +24,8 @@
 static unsigned int EE_highscore EEMEM = 0;
 unsigned int Snake::highscore_ = eeprom_read_word(&EE_highscore);
 
+const unsigned int periods[] PROGMEM = {600, 500, 400, 275, 180};
+
 Snake::Snake(Display *display) : Game(display, SNAKE), body_(display->rows() * display->cols())
 {
 	// set speed for case that it wouldnt be done
@@ -50,20 +52,18 @@ void Snake::start(Event *event)
 	new_direction_ = START;
 
 	// Setup timer for moving
-	event->addTrigger(new Timer(interval_));
-	event->trigger(0)->start();
+	timer_ = new Timer(pgm_read_word(&periods[speed_]));
+	event->addTrigger(timer_);
 
 	// print display first time
 	render();
 }
 
 // stores intervals for diferent speeds in progmem
-const unsigned int periods[] PROGMEM = {600, 500, 400, 275, 180};
 
 void Snake::setSpeed(const byte v)
 {
-	// read speed out of progmem
-	interval_ = pgm_read_word(&periods[v]);
+	speed_ = v;
 }
 
 void Snake::resetHighscore()
@@ -84,7 +84,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::DOWN && direction_ != Snake::UP)
 			{
 				new_direction_ = Snake::UP;
-				event->trigger(0)->restart();
+				timer_->restart();
 				return tick();
 			}
 		}
@@ -93,7 +93,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::LEFT && direction_ != Snake::RIGHT)
 			{
 				new_direction_ = Snake::RIGHT;
-				event->trigger(0)->restart();
+				timer_->restart();
 				return tick();
 			}
 		}
@@ -103,7 +103,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::RIGHT && direction_ != Snake::LEFT && direction_ != Snake::START)
 			{
 				new_direction_ = Snake::LEFT;
-				event->trigger(0)->restart();
+				timer_->restart();
 				return tick();
 			}
 		}
@@ -113,7 +113,7 @@ bool Snake::onButtonChange(Event *event)
 			if (direction_ != Snake::UP && direction_ != Snake::DOWN)
 			{
 				new_direction_ = Snake::DOWN;
-				event->trigger(0)->restart();
+				timer_->restart();
 				return tick();
 			}
 		}
@@ -123,7 +123,7 @@ bool Snake::onButtonChange(Event *event)
 
 bool Snake::onTriggered(Event *event)
 {
-	if (event->trigger(0)->triggered())
+	if (timer_->triggered())
 	{
 		return tick();
 	}
@@ -133,7 +133,7 @@ bool Snake::onTriggered(Event *event)
 void Snake::onStop(Event *event)
 {
 	// stop timer during break
-	event->trigger(0)->stop();
+	timer_->stop();
 	// let the stop symbol and score print
 	Game::onStop(event);
 }
@@ -141,7 +141,7 @@ void Snake::onStop(Event *event)
 void Snake::onContinue(Event *event)
 {
 	// restart the stopped timer
-	event->trigger(0)->start();
+	timer_->start();
 	// executes render and clears the score text
 	Game::onContinue(event);
 }

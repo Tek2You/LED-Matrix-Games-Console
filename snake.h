@@ -21,6 +21,7 @@
 #include "list.h"
 #include "position.h"
 #include "staticlist.h"
+#include "timer.h"
 
 class Snake : public Game
 {
@@ -67,8 +68,9 @@ private:
 		START
 	};
 
-	// interval speed
-	unsigned int interval_;
+	Timer * timer_;
+
+	byte speed_;
 	// saves the current direction of the snake
 	Direction direction_;
 	// saves the wanted direction of the snake
