@@ -17,7 +17,7 @@
  */
 #include "button.h"
 
-Button::Button(PortPin pin, unsigned int debounce_time) : pin_(pin), debounce_time_(debounce_time)
+Button::Button(PortPin pin, const unsigned int debounce_time) : pin_(pin), debounce_time_(debounce_time)
 {
 	pin_.input();
 	pin_.set();

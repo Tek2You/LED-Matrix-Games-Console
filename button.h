@@ -23,29 +23,14 @@
 class Button
 {
 public:
-	Button(PortPin pin, unsigned int debounce_time);
+	Button(PortPin pin, const unsigned int debounce_time);
 	void processDebounce();
 	void checkChange();
-	inline bool changed() const
-	{
-		return bitRead(state_, Changed);
-	}
-	inline bool state() const
-	{
-		return bitRead(state_, State);
-	}
-	inline bool pressed() const
-	{
-		return state() && changed();
-	}
-	inline bool released() const
-	{
-		return (!state()) && changed();
-	}
-	inline bool clear()
-	{
-		bitClear(state_, Changed);
-	}
+	inline bool changed() const { return bitRead(state_, Changed); }
+	inline bool state() const { return bitRead(state_, State); }
+	inline bool pressed() const { return state() && changed(); }
+	inline bool released() const { return (!state()) && changed(); }
+	inline bool clear() { bitClear(state_, Changed); }
 
 private:
 	enum ButtonSpecifications
