@@ -421,6 +421,7 @@ bool Tetris::clearFullRows(Event *event)
 
 void Tetris::clearFullRowsImmediately()
 {
+	if(!rowsFull()) return;
 	for (byte i = 0; i < field_.size(); i++)
 	{
 		while (field_[i] == 0xFF)
