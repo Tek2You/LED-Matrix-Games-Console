@@ -22,7 +22,7 @@ protected:
 	void start() override;
 
 private:
-	TimerNew timer_;
+	Timer timer_;
 
 	int first_interval_;
 	int interval_;
