@@ -89,7 +89,6 @@ void Tetris::onContinue(Event *event)
 	move_trigger_->start();
 
 	Game::onContinue(event);
-	// for the second timer, the restart is not required, because its used for button long pressed
 }
 
 bool Tetris::rotate()
@@ -106,6 +105,7 @@ bool Tetris::rotate()
 	// 1.	get current values
 
 	Tetromino tmp = tetromino_;
+
 	tmp.rotate();
 
 	// 2. calculate new (wanted) direction
@@ -113,7 +113,7 @@ bool Tetris::rotate()
 	byte valid_output = tmp.validationErrors(&field_);
 
 	// if not valid, try to move to make valid
-	if (valid_output)
+	if (valid_output != VALID)
 	{
 		if (valid_output & OVER_LEFT)
 		{
@@ -190,18 +190,21 @@ void Tetris::clear()
 
 bool Tetris::newTetromino()
 {
-	Tetromino tmp = tetromino_;
+	Tetromino tmp;
+	tmp.pos_ = Pos(4, display_->rows());
 	tmp.randomShape();
 	tmp.randomDirection();
-	tmp.pos_ = Pos(4, display_->rows() - 1);
 
 	Pos points[4];
 	tmp.getPoints(points);
 	// place tetromino full in the field
 	for (Pos p : points)
 	{
-		while(!(p.pos_y < display_->rows()))
-			tmp.pos_.pos_y--;
+		if (p.pos_y >= display_->rows())
+		{
+			tmp.pos_.pos_y -= (p.pos_y - (display_->rows() - 1));
+			tmp.getPoints(points);
+		}
 	}
 	tetromino_ = tmp;
 	render();
