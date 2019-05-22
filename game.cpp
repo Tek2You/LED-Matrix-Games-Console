@@ -20,13 +20,12 @@
 #include "game.h"
 #include "operators.h"
 
-Game::Game(Display *display, GameType game_type) : display_(display), game_type_(game_type), is_new_highscore_(false), stop_state_(false)
+Game::Game(Display *display, GameType game_type)
+	 : display_(display), game_type_(game_type), is_new_highscore_(false), stop_state_(false)
 {
 }
 
-Game::~Game()
-{
-}
+Game::~Game() {}
 
 bool Game::process(Event *event)
 {
@@ -57,7 +56,7 @@ bool Game::process(Event *event)
 			first_released_ = false;
 			display_->setRow(15, 0);
 			display_->show();
-			(static_cast<Timer*>(event->triggers_.last()))->setInterval(500);
+			(static_cast<Timer *>(event->triggers_.last()))->setInterval(500);
 		}
 		if (stop_state_)
 		{
@@ -77,7 +76,7 @@ bool Game::process(Event *event)
 	}
 	else if (stop_state_)
 	{
-		Timer * timer = static_cast<Timer*>(event->triggers_.last());
+		Timer *timer = static_cast<Timer *>(event->triggers_.last());
 		if (timer->triggered() && event->buttonStop().state())
 		{
 			timer->setInterval(200);
@@ -100,13 +99,11 @@ bool Game::process(Event *event)
 	// check if processing is required
 	if (event->controlButtonChanged())
 	{
-		if (onButtonChange(event))
-			output = true;
+		if (onButtonChange(event)) output = true;
 	}
 	if (event->generalOverflow())
 	{
-		if (onTriggered(event))
-			output = true;
+		if (onTriggered(event)) output = true;
 	}
 	return output;
 }
@@ -115,8 +112,8 @@ void Game::onStop(Event *event)
 {
 	display_->clear();
 	display_->text1_.setOffset(0);
-	display_->text1_.setNumber(this->score(),false);
-	display_->setIcon(0x0000242424240000, 8,false);
+	display_->text1_.setNumber(this->score(), false);
+	display_->setIcon(0x0000242424240000, 8, false);
 	display_->show();
 }
 
@@ -126,13 +123,9 @@ void Game::onContinue(Event *event)
 	render();
 }
 
-bool Game::onButtonChange(Event *event)
-{
-}
+bool Game::onButtonChange(Event *event) {}
 
-bool Game::onTriggered(Event *event)
-{
-}
+bool Game::onTriggered(Event *event) {}
 
 extern "C" void __cxa_pure_virtual()
 {

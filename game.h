@@ -26,7 +26,8 @@
 class Game
 {
 public:
-	enum GameType{
+	enum GameType
+	{
 		TETRIS,
 		SNAKE,
 		DODGE,
@@ -47,14 +48,9 @@ public:
 
 	// score and highscore methods
 	virtual unsigned int score() const = 0;
-	virtual bool isNewHighscore() const
-	{
-		return is_new_highscore_;
-	}
+	virtual bool isNewHighscore() const { return is_new_highscore_; }
 
-	GameType type(){
-		return game_type_;
-	}
+	GameType type() { return game_type_; }
 
 protected:
 	virtual bool onButtonChange(Event *event);
