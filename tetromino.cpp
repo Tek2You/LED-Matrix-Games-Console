@@ -22,18 +22,8 @@ Tetromino::Tetromino() {}
 
 void Tetromino::rotate()
 {
-	byte directions = tetromino::tetrominos[shape_].directions;
-	if (directions == bit(direction_))
-	{
-		return; // not rotateable
-	}
-
-	Direction tmp = direction_;
-	do
-	{
-		tmp = Direction((byte(tmp) + 1) % 4);
-	} while (directions & bit(tmp));
-	direction_ = tmp;
+	// chose next direction
+	direction_ = Direction((byte(direction_) + 1) % 4);
 }
 
 byte Tetromino::validationErrors(const StaticList<byte> *field) const
@@ -41,7 +31,7 @@ byte Tetromino::validationErrors(const StaticList<byte> *field) const
 	Pos positions[4];
 	getPoints(positions);
 	byte valid_errors = 0;
-	for (const SmartPos *pos = tetromino::tetrominos[shape_].pos; pos < &tetromino::tetrominos[shape_].pos[4]; pos++)
+	for (const Pos *pos = &positions[0]; pos < &positions[4]; pos++)
 	{
 		if (pos->y() > (field->size() - 1))
 		{
@@ -75,75 +65,24 @@ void Tetromino::randomShape()
 
 void Tetromino::randomDirection()
 {
-	byte directions = tetromino::tetrominos[shape_].directions;
-	byte num = Tetromino::possibleDirectionNum();
+	// use millis as random seed
+	direction_ = Direction(millis() % 4);
+}
 
-	if (num <= 1)
+void Tetromino::getPoints(Pos (&positions)[4]) const
+{
+	PGM_P p = (PGM_P)pgm_read_word(&(tetrominos_[shape_]));
+	int array = pgm_read_word(p + direction_ * 2);
+
+	for (int i = 0, j = 0; i < 16; i++)
 	{
-		direction_ = TOP;
-		return;
-	}
-	byte rand = ((millis()) % (num));
-	for (int i = 0, j = 0; i < 4; i++)
-	{
-		if (bitRead(directions, i))
+		if (array & (1 << i))
 		{
-			if (j == rand)
+			positions[j] = Pos(i / 4 - 1, i % 4 - 2) + pos_;
+			if (j++ == 4)
 			{
-				direction_ = Direction(j);
 				return;
 			}
-			j++;
 		}
 	}
-}
-
-byte Tetromino::possibleDirectionNum() const
-{
-	byte num = 0;
-	byte directions = tetromino::tetrominos[shape_].directions;
-	for (byte i = 0x01; i; i = i << 1)
-		if (i & directions) num++;
-	return num;
-}
-
-Specifications Tetromino::specifications() const {}
-
-bool Tetromino::getPoints(Pos (&positions)[4]) const
-{
-	Specifications brick = tetrominos[shape_];
-
-	if (!brick.directions & BV_(direction_)) // direction not available
-		return false;
-
-	const Pos pos_rotate = brick.pos[0];
-	for (int i = 0; i < 4; i++)
-	{
-		const Pos dot_pos = brick.pos[i].toPos() - pos_rotate;
-
-		Pos tmp_pos;
-		switch (direction_)
-		{
-		case BOTTOM:
-			tmp_pos = dot_pos;
-			break;
-		case LEFT:
-			tmp_pos.pos_x = dot_pos.y();
-			tmp_pos.pos_y = -dot_pos.pos_x;
-			break;
-		case TOP:
-			tmp_pos.pos_x = -dot_pos.pos_x;
-			tmp_pos.pos_y = -dot_pos.y();
-			break;
-		case RIGHT:
-			tmp_pos.pos_x = -dot_pos.y();
-			tmp_pos.pos_y = dot_pos.pos_x;
-			break;
-		default:
-			break;
-		}
-
-		positions[i] = pos_ + tmp_pos;
-	}
-	return true;
 }
