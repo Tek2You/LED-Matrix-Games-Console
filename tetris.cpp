@@ -24,15 +24,14 @@ static unsigned int EE_highscore EEMEM = 0;
 unsigned int Tetris::highscore_ = eeprom_read_word(&EE_highscore);
 
 const int speeds[] PROGMEM = {
-    1800, 180, 400, 200, 80,  // very slow
-    1400, 140, 400, 160, 90,  // slow
-    1000, 100, 300, 140, 100, // medium fast
-    800,  80,  350, 120, 110, // fast
-    500,  50,  300, 100, 120, // very fast
+	 1800, 180, 400, 200, 80,  // very slow
+	 1400, 140, 400, 160, 90,  // slow
+	 1000, 100, 300, 140, 100, // medium fast
+	 800,  80,  350, 120, 110, // fast
+	 500,  50,  300, 100, 120, // very fast
 };
 
-Tetris::Tetris(Display *display)
-	 : Game(display, TETRIS), blink_cycle_(DEFAULT), field_(display->rows()), tetromino_(nullptr), points_(0)
+Tetris::Tetris(Display *display) : Game(display, TETRIS), blink_cycle_(DEFAULT), field_(display->rows()), points_(0)
 {
 	display_->clear();
 	display->show();
@@ -42,18 +41,9 @@ Tetris::Tetris(Display *display)
 	{
 		field_ << 0;
 	}
-
 }
 
-Tetris::~Tetris()
-{
-	if (tetromino_ != nullptr)
-	{
-		delete tetromino_;
-	}
-
-	points_ = 0;
-}
+Tetris::~Tetris() { points_ = 0; }
 
 void Tetris::start(Event *event)
 {
@@ -62,30 +52,24 @@ void Tetris::start(Event *event)
 	event->addTrigger(step_timer_);
 	blink_timer_ = new Timer(readSpeed(BlinkInterval));
 	event->addTrigger(blink_timer_);
-	move_trigger_ =
-		 new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), readSpeed(FirstMoveInterval), readSpeed(MoveInterval));
+	move_trigger_ = new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), readSpeed(FirstMoveInterval),
+													  readSpeed(MoveInterval));
 	event->addTrigger(move_trigger_);
 
 	newTetromino();
 }
 
-
-
-
 void Tetris::render()
 {
 	display_->clear();
 	display_->setArray(field_.toArray());
-	if (tetromino_ != nullptr)
+	Pos positions[4];
+	tetromino_.getPoints(positions);
+	for (Pos p : positions)
 	{
-		Pos positions[4];
-		tetromino_->getPositions(positions);
-		for (Pos p : positions)
-		{
-			display_->setPixel(p.pos_x, p.pos_y, true);
-		}
+		display_->setPixel(p);
 	}
-	display_->show(true);
+	display_->show();
 }
 
 void Tetris::onStop(Event *event)
@@ -102,6 +86,7 @@ void Tetris::onContinue(Event *event)
 	clearFullRowsImmediately(); // clears all rows, if interrupted during clear effect
 	step_timer_->setInterval((event->buttonDown().state() ? readSpeed(DownInterval) : readSpeed(StepInterval)));
 	step_timer_->start();
+	move_trigger_->start();
 
 	Game::onContinue(event);
 	// for the second timer, the restart is not required, because its used for button long pressed
@@ -118,56 +103,53 @@ bool Tetris::rotate()
 	 * 4. if not: try to change to a valid position
 	 */
 
-	if (tetromino_ == nullptr) return false;
-
 	// 1.	get current values
-	Pos tmp_pos = tetromino_->pos();
-	const Shape shape = tetromino_->shape();
+
+	Tetromino tmp = tetromino_;
+	tmp.rotate();
 
 	// 2. calculate new (wanted) direction
-	const Direction new_dir = Tetromino::rotate(tetromino_->direction(), shape);
-
 	// 3. check valid
-	byte valid_output = tetromino_->isValid(shape, new_dir, tmp_pos);
+	byte valid_output = tmp.validationErrors(&field_);
 
 	// if not valid, try to move to make valid
 	if (valid_output)
 	{
 		if (valid_output & OVER_LEFT)
 		{
-			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_LEFT)
+			while (valid_output = tmp.validationErrors(&field_) & OVER_LEFT)
 			{
-				tmp_pos.pos_x++;
+				tmp.pos_.pos_x++;
 			}
 		}
 		else if (valid_output & OVER_RIGHT)
 		{
-			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_RIGHT)
+			while (valid_output = tmp.validationErrors(&field_) & OVER_RIGHT)
 			{
-				tmp_pos.pos_x--;
+				tmp.pos_.pos_x--;
 			}
 		}
 		if (valid_output & OVER_BELOW)
 		{
-			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_BELOW)
+			while (valid_output = tmp.validationErrors(&field_) & OVER_BELOW)
 			{
-				tmp_pos.pos_y++;
+				tmp.pos_.pos_y++;
 			}
 		}
 		else if (valid_output & OVER_ABOVE)
 		{
-			while (valid_output = tetromino_->isValid(shape, new_dir, tmp_pos) & OVER_ABOVE)
+			while (valid_output = tmp.validationErrors(&field_) & OVER_ABOVE)
 			{
-				tmp_pos.pos_y--;
+				tmp.pos_.pos_y--;
 			}
 		}
-		if (valid_output & COLLIDE || tetromino_->isValid(shape, new_dir, tmp_pos)) // collides with exiting tetromino
+		if (valid_output & COLLIDE || tmp.validationErrors(&field_)) // collides with exiting tetromino
 		{
+			// not even valid
 			return false;
 		}
 	}
-	tetromino_->setPos(tmp_pos);
-	tetromino_->setDirection(new_dir);
+	tetromino_ = tmp;
 	render();
 	return true;
 }
@@ -175,30 +157,27 @@ bool Tetris::rotate()
 void Tetris::move(const ButtonAutoTrigger::Direction dir)
 
 {
-	if (!tetromino_) return;
-	Pos pos = tetromino_->pos();
-	pos.pos_x+= (dir == ButtonAutoTrigger::BTN_1 ? -1 : 1);
-	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos) == VALID)
-	{ // valid
-		tetromino_->setPos(pos);
+	Tetromino tmp = tetromino_;
+	tmp.pos_.pos_x += (dir == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+	if (tmp.isValid(&field_))
+	{
+		tetromino_ = tmp;
 		render();
 	}
 }
 
 bool Tetris::tick(Event *event)
 {
-	if (tetromino_ == nullptr) return false;
-	Pos pos = tetromino_->pos();
-	pos.pos_y--;
-
-	if (tetromino_->isValid(tetromino_->shape(), tetromino_->direction(), pos))
+	Tetromino tmp = tetromino_;
+	tmp.pos_.pos_y--;
+	if (tmp.isValid(&field_))
 	{
-		if (blink_cycle_ == DEFAULT) takeOverTetromino();
-		return clearFullRows(event);
+		tetromino_ = tmp;
+		render();
+		return false;
 	}
-	tetromino_->setPos(pos);
-	render();
-	return false;
+	if (blink_cycle_ == DEFAULT) takeOverTetromino();
+	return clearFullRows(event);
 }
 
 void Tetris::clear()
@@ -211,35 +190,28 @@ void Tetris::clear()
 
 bool Tetris::newTetromino()
 {
-	if (tetromino_)
-	{ // make sure, a tetromino exists before delete
-		delete tetromino_;
-		tetromino_ = nullptr;
-	}
-	const Shape shape = randomTetrominoShape();
-	tetromino_ = new Tetromino(shape, display_->rows(), field_.toArray(), randomTetrominoDirection(shape),
-										Pos(4, display_->rows() - 1));
+	Tetromino tmp = tetromino_;
+	tmp.randomShape();
+	tmp.randomDirection();
+	tmp.pos_ = Pos(4, display_->rows() - 1);
+
 	Pos points[4];
-	tetromino_->getPositions(points);
+	tmp.getPoints(points);
 	// place tetromino full in the field
 	for (Pos p : points)
 	{
-		if (p.pos_y > display_->rows() - 1)
-		{
-			Pos pos = tetromino_->pos();
-			pos.pos_y -= (p.pos_y - (display_->rows() - 1));
-			tetromino_->setPos(pos);
-			tetromino_->getPositions(points);
-		}
+		while(!(p.pos_y < display_->rows()))
+			tmp.pos_.pos_y--;
 	}
+	tetromino_ = tmp;
 	render();
-	return tetromino_->isValid() & COLLIDE;
+	return tetromino_.isValid(&field_) & COLLIDE;
 }
 
 void Tetris::takeOverTetromino()
 {
 	Pos positions[4];
-	tetromino_->getPositions(positions);
+	tetromino_.getPoints(positions);
 	for (Pos p : positions)
 	{
 		bitWrite(field_[p.pos_y], p.pos_x, true);
@@ -262,11 +234,12 @@ bool Tetris::onButtonChange(Event *event)
 	}
 
 	// Down(faster and lower)
-	if(event->buttonDown().changed()){
+	if (event->buttonDown().changed())
+	{
 		unsigned int interval;
-		if(event->buttonDown().state()){
-			if(tick(event))
-				return true;
+		if (event->buttonDown().state())
+		{
+			if (tick(event)) return true;
 			interval = readSpeed(DownInterval);
 		}
 		else
@@ -393,7 +366,7 @@ bool Tetris::clearFullRows(Event *event)
 
 void Tetris::clearFullRowsImmediately()
 {
-	if(!rowsFull()) return;
+	if (!rowsFull()) return;
 	for (byte i = 0; i < field_.size(); i++)
 	{
 		while (field_[i] == 0xFF)
@@ -425,33 +398,4 @@ bool Tetris::rowsFull() const
 	return false;
 }
 
-Shape Tetris::randomTetrominoShape() { return Shape(millis() % 7); }
-
-Direction Tetris::randomTetrominoDirection(const Shape &shape)
-{
-	byte directions = Tetromino::possibleDirections(shape);
-	byte num = Tetromino::possibleDirectionNum(shape);
-
-	if (num <= 1)
-	{
-		return TOP;
-	}
-
-	byte rand = ((millis()) % (num));
-	for (int i = 0, j = 0; i < 4; i++)
-	{
-		if (bitRead(directions, i))
-		{
-			if (j == rand)
-			{
-				return Direction(j);
-			}
-			j++;
-		}
-	}
-}
-
-unsigned int Tetris::readSpeed(const Tetris::SpeedFlag flag) const
-{
-	return pgm_read_word(&speeds[flag+speed_*5]);
-}
+unsigned int Tetris::readSpeed(const Tetris::SpeedFlag flag) const { return pgm_read_word(&speeds[flag + speed_ * 5]); }

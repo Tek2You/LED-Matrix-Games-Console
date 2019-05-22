@@ -67,9 +67,6 @@ private:
 
 	bool newTetromino();
 	void takeOverTetromino();
-	// random tetromino data functions
-	Shape randomTetrominoShape();
-	Direction randomTetrominoDirection(const Shape &shape);
 
 	Timer * step_timer_;
 	Timer * blink_timer_;
@@ -87,7 +84,7 @@ private:
 	unsigned int readSpeed(const SpeedFlag flag) const;
 
 	StaticList<byte> field_; // field without current tetromino
-	Tetromino *tetromino_;
+	Tetromino tetromino_;
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
 
