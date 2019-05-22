@@ -19,6 +19,8 @@
 #pragma once
 #include "avr.h"
 #include "position.h"
+#include "avr/pgmspace.h"
+#include "staticlist.h"
 
 namespace tetromino
 {
@@ -52,70 +54,58 @@ enum VALIDATION_ERROR : byte
 
 struct Specifications
 {
+	//	byte points[8];
 	byte directions;
-	SmartPos shape[4];
+	SmartPos pos[4];
+};
+
+struct SpecificationsNew
+{
+	int brick[4];
 };
 
 #define BV_(bit) 1 << bit
 
+
+//const int points_i [4] PROGMEM = {0b0100010001000100, 0b0000000001000000, 0b0100010001000100, 0b0000000001000000};
+//const int points_j [4] PROGMEM = {0b0000010001001100, 0b0000100011100000, 0b0000011001000100, 0b0000000011100010};
+//const int points_l [4] PROGMEM = {0b0000010001000110, 0b0000000011101000, 0b0000110001000100, 0b0000001011100000};
+//const int points_o [4] PROGMEM = {0b0000011001100000, 0b0000011001100000, 0b0000011001100000, 0b0000011001100000};
+//const int points_s [4] PROGMEM = {0b0000000001101100, 0b0000010001100010, 0b0000000001101100, 0b0000010001100010};
+//const int points_t [4] PROGMEM = {0b0000000011100100, 0b0000010011000100, 0b0000010011100000, 0b0000010001100100};
+//const int points_z [4] PROGMEM = {0b0000000011000110, 0b0000010011001000, 0b0000000011000110, 0b0000010011001000};
+
+//const char* asfd [] PROGMEM = {};
+
 const Specifications tetrominos[7] = {
-    {BV_(TOP) | BV_(RIGHT), {SmartPos(0, 1), SmartPos(0, 0), SmartPos(0, 2), SmartPos(0, 3)}},
-    {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT), {SmartPos(1, 1), SmartPos(1, 0), SmartPos(1, 2), SmartPos(0, 2)}},
-    {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT), {SmartPos(0, 1), SmartPos(0, 0), SmartPos(0, 2), SmartPos(1, 2)}},
-    {BV_(TOP), {SmartPos(0, 0), SmartPos(0, 1), SmartPos(1, 0), SmartPos(1, 1)}},
-    {BV_(TOP) | BV_(RIGHT), {SmartPos(1, 0), SmartPos(1, 1), SmartPos(0, 1), SmartPos(2, 0)}},
-    {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT), {SmartPos(1, 0), SmartPos(0, 0), SmartPos(1, 1), SmartPos(2, 0)}},
-    {BV_(TOP) | BV_(RIGHT), {SmartPos(1, 0), SmartPos(0, 0), SmartPos(1, 1), SmartPos(2, 1)}},
+	 {BV_(TOP) | BV_(RIGHT), {SmartPos(0, 1), SmartPos(0, 0), SmartPos(0, 2), SmartPos(0, 3)}},
+	 {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT), {SmartPos(1, 1), SmartPos(1, 0), SmartPos(1, 2), SmartPos(0, 2)}},
+	 {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT), {SmartPos(0, 1), SmartPos(0, 0), SmartPos(0, 2), SmartPos(1, 2)}},
+	 {BV_(TOP), {SmartPos(0, 0), SmartPos(0, 1), SmartPos(1, 0), SmartPos(1, 1)}},
+	 {BV_(TOP) | BV_(RIGHT), {SmartPos(1, 0), SmartPos(1, 1), SmartPos(0, 1), SmartPos(2, 0)}},
+	 {BV_(TOP) | BV_(RIGHT) | BV_(BOTTOM) | BV_(LEFT), {SmartPos(1, 0), SmartPos(0, 0), SmartPos(1, 1), SmartPos(2, 0)}},
+	 {BV_(TOP) | BV_(RIGHT), {SmartPos(1, 0), SmartPos(0, 0), SmartPos(1, 1), SmartPos(2, 1)}},
 };
 } // namespace tetromino
 
 using namespace tetromino;
+
 class Tetromino
 {
 public:
-	Tetromino(Shape shape, byte heigth, byte *field, Direction direction, Pos pos);
 
-	void setPos(const Pos &pos)
-	{
-		pos_ = pos;
-	}
-	const Pos &pos() const
-	{
-		return pos_;
-	}
+	Tetromino();
 
-	void setDirection(const Direction direction)
-	{
-		direction_ = direction;
-	}
-	const Direction direction() const
-	{
-		return direction_;
-	}
-
-	const Shape shape() const
-	{
-		return shape_;
-	}
-
-	bool getPositions(Pos (&positions)[4]) const;
-	static bool getPositions(Pos (&positions)[4], const Shape &shape, const Direction &direction, const Pos &pos);
-
-	static const Direction rotate(const Direction direction, const Shape shape);
-	void rotate();
-
-	byte isValid() const;
-	byte isValid(const Shape shape, const Direction direction, const Pos pos) const;
-
-	static byte possibleDirections(const Shape shape);
-	byte possibleDirections() const;
-	static byte possibleDirectionNum(const Shape shape);
+	bool getPoints(Pos (&positions)[4]) const;
+	Specifications specifications() const;
 	byte possibleDirectionNum() const;
+	void rotate();
+	byte validationErrors(const StaticList<byte> *field) const;
+	inline bool isValid(const StaticList<byte> * field) const {return validationErrors(field) == VALID;}
+	void randomShape();
+	void randomDirection();
 
-private:
-	const Shape shape_;
+	Shape shape_;
 	Direction direction_;
 	Pos pos_;
-	const byte heigth_;
-	const byte *field_;
 };
