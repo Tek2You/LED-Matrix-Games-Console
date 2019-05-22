@@ -182,14 +182,14 @@ void SpaceInvaders::render()
 	// print shots
 	for (Shot s : shots_)
 	{
-		display_->setPixel(s.col_, s.row_, false);
+		display_->setPixel(s.col_, s.row_);
 	}
 
 	// print shoter
-	display_->setPixel(pos_ - 1, 0, false);
-	display_->setPixel(pos_, 0, false);
-	display_->setPixel(pos_, 1, false);
-	display_->setPixel(pos_ + 1, 0, false);
+	display_->setPixel(pos_ - 1, 0);
+	display_->setPixel(pos_, 0);
+	display_->setPixel(pos_, 1);
+	display_->setPixel(pos_ + 1, 0);
 
 	// finaly show all on display
 	display_->show();
