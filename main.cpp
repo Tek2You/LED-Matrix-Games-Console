@@ -20,7 +20,7 @@
 #include "avr/wdt.h"
 #include "display.h"
 #include "event.h"
-#include "game_sm.h"
+#include "menu_sm.h"
 
 FUSES = {
 	 LFUSE_DEFAULT | (byte)~FUSE_CKDIV8, // run at 8MHz
@@ -30,7 +30,7 @@ FUSES = {
 
 Event event;
 Display dp(16, 8);
-GameSM sm(&dp, &event);
+MenuSM sm(&dp, &event);
 
 int counter = 0;
 
