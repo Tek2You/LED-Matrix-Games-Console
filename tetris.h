@@ -18,11 +18,11 @@
 
 #pragma once
 #include "avr.h"
+#include "buttonautotrigger.h"
 #include "display.h"
 #include "game.h"
-#include "tetromino.h"
 #include "staticlist.h"
-#include "buttonautotrigger.h"
+#include "tetromino.h"
 
 class Tetris : public Game
 {
@@ -31,20 +31,12 @@ public:
 	~Tetris();
 
 	void start(Event *event);
-	void setSpeed(const byte v) override
-	{
-		speed_ = v;
-	}
+	void setSpeed(const byte v) override { speed_ = v; }
 
 	// score functions
-	unsigned int score() const
-	{
-		return points_;
-	}
-	static unsigned int highscore()
-	{
-		return highscore_;
-	}
+	unsigned int score() const { return points_; }
+
+	static unsigned int highscore() { return highscore_; }
 	static void resetHighscore();
 
 protected:
@@ -57,7 +49,6 @@ protected:
 
 private:
 	// private functions only for tetris
-	void clear();
 	bool rotate();
 	void move(const ButtonAutoTrigger::Direction dir);
 	bool tick(Event *event);
@@ -68,12 +59,13 @@ private:
 	bool newTetromino();
 	void takeOverTetromino();
 
-	Timer * step_timer_;
-	Timer * blink_timer_;
-	ButtonAutoTrigger * move_trigger_;
+	Timer *step_timer_;
+	Timer *blink_timer_;
+	ButtonAutoTrigger *move_trigger_;
 
 	byte speed_;
-	enum SpeedFlag{
+	enum SpeedFlag
+	{
 		StepInterval = 0,
 		DownInterval = 1,
 		FirstMoveInterval = 2,
@@ -85,10 +77,12 @@ private:
 
 	StaticList<byte> field_; // field without current tetromino
 	Tetromino tetromino_;
+
 	unsigned int points_ = 0;
 	static unsigned int highscore_;
 
-	enum BlinkCycle {
+	enum BlinkCycle
+	{
 		DEFAULT = 0,
 		INIT_BLINK = 1,
 		BLINK_OFF_1 = 2,

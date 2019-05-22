@@ -180,14 +180,6 @@ bool Tetris::tick(Event *event)
 	return clearFullRows(event);
 }
 
-void Tetris::clear()
-{
-	for (byte &row : field_)
-	{
-		row = 0;
-	}
-}
-
 bool Tetris::newTetromino()
 {
 	Tetromino tmp;
