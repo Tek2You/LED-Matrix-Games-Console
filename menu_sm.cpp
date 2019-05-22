@@ -16,7 +16,7 @@
  * along with this library.  If not, see http://www.gnu.org/licenses/.
  */
 
-#include "game_sm.h"
+#include "menu_sm.h"
 #include "avr/eeprom.h"
 #include "avr/wdt.h"
 #include "defaults.h"
@@ -28,17 +28,11 @@
 #include "tetris.h"
 
 #undef TRANSITION
-#define TRANSITION(s, event)                                                                                           \
-	{                                                                                                                   \
-		setState(STATE_CAST(&GameSM::s));                                                                                \
-		event->clearFlags();                                                                                             \
-		event->setOnEntry();                                                                                             \
-		process(event);                                                                                                  \
-	}
+#define TRANSITION(s, event) transition(&MenuSM::s, event)
 
 #define LOAD_EFFECT_STANDART(s, event)                                                                                 \
 	{                                                                                                                   \
-		load_following_state_ = STATE_CAST(&GameSM::s);                                                                  \
+		load_following_state_ = STATE_CAST(&MenuSM::s);                                                                  \
 		TRANSITION(stateLoadEffect, event);                                                                              \
 		return;                                                                                                          \
 	}
@@ -61,8 +55,8 @@ byte EE_speed EEMEM = DEFAULT_SPEED;
 byte EE_language EEMEM = DEFAULT_LANGUAGE;
 byte EE_brightness EEMEM = DEFAULT_BRIGHTNESS;
 
-GameSM::GameSM(Display *display, Event *event)
-	 : StateMachine(STATE_CAST(&GameSM::stateDefault)), display_(display), language_(EN)
+MenuSM::MenuSM(Display *display, Event *event)
+	 : StateMachine(STATE_CAST(&MenuSM::stateDefault)), display_(display), language_(EN)
 {
 	display_->text1_.setShiftSpeed(5);
 	display_->text2_.setShiftSpeed(5);
@@ -81,7 +75,15 @@ GameSM::GameSM(Display *display, Event *event)
 	event->clear();
 }
 
-bool GameSM::processMenuStop(Event *event)
+void MenuSM::transition(Function function, Event *event)
+{
+	static_cast<StateMachine<Event *>::State>(function);
+	event->clearFlags();
+	event->setOnEntry();
+	this->StateMachine::process(event);
+}
+
+bool MenuSM::processMenuStop(Event *event)
 {
 	if (event->buttonStop().pressed())
 	{
@@ -91,7 +93,7 @@ bool GameSM::processMenuStop(Event *event)
 	return false;
 }
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
+MenuSM::MenuItem::Button MenuSM::MenuItem::advance(Event *event, char &item, const char num, const char min)
 {
 	if (event->buttonLeft().pressed())
 	{
@@ -112,7 +114,7 @@ GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event, char &item, con
 	return NO_BTN;
 }
 
-void GameSM::stateDefault(Event *event)
+void MenuSM::stateDefault(Event *event)
 {
 	static const Item items[6] = {Item{"highscore", "Highscore", 0x00081c2018043810},
 											Item{"settings", "Einstellungen", 0x000003c3c3c3c0000},
@@ -129,8 +131,7 @@ void GameSM::stateDefault(Event *event)
 		item.init(6);
 		item.value_ = last_played_game_ + 2;
 		display_->loadMenuConfig();
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (event->buttonStop().pressed())
 	{
@@ -168,7 +169,7 @@ void GameSM::stateDefault(Event *event)
 	showItem(items[item.value_]);
 }
 
-void GameSM::stateGame(Event *event)
+void MenuSM::stateGame(Event *event)
 {
 	if (event->onEntry())
 	{
@@ -205,7 +206,7 @@ void GameSM::stateGame(Event *event)
 	}
 }
 
-void GameSM::stateGameOver(Event *event)
+void MenuSM::stateGameOver(Event *event)
 {
 	if (event->onEntry())
 	{
@@ -214,8 +215,7 @@ void GameSM::stateGameOver(Event *event)
 		display_->text2_.clear();
 		if (game_ != nullptr)
 		{
-			event->setFlag(Event::ProcessPinChanges);
-			event->setFlag(Event::ProcessStop);
+			event->setupMenu();
 			display_->loadMenuConfig();
 			if (game_->type() == Game::SNAKE && game_->score() >= 124)
 			{
@@ -251,7 +251,7 @@ void GameSM::stateGameOver(Event *event)
 	}
 }
 
-void GameSM::stateSettingsMenu(Event *event)
+void MenuSM::stateSettingsMenu(Event *event)
 {
 	static const Item items[3] = {Item{"speed", "Geschwindigkeit", 0x0000122448241200},
 											Item{"language", "Sprache", 0x2060ff818181ff00},
@@ -261,8 +261,7 @@ void GameSM::stateSettingsMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		item.init(3, 0);
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (processMenuStop(event))
 	{
@@ -302,15 +301,14 @@ void GameSM::stateSettingsMenu(Event *event)
 	showItem(items[item.value_]);
 }
 
-void GameSM::stateSpeedMenu(Event *event)
+void MenuSM::stateSpeedMenu(Event *event)
 {
 	static MenuItem item;
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
 		item.init(5, speed_);
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (processMenuStop(event))
 	{
@@ -345,15 +343,14 @@ void GameSM::stateSpeedMenu(Event *event)
 	display_->show();
 }
 
-void GameSM::stateBrightnessMenu(Event *event)
+void MenuSM::stateBrightnessMenu(Event *event)
 {
 	static MenuItem item;
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
 		item.init(4, brightness_);
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (processMenuStop(event))
 	{
@@ -391,7 +388,7 @@ void GameSM::stateBrightnessMenu(Event *event)
 	display_->setBrightness(item.value_);
 }
 
-void GameSM::stateLanguageMenu(Event *event)
+void MenuSM::stateLanguageMenu(Event *event)
 {
 	const char *menu_text[2] = {"english", "Deutsch"};
 	static MenuItem item;
@@ -399,8 +396,7 @@ void GameSM::stateLanguageMenu(Event *event)
 	{
 		display_->loadMenuConfig();
 		item.init(2, (language_ == DE ? 0 : 1));
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (processMenuStop(event))
 	{
@@ -441,7 +437,7 @@ void GameSM::stateLanguageMenu(Event *event)
 	display_->text1_.setText(menu_text[item.value_]);
 }
 
-void GameSM::stateLoadEffect(Event *event)
+void MenuSM::stateLoadEffect(Event *event)
 {
 	static int count = 0;
 	if (event->onEntry())
@@ -449,7 +445,7 @@ void GameSM::stateLoadEffect(Event *event)
 		count = 0;
 		display_->text1_.clear();
 		display_->text2_.clear();
-		event->removeAllTimers();
+		event->removeAllTriggers();
 		event->addTrigger(new Timer(12));
 		event->setFlag(Event::ProcessTriggers);
 		event->setFlag(Event::ProcessStop);
@@ -466,7 +462,7 @@ void GameSM::stateLoadEffect(Event *event)
 			{
 				setState(load_following_state_);
 				load_following_state_ = nullptr;
-				event->removeAllTimers();
+				event->removeAllTriggers();
 				event->clearFlags();
 				event->setOnEntry();
 				process(event);
@@ -485,14 +481,13 @@ void GameSM::stateLoadEffect(Event *event)
 	}
 }
 
-void GameSM::stateHighscoreMenu(Event *event)
+void MenuSM::stateHighscoreMenu(Event *event)
 {
 	static MenuItem item;
 	if (event->onEntry())
 	{
 		item.init(5, 1);
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (processMenuStop(event))
 	{
@@ -556,13 +551,12 @@ void GameSM::stateHighscoreMenu(Event *event)
 	display_->show();
 }
 
-void GameSM::stateResetMenu(Event *event)
+void MenuSM::stateResetMenu(Event *event)
 {
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		event->setFlag(Event::ProcessPinChanges);
-		event->setFlag(Event::ProcessStop);
+		event->setupMenu();
 	}
 	else if (processMenuStop(event))
 	{
@@ -599,15 +593,16 @@ void GameSM::stateResetMenu(Event *event)
 	display_->show();
 }
 
-void GameSM::processGame(Event *event)
+void MenuSM::processGame(Event *event)
 {
 	if (game_->process(event))
 	{
+		event->removeAllTriggers();
 		TRANSITION(stateGameOver, event);
 	}
 }
 
-void GameSM::showItem(const GameSM::Item &item)
+void MenuSM::showItem(const MenuSM::Item &item)
 {
 	display_->setIcon(item.icon_, 0, false);
 
@@ -615,4 +610,4 @@ void GameSM::showItem(const GameSM::Item &item)
 	display_->show();
 }
 
-GameSM::MenuItem::Button GameSM::MenuItem::advance(Event *event) { return advance(event, value_, num_); }
+MenuSM::MenuItem::Button MenuSM::MenuItem::advance(Event *event) { return advance(event, value_, num_); }

@@ -8,7 +8,7 @@ add_avr_executable(${PROJECT_NAME}
     tetromino.cpp
     tetris.cpp
     display.cpp
-    game_sm.cpp
+    menu_sm.cpp
     spi.cpp
     timing.c
     text.cpp

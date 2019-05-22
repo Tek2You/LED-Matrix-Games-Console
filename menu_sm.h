@@ -23,13 +23,16 @@
 #include "statemachine.h"
 
 class Display;
-class GameSM : public StateMachine<Event *>
+class MenuSM : public StateMachine<Event *>
 {
 public:
-	GameSM(Display *display, Event *event);
-	//	void processStateMaschine(Event *event);
+	MenuSM(Display *display, Event *event);
+    //	void processStateMaschine(Event *event);
 private:
-	bool processMenuStop(Event *event);
+    typedef void(MenuSM::*Function)(Event*);
+    void transition(Function function, Event *event);
+
+    bool processMenuStop(Event *event);
 	// states
 	void stateDefault(Event *event);
 	void stateGameOver(Event *event);
