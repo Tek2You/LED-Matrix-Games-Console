@@ -534,6 +534,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 															  : "Zur"
 																 "\x1c"
 																 "cksetzen");
+		break;
 	case 1:
 		display_->setIcon(0xfffff7e300081c00, 0, false);
 		display_->text1_.setNumber(Tetris::highscore());
@@ -552,6 +553,7 @@ void GameSM::stateHighscoreMenu(Event *event)
 	default:
 		break;
 	}
+	display_->show();
 }
 
 void GameSM::stateResetMenu(Event *event)
