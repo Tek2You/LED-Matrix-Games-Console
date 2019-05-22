@@ -67,4 +67,7 @@ protected:
 	bool is_new_highscore_ = false;
 	bool stop_state_;
 	const GameType game_type_;
+
+	byte reset_count_ = 0;
+	bool first_released_ = false;
 };

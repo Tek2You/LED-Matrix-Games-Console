@@ -30,9 +30,7 @@ Game::~Game()
 
 bool Game::process(Event *event)
 {
-	bool output = false;
-	static bool first_released_ = false;
-	static byte reset_count = 0;
+	reset_count_ = 0;
 	/* Stop Button
 	 * Enable Stop directly after push
 	 * Disable Stop after released after second
@@ -53,9 +51,9 @@ bool Game::process(Event *event)
 	}
 	else if (event->buttonStop().released())
 	{
-		if (reset_count)
+		if (reset_count_)
 		{ // tryed to leave
-			reset_count = 0;
+			reset_count_ = 0;
 			first_released_ = false;
 			display_->setRow(15, 0);
 			display_->show();
@@ -79,24 +77,26 @@ bool Game::process(Event *event)
 	}
 	else if (stop_state_)
 	{
-		if (event->triggers_.last()->triggered() && event->buttonStop().state())
+		Timer * timer = static_cast<Timer*>(event->triggers_.last());
+		if (timer->triggered() && event->buttonStop().state())
 		{
-			(static_cast<Timer*>(event->triggers_.last()))->setInterval(200);
-			event->triggers_.last()->restart();
-			display_->setPixel(reset_count, 15);
+			timer->setInterval(200);
+			timer->restart();
+			display_->setPixel(reset_count_, 15);
 			display_->show();
-			reset_count++;
-			if (reset_count >= 8)
+			reset_count_++;
+			if (reset_count_ >= 8)
 			{
 				stop_state_ = false;
 				first_released_ = false;
-				reset_count = 0;
+				reset_count_ = 0;
 				event->triggers_.removeLast();
 				return true;
 			}
 		}
 		return false;
 	}
+	byte output = false;
 	// check if processing is required
 	if (event->controlButtonChanged())
 	{
