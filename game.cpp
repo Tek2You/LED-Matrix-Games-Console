@@ -20,7 +20,7 @@
 #include "game.h"
 #include "operators.h"
 
-Game::Game(Display *display, GameType game_type)
+Game::Game(Display *display, const GameType game_type)
 	 : display_(display), game_type_(game_type), is_new_highscore_(false), stop_state_(false)
 {
 }
@@ -34,43 +34,47 @@ bool Game::process(Event *event)
 	 * Enable Stop directly after push
 	 * Disable Stop after released after second
 	 */
-	if (event->buttonStop().pressed())
+	if (event->buttonStop().changed())
 	{
-		if (!stop_state_) // first time pressed -> stop game
+		if (event->buttonStop().state())
 		{
-			stop_state_ = true;
-			onStop(event);
-			event->addTrigger(new Timer(500)); // add timer for reset game
-		}
-		else // second time pressed
-		{
-			event->triggers_.last()->restart();
-		}
-		return false;
-	}
-	else if (event->buttonStop().released())
-	{
-		if (reset_count_)
-		{ // tryed to leave
-			reset_count_ = 0;
-			first_released_ = false;
-			display_->setRow(15, 0);
-			display_->show();
-			(static_cast<Timer *>(event->triggers_.last()))->setInterval(500);
-		}
-		if (stop_state_)
-		{
-			if (!first_released_) // released first time
+			if (stop_state_) // first time pressed -> stop game
 			{
-				first_released_ = true;
+				event->triggers_.last()->restart();
 			}
-			else // released second time -> continue game
+			else // second time pressed
 			{
+				stop_state_ = true;
+				onStop(event);
+				event->addTrigger(new Timer(500)); // add timer for reset game
+			}
+			return false;
+		}
+		else
+		{
+			if (reset_count_)
+			{
+				// tryed to leave
+				reset_count_ = 0;
 				first_released_ = false;
-				stop_state_ = false;
-				onContinue(event);
-				event->triggers_.removeLast();
-				return false;
+				display_->setRow(15, 0);
+				display_->show();
+				(static_cast<Timer *>(event->triggers_.last()))->setInterval(500);
+			}
+			if (stop_state_)
+			{
+				if (!first_released_) // released first time
+				{
+					first_released_ = true;
+				}
+				else // released second time -> continue game
+				{
+					first_released_ = false;
+					stop_state_ = false;
+					onContinue(event);
+					event->triggers_.removeLast();
+					return false;
+				}
 			}
 		}
 	}

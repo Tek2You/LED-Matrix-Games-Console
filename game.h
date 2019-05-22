@@ -34,7 +34,7 @@ public:
 		SPACE_INVADERS,
 	};
 
-	Game(Display *display, GameType game_type);
+	Game(Display *display, const GameType game_type);
 	virtual ~Game();
 
 	// start the game
@@ -60,10 +60,11 @@ protected:
 	virtual void render() = 0;
 
 	Display *display_;
-	bool is_new_highscore_ = false;
-	bool stop_state_;
 	const GameType game_type_;
+
+	bool is_new_highscore_ = false;
 
 	byte reset_count_ = 0;
 	bool first_released_ = false;
+	bool stop_state_;
 };
