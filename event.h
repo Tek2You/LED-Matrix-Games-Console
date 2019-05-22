@@ -55,7 +55,7 @@ public:
 	Trigger *trigger(const byte index);
 	bool overflow(const byte index);
 	void removeTimer(const byte index);
-	void removeAllTimers();
+	void removeAllTriggers();
 
 	enum Flags
 	{
@@ -67,8 +67,12 @@ public:
 
 	void setupGame()
 	{
-		removeAllTimers();
+		removeAllTriggers();
 		flags_ = (Event::ProcessPinChanges | Event::ProcessTriggers | Event::ProcessStop);
+	}
+
+	void setupMenu(){
+		flags_ = (Event::ProcessPinChanges | Event:: ProcessStop);
 	}
 
 	inline void clearFlags() { flags_ = 0; }

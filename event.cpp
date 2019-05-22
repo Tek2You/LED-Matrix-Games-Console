@@ -91,7 +91,7 @@ void Event::removeTimer(const byte index)
 	triggers_.remove(index);
 }
 
-void Event::removeAllTimers()
+void Event::removeAllTriggers()
 {
 	for (Trigger *t : triggers_)
 	{
