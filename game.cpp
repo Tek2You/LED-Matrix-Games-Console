@@ -29,11 +29,11 @@ Game::~Game() {}
 
 bool Game::process(Event *event)
 {
-	reset_count_ = 0;
 	/* Stop Button
 	 * Enable Stop directly after push
 	 * Disable Stop after released after second
 	 */
+
 	if (event->buttonStop().changed())
 	{
 		if (event->buttonStop().state())
@@ -63,13 +63,9 @@ bool Game::process(Event *event)
 			}
 			if (stop_state_)
 			{
-				if (!first_released_) // released first time
+				first_released_ = !first_released_;
+				if (!first_released_) // released second time
 				{
-					first_released_ = true;
-				}
-				else // released second time -> continue game
-				{
-					first_released_ = false;
 					stop_state_ = false;
 					onContinue(event);
 					event->triggers_.removeLast();
@@ -99,7 +95,9 @@ bool Game::process(Event *event)
 		}
 		return false;
 	}
+
 	byte output = false;
+
 	// check if processing is required
 	if (event->controlButtonChanged())
 	{
