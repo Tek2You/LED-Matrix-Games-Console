@@ -23,9 +23,10 @@
 class Display : public MatrixDisplay
 {
 public:
+	class Icon;
 	Display(byte height, byte width);
 
-	void setIcon(uint64_t icon, byte offset = 0, bool show=true);
+	void setIcon(Icon icon, byte offset = 0, bool show = true);
 	void update();
 	void loadMenuConfig();
 	void loadsGameCofig();
@@ -33,10 +34,16 @@ public:
 
 	Text text1_, text2_;
 
-//private:
-	union Icon {
-		uint64_t i64;
-		byte bytes[8];
-		int words[4];
+	class Icon
+	{
+	public:
+		Icon(uint64_t i64){
+			data_.i64 = i64;
+		}
+
+		union Data {
+			uint64_t i64;
+			uint8_t i8[8];
+		} data_;
 	};
 };

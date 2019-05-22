@@ -24,13 +24,11 @@ Display::Display(byte height, byte width) : MatrixDisplay(height, width), text1_
 	loadMenuConfig();
 }
 
-void Display::setIcon(uint64_t icon, byte offset, bool show)
+void Display::setIcon(Icon icon, byte offset, bool show)
 {
-	Icon i;
-	i.i64 = icon;
 	for (int r = offset; r < 8 + offset; r++)
 	{
-		setRow(r, i.bytes[7 + offset - r]);
+		setRow(r, icon.data_.i8[7 + offset - r]);
 	}
 	if(show)
 		Display::show();
@@ -73,3 +71,5 @@ void Display::setBrightness(byte brigthness)
 	const byte values[4] = {100, 220, 245, 255};
 	MatrixDisplay::setBrightness(values[brigthness]);
 }
+
+

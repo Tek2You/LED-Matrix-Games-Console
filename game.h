@@ -52,7 +52,6 @@ public:
 		return is_new_highscore_;
 	}
 
-
 	GameType type(){
 		return game_type_;
 	}
