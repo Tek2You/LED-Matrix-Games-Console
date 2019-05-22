@@ -9,11 +9,11 @@ public:
 	~StaticList();
 
 	// getter
-	T &itemAt(const int index);
+	T &itemAt(const int index) const;
 	T &first();
 	T &last();
 
-	inline T &operator[](const int index) { return itemAt(index); }
+	inline T &operator[](const int index) const { return itemAt(index); }
 
 	inline T* toArray() const;
 
@@ -77,7 +77,7 @@ StaticList<T>::~StaticList()
 }
 
 template <class T>
-T &StaticList<T>::itemAt(const int index)
+T &StaticList<T>::itemAt(const int index) const
 {
 	if (index < size_) return first_[index];
 }
