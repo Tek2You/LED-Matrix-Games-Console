@@ -22,7 +22,7 @@ Timer::Timer(const unsigned int interval) : Trigger(), interval_(interval), next
 {
 	if (interval_ != 0)
 	{
-		next_time_ = millis() + interval_;
+		start();
 	}
 }
 
