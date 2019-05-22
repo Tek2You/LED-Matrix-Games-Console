@@ -83,12 +83,12 @@ void Tetris::onStop(Event *event)
 
 void Tetris::onContinue(Event *event)
 {
-	clearFullRowsImmediately(); // clears all rows, if interrupted during clear effect
 	step_timer_->setInterval((event->buttonDown().state() ? readSpeed(DownInterval) : readSpeed(StepInterval)));
 	step_timer_->start();
 	move_trigger_->start();
-
 	Game::onContinue(event);
+
+	clearFullRows(event); // clears all rows, if interrupted during clear effect
 }
 
 bool Tetris::rotate()
@@ -230,6 +230,7 @@ bool Tetris::onButtonChange(Event *event)
 	{
 		return false;
 	}
+
 	// Rotation
 	if (event->buttonUp().pressed())
 	{
@@ -307,8 +308,8 @@ bool Tetris::clearFullRows(Event *event)
 		{
 			blink_cycle_ = DEFAULT;
 			blink_timer_->stop();
-			//			clearFullRowsImmediately();
 			display_->setArray(field_.toArray());
+			display_->show();
 			step_timer_->start();
 			step_timer_->setInterval((event->buttonDown().state() ? readSpeed(DownInterval) : readSpeed(StepInterval)));
 
@@ -326,8 +327,7 @@ bool Tetris::clearFullRows(Event *event)
 		else
 		{
 			// place a new stone, because all is empty
-			if (newTetromino()) return true;
-			return false;
+			return newTetromino();
 		}
 	}
 	if (blink_cycle_ == INIT_BLINK)
@@ -350,46 +350,18 @@ bool Tetris::clearFullRows(Event *event)
 		}
 		blink_cycle_ = BLINK_OFF_1;
 		blink_timer_->start();
+		return false;
 	}
-	else if (blink_cycle_ == BLINK_OFF_1 || blink_cycle_ == BLINK_OFF_2 || blink_cycle_ == BLINK_OFF_3)
+
+	display_->setArray(field_.toArray());
+
+	if (blink_cycle_ == BLINK_OFF_1 || blink_cycle_ == BLINK_OFF_2 || blink_cycle_ == BLINK_OFF_3)
 	{
-		display_->setArray(field_.toArray());
 		display_->clearRows(blink_start_row_, blink_end_row_);
-		display_->show();
-		blink_cycle_++;
 	}
-	else if (blink_cycle_ == BLINK_ON_1 || blink_cycle_ == BLINK_ON_2)
-	{
-		display_->setArray(field_.toArray());
-		display_->show();
-		blink_cycle_++;
-	}
+	display_->show();
+	blink_cycle_++;
 	return false;
-}
-
-void Tetris::clearFullRowsImmediately()
-{
-	if (!rowsFull()) return;
-	for (byte i = 0; i < field_.size(); i++)
-	{
-		while (field_[i] == 0xFF)
-		{
-			field_.remove(i);
-			field_ << 0;
-			points_++;
-		}
-	}
-	render();
-	blink_cycle_ = DEFAULT;
-	takeOverTetromino();
-	newTetromino();
-
-	if (points_ > highscore_)
-	{
-		highscore_ = points_;
-		eeprom_write_word(&EE_highscore, highscore_);
-		is_new_highscore_ = true;
-	}
 }
 
 bool Tetris::rowsFull() const

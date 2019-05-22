@@ -101,5 +101,4 @@ private:
 	byte blink_cycle_;
 	byte blink_start_row_;
 	byte blink_end_row_;
-	void clearFullRowsImmediately();
 };
