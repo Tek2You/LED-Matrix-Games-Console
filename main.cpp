@@ -24,7 +24,7 @@
 
 FUSES = {
 	 LFUSE_DEFAULT | (byte)~FUSE_CKDIV8, // run at 8MHz
-	 HFUSE_DEFAULT &FUSE_EESAVE,         // protect EEPROM from erase
+	 HFUSE_DEFAULT & FUSE_EESAVE,          // protect EEPROM from erase
 	 EFUSE_DEFAULT,
 };
 
@@ -55,16 +55,12 @@ int main(void)
 			event.processDebounce();
 		}
 		if (check_buttons) event.checkButtons();
-//		if (check_buttons || counter++ >= 0xFF) // pre-devider for processing function
-//		{
-//			counter = 0;
-			dp.update();
-			if (event.process())
-			{
-				sm.process(&event);
-				event.clear();
-			}
-//		}
+		dp.update();
+		if (event.process())
+		{
+			sm.process(&event);
+			event.clear();
+		}
 		check_buttons = false;
 	}
 	return 0;
