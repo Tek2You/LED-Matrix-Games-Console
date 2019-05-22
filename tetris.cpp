@@ -91,7 +91,7 @@ void Tetris::onContinue(Event *event)
 	clearFullRows(event); // clears all rows, if interrupted during clear effect
 }
 
-bool Tetris::rotate()
+void Tetris::rotate()
 {
 	/*
 	 * sheme of work:
@@ -146,12 +146,12 @@ bool Tetris::rotate()
 		if (valid_output & COLLIDE || tmp.validationErrors(&field_)) // collides with exiting tetromino
 		{
 			// not even valid
-			return false;
+			return;
 		}
 	}
 	tetromino_ = tmp;
 	render();
-	return true;
+	return;
 }
 
 void Tetris::move(const ButtonAutoTrigger::Direction dir)
@@ -352,7 +352,7 @@ bool Tetris::clearFullRows(Event *event)
 		display_->clearRows(blink_start_row_, blink_end_row_);
 	}
 	display_->show();
-	blink_cycle_++;
+	blink_cycle_ = BlinkCycle(byte(blink_cycle_)+1);
 	return false;
 }
 

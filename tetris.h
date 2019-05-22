@@ -49,7 +49,7 @@ protected:
 
 private:
 	// private functions only for tetris
-	bool rotate();
+	void rotate();
 	void move(const ButtonAutoTrigger::Direction dir);
 	bool tick(Event *event);
 
@@ -92,7 +92,7 @@ private:
 		BLINK_OFF_3 = 6,
 		FINISHED_CURRENT = 7
 	};
-	byte blink_cycle_;
+	BlinkCycle blink_cycle_;
 	byte blink_start_row_;
 	byte blink_end_row_;
 };
