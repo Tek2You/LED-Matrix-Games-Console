@@ -23,9 +23,7 @@ struct SmartPos;
 
 struct Pos
 {
-	Pos()
-	{
-	}
+	Pos() {}
 	Pos(char x, char y);
 	Pos(const SmartPos &pos);
 	SmartPos toSmartPos();
@@ -40,15 +38,17 @@ struct Pos
 	bool operator!=(const Pos &pos) const;
 	Pos &operator=(const SmartPos &pos);
 	Pos operator~();
+
+	inline char x() const { return pos_x; }
+	inline char y() const { return pos_y; }
+
 	char pos_x = 0;
 	char pos_y = 0;
 };
 
 struct SmartPos
 {
-	SmartPos()
-	{
-	}
+	SmartPos() {}
 	SmartPos(byte x, byte y);
 	Pos toPos() const;
 	byte x() const;
