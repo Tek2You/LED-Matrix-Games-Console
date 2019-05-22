@@ -88,7 +88,7 @@ void Tetris::onContinue(Event *event)
 	move_trigger_->start();
 	Game::onContinue(event);
 
-	clearFullRows(event); // clears all rows, if interrupted during clear effect
+	if (rowsFull()) clearFullRows(event); // clears all rows, if interrupted during clear effect
 }
 
 void Tetris::rotate()
@@ -352,7 +352,7 @@ bool Tetris::clearFullRows(Event *event)
 		display_->clearRows(blink_start_row_, blink_end_row_);
 	}
 	display_->show();
-	blink_cycle_ = BlinkCycle(byte(blink_cycle_)+1);
+	blink_cycle_ = BlinkCycle(byte(blink_cycle_) + 1);
 	return false;
 }
 
