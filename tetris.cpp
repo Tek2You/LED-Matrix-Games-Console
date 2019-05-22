@@ -208,7 +208,7 @@ bool Tetris::newTetromino()
 	}
 	tetromino_ = tmp;
 	render();
-	return tetromino_.isValid(&field_) & COLLIDE;
+	return tetromino_.validationErrors(&field_) & COLLIDE;
 }
 
 void Tetris::takeOverTetromino()
