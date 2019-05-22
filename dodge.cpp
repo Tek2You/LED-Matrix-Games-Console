@@ -88,6 +88,7 @@ bool Dodge::onButtonChange(Event *event)
 		step_timer_->setInterval(interval);
 		step_timer_->restart();
 	}
+	return false;
 }
 
 bool Dodge::onTriggered(Event *event)
@@ -103,7 +104,7 @@ bool Dodge::onTriggered(Event *event)
 		move(dir);
 	}
 
-	if (step_timer_->triggered())
+	if (blink_timer_->triggered())
 	{
 		dot_state_ = !dot_state_;
 	}
@@ -202,7 +203,7 @@ bool Dodge::tick()
 void Dodge::move(ButtonAutoTrigger::Direction dir)
 {
 	Pos tmp = pos_;
-	tmp.pos_x += (dir == ButtonAutoTrigger::BTN_1 ? 1 : -1);
+	tmp.pos_x += (dir == ButtonAutoTrigger::BTN_1 ? -1 : 1);
 	if (tmp.pos_x > 7) return;
 	if (tmp.pos_x < 0) return;
 	if (bitRead(elements_.itemAt(15 - tmp.pos_y), tmp.pos_x))
