@@ -48,13 +48,17 @@ public:
 	void clear();
 
 	const inline bool onEntry() const { return on_entry_; }
-	inline void setOnEntry() { on_entry_ = true; }
+	inline void setOnEntry()
+	{
+		on_entry_ = true;
+		removeAllTriggers();
+	}
 
 	bool process();
 	void addTrigger(Trigger *trigger);
 	Trigger *trigger(const byte index);
 	bool overflow(const byte index);
-	void removeTimer(const byte index);
+	void removeTrigger(const byte index);
 	void removeAllTriggers();
 
 	enum Flags
@@ -65,15 +69,9 @@ public:
 		ProcessStop = (1 << 3),
 	};
 
-	void setupGame()
-	{
-		removeAllTriggers();
-		flags_ = (Event::ProcessPinChanges | Event::ProcessTriggers | Event::ProcessStop);
-	}
+	void setupGame() { flags_ = (Event::ProcessPinChanges | Event::ProcessTriggers | Event::ProcessStop); }
 
-	void setupMenu(){
-		flags_ = (Event::ProcessPinChanges | Event:: ProcessStop);
-	}
+	void setupMenu() { flags_ = (Event::ProcessPinChanges | Event::ProcessStop); }
 
 	inline void clearFlags() { flags_ = 0; }
 	inline void setFlag(Flags flag, bool set = true)
@@ -86,7 +84,7 @@ public:
 	inline bool flag(Flags flag) { return flags_ & flag; }
 	bool generalOverflow() const { return triggered_; }
 
-	List<Trigger*> triggers_;
+	List<Trigger *> triggers_;
 
 private:
 	bool processTriggers();

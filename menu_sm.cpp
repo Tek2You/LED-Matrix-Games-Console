@@ -375,7 +375,6 @@ void MenuSM::stateBrightnessMenu(Event *event)
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 			return;
 		case MenuItem::UP_BTN:
-			event->removeAllTriggers();
 			TRANSITION(stateSettingsMenu, event);
 			return;
 		case MenuItem::NO_BTN:
@@ -440,7 +439,6 @@ void MenuSM::stateLoadEffect(Event *event)
 		count = 0;
 		display_->text1_.clear();
 		display_->text2_.clear();
-		event->removeAllTriggers();
 		event->addTrigger(new Timer(12));
 		event->setFlag(Event::ProcessTriggers);
 		event->setFlag(Event::ProcessStop);
@@ -457,7 +455,6 @@ void MenuSM::stateLoadEffect(Event *event)
 			{
 				setState(load_following_state_);
 				load_following_state_ = nullptr;
-				event->removeAllTriggers();
 				event->clearFlags();
 				event->setOnEntry();
 				process(event);
@@ -592,7 +589,6 @@ void MenuSM::processGame(Event *event)
 {
 	if (game_->process(event))
 	{
-		event->removeAllTriggers();
 		TRANSITION(stateGameOver, event);
 	}
 }

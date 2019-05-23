@@ -85,7 +85,7 @@ Trigger *Event::trigger(const byte index) { return triggers_.itemAt(index); }
 
 bool Event::overflow(const byte index) { triggers_.itemAt(index)->triggered(); }
 
-void Event::removeTimer(const byte index)
+void Event::removeTrigger(const byte index)
 {
 	delete triggers_.itemAt(index);
 	triggers_.remove(index);
