@@ -77,7 +77,7 @@ MenuSM::MenuSM(Display *display, Event *event)
 
 void MenuSM::transition(Function function, Event *event)
 {
-	static_cast<StateMachine<Event *>::State>(function);
+	setState(static_cast<StateMachine<Event *>::State>(function));
 	event->clearFlags();
 	event->setOnEntry();
 	this->StateMachine::process(event);
@@ -310,7 +310,7 @@ void MenuSM::stateSpeedMenu(Event *event)
 	{
 		item.init(5, speed_);
 		display_->loadMenuConfig();
-		event->setupMenu();
+		event->setupGame();
 		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 300));
 	}
 	else if (processMenuStop(event))
@@ -320,6 +320,8 @@ void MenuSM::stateSpeedMenu(Event *event)
 	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
 	{
 		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+		if(item.value_ < 0) item.value_ = 0;
+		else if(item.value_ > 4) item.value_ = 4;
 	}
 	else
 	{
@@ -369,6 +371,8 @@ void MenuSM::stateBrightnessMenu(Event *event)
 	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
 	{
 		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+		if(item.value_ < 0) item.value_ = 0;
+		else if(item.value_ > 3) item.value_ = 3;
 	}
 	else
 	{
