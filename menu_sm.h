@@ -96,6 +96,4 @@ private:
 										  // after its
 
 	Game::GameType last_played_game_ = Game::TETRIS;
-
-	char cachetext[64];
 };

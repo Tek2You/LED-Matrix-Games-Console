@@ -56,8 +56,6 @@ void SpaceInvaders::resetHighscore()
 
 void SpaceInvaders::start(Event *event)
 {
-	// sets the event flags
-	event->setupGame();
 	// setup timers
 	step_timer_ = new Timer(readSpeed(StepInterval));
 	event->addTrigger(step_timer_);

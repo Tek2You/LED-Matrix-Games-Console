@@ -33,8 +33,6 @@ const int speeds[] PROGMEM = {
 
 Tetris::Tetris(Display *display) : Game(display, TETRIS), blink_cycle_(DEFAULT), field_(display->rows()), points_(0)
 {
-	display_->clear();
-	display->show();
 	setSpeed(2);
 
 	for (int i = 0; i < display->rows(); i++)
@@ -47,7 +45,6 @@ Tetris::~Tetris() { points_ = 0; }
 
 void Tetris::start(Event *event)
 {
-	event->setupGame();
 	step_timer_ = new Timer(readSpeed(StepInterval));
 	event->addTrigger(step_timer_);
 	blink_timer_ = new Timer(readSpeed(BlinkInterval));

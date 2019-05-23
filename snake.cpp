@@ -36,9 +36,6 @@ Snake::~Snake() {}
 
 void Snake::start(Event *event)
 {
-	// load standard flags
-	event->setupGame();
-
 	// Create initial Snake
 	body_ << SmartPos(1, 7);
 	body_ << SmartPos(2, 7);

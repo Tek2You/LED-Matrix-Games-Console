@@ -134,8 +134,6 @@ void MenuSM::stateDefault(Event *event)
 	{
 		last_played_game_ = Game::TETRIS;
 		item_.value_ = 2;
-//		event->clear();
-//		stateDefault(event);
 	}
 	else if (event->controlButtonPressed())
 	{
@@ -175,6 +173,9 @@ void MenuSM::stateGame(Event *event)
 			delete game_;
 			game_ = nullptr;
 		}
+
+		display_->loadsGameCofig();
+		event->setupGame();
 
 		switch (last_played_game_)
 		{

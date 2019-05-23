@@ -60,6 +60,7 @@ void Display::loadsGameCofig()
 	text1_.clear();
 	text2_.clear();
 	clear();
+	show();
 }
 
 void Display::setBrightness(byte brigthness)

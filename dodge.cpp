@@ -40,8 +40,6 @@ Dodge::Dodge(Display *display) : Game(display, DODGE), dot_state_(true), score_(
 
 void Dodge::start(Event *event)
 {
-	event->setupGame();
-
 	step_timer_ = new Timer(readSpeed(StepInterval));
 	event->addTrigger(step_timer_);
 	blink_timer_ = new Timer(20);
