@@ -351,12 +351,19 @@ void MenuSM::stateBrightnessMenu(Event *event)
 		display_->loadMenuConfig();
 		item.init(4, brightness_);
 		event->setupMenu();
+		event->setFlag(Event::ProcessTriggers);
+		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 400));
 	}
 	else if (processMenuStop(event))
 	{
 		return;
 	}
-	else if (event->controlButtonPressed())
+	else if (event->trigger(0)->triggered())
+	{
+		ButtonAutoTrigger::Direction dir = static_cast<ButtonAutoTrigger *>(event->trigger(0))->direction();
+		item.value_ += (dir == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+	}
+	else
 	{
 		switch (item.advance(event))
 		{
@@ -367,16 +374,16 @@ void MenuSM::stateBrightnessMenu(Event *event)
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 			return;
 		case MenuItem::UP_BTN:
+			event->removeAllTriggers();
 			TRANSITION(stateSettingsMenu, event);
 			return;
-		default:
+		case MenuItem::NO_BTN:
 			break;
+		default:
+			return;
 		}
 	}
-	else
-	{
-		return;
-	}
+
 	display_->clear();
 	display_->text1_.setNumber(item.value_ + 1, false);
 	byte cols = display_->cols() / 4.0 * (item.value_ + 1);
@@ -402,7 +409,7 @@ void MenuSM::stateLanguageMenu(Event *event)
 	{
 		return;
 	}
-	else if (event->controlButtonPressed())
+	else
 	{
 		switch (item.advance(event))
 		{ // enter pressed
@@ -414,13 +421,11 @@ void MenuSM::stateLanguageMenu(Event *event)
 		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu, event);
 			return;
-		default:
+		case MenuItem::NO_BTN: // down and up not triggered
 			break;
+		default:
+			return;
 		}
-	}
-	else
-	{
-		return;
 	}
 
 	switch (item.value_)
