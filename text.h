@@ -41,7 +41,7 @@ public:
 	};
 
 	void setText(const char *text, const bool show = true);
-	void setNumber(const int &number, const bool show = true);
+	void setNumber(const int number, const bool show = true);
 	void setAlignment(const Align align) { alignment_ = align; }
 
 	void clear();

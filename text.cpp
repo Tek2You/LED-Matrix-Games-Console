@@ -64,7 +64,7 @@ void Text::setText(const char *text, const bool show)
 	}
 }
 
-void Text::setNumber(const int &value, const bool show)
+void Text::setNumber(const int value, const bool show)
 {
 	setText(display_->formatInt(number_buffer_, 10, value),show);
 }
