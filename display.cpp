@@ -63,6 +63,16 @@ void Display::loadsGameCofig()
 	show();
 }
 
+void Display::setBar(byte n, byte max)
+{
+	byte cols = this->cols() / float(max) * float(n);
+	clear();
+	for (int col = 0; col < cols; col++)
+	{
+		setColumn(col, 0xFF);
+	}
+}
+
 void Display::setBrightness(byte brigthness)
 {
 	if (brigthness > 3)
