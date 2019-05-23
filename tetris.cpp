@@ -41,7 +41,10 @@ Tetris::Tetris(Display *display) : Game(display, TETRIS), blink_cycle_(DEFAULT),
 	}
 }
 
-Tetris::~Tetris() { points_ = 0; }
+Tetris::~Tetris()
+{
+	points_ = 0;
+}
 
 void Tetris::start(Event *event)
 {

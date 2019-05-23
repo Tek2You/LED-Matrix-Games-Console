@@ -27,6 +27,13 @@ Game::Game(Display *display, const GameType game_type)
 
 Game::~Game() {}
 
+static int freeRam()
+{
+	extern int __heap_start, *__brkval;
+	int v;
+	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+}
+
 bool Game::process(Event *event)
 {
 	/* Stop Button
@@ -68,7 +75,7 @@ bool Game::process(Event *event)
 				{
 					stop_state_ = false;
 					onContinue(event);
-					delete event->triggers_.last();
+					delete  event->triggers_.last();
 					event->triggers_.removeLast();
 					return false;
 				}
@@ -90,7 +97,7 @@ bool Game::process(Event *event)
 				stop_state_ = false;
 				first_released_ = false;
 				reset_count_ = 0;
-				delete event->triggers_.last();
+				delete  event->triggers_.last();
 				event->triggers_.removeLast();
 				return true;
 			}
@@ -116,7 +123,7 @@ void Game::onStop(Event *event)
 {
 	display_->clear();
 	display_->text1_.setOffset(0);
-	display_->text1_.setNumber(this->score(), false);
+	display_->text1_.setNumber(/*this->score()*/ freeRam(), false);
 	display_->setIcon(0x0000242424240000, 8, false);
 	display_->show();
 }

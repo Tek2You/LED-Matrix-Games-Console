@@ -168,12 +168,6 @@ void MenuSM::stateGame(Event *event)
 {
 	if (event->onEntry())
 	{
-		if (game_)
-		{
-			delete game_;
-			game_ = nullptr;
-		}
-
 		display_->loadsGameCofig();
 		event->setupGame();
 
@@ -233,6 +227,7 @@ void MenuSM::stateGameOver(Event *event)
 			display_->text2_.setNumber(game_->score(), false);
 			display_->show();
 			// delete game
+			event->removeAllTriggers();
 			delete game_;
 			game_ = nullptr;
 		}
