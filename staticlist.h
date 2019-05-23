@@ -73,7 +73,7 @@ StaticList<T>::StaticList(const int size) : max_size_(size), size_(0)
 template <class T>
 StaticList<T>::~StaticList()
 {
-	removeAll();
+	free(first_);
 }
 
 template <class T>
@@ -179,8 +179,6 @@ template <class T>
 void StaticList<T>::removeAll()
 {
 	for (; size_ >= 0; --size_) first_[size_] = T();
-	{
-	}
 }
 
 template <class T>
