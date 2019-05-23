@@ -139,36 +139,32 @@ void MenuSM::stateDefault(Event *event)
 		display_->loadMenuConfig();
 		event->setupMenu();
 	}
-	else if (event->buttonStop().pressed())
-	{
-		last_played_game_ = Game::TETRIS;
-		item_.value_ = 2;
-	}
-
-	else if (event->buttonDown().pressed())
-	{
-		switch (item_.value_)
-		{
-		// last because we begin counting with 2
-		case 0:
-			TRANSITION(stateHighscoreMenu, event);
-			break;
-		case 1:
-			TRANSITION(stateSettingsMenu, event);
-			break;
-		default:
-			last_played_game_ = Game::GameType(item_.value_ - 2);
-			TRANSITION(stateGame, event);
-			break;
-		}
-		return;
-	}
-	else if (item_.advance(event))
-	{
-	}
 	else
 	{
-		return;
+		if (event->buttonDown().pressed())
+		{
+			switch (item_.value_)
+			{
+			// last because we begin counting with 2
+			case 0:
+				TRANSITION(stateHighscoreMenu, event);
+				break;
+			case 1:
+				TRANSITION(stateSettingsMenu, event);
+				break;
+			default:
+				last_played_game_ = Game::GameType(item_.value_ - 2);
+				TRANSITION(stateGame, event);
+				break;
+			}
+			return;
+		}
+		if (event->buttonStop().pressed())
+		{
+			last_played_game_ = Game::TETRIS;
+			item_.value_ = 2;
+		}
+		if (!item_.advance(event)) return;
 	}
 
 	showItem(items[item_.value_]);
@@ -202,7 +198,7 @@ void MenuSM::stateGame(Event *event)
 		game_->start(event);
 		return;
 	}
-	if (game_->process(event))
+	else if (game_->process(event))
 	{
 		TRANSITION(stateGameOver, event);
 	}
@@ -241,14 +237,16 @@ void MenuSM::stateGameOver(Event *event)
 		}
 		return;
 	}
-	else if (processMenuStop(event))
+	else // not on entry
 	{
-		return;
-	}
-	if (event->controlButtonPressed())
-	{
-		TRANSITION(stateDefault, event);
-		return;
+		if (event->controlButtonPressed())
+		{
+			TRANSITION(stateDefault, event);
+			return;
+		}
+		if (processMenuStop(event))
+		{
+		}
 	}
 }
 
@@ -263,44 +261,42 @@ void MenuSM::stateSettingsMenu(Event *event)
 		item_.init(3, 0);
 		event->setupMenu();
 	}
-	else if (processMenuStop(event))
+	else // not on entry
 	{
-		return;
-	}
 
-	else if (event->buttonDown().pressed())
-	{
-		switch (item_.value_)
+		if (processMenuStop(event))
 		{
-		case 0:
-			TRANSITION(stateSpeedMenu, event);
-			break;
-		case 1:
-			TRANSITION(stateLanguageMenu, event);
-			break;
-		case 2:
-			TRANSITION(stateBrightnessMenu, event);
-			break;
-		default:
-			break;
+			return;
 		}
-		return;
+
+		if (event->buttonDown().pressed())
+		{
+			switch (item_.value_)
+			{
+			case 0:
+				TRANSITION(stateSpeedMenu, event);
+				break;
+			case 1:
+				TRANSITION(stateLanguageMenu, event);
+				break;
+			case 2:
+				TRANSITION(stateBrightnessMenu, event);
+				break;
+			default:
+				break;
+			}
+			return;
+		}
+
+		if (event->buttonUp().pressed())
+		{
+			TRANSITION(stateDefault, event);
+			return;
+		}
+
+		if (!item_.advance(event)) return;
 	}
 
-	else if (event->buttonUp().pressed())
-	{
-		TRANSITION(stateDefault, event);
-		return;
-	}
-
-	else if (item_.advance(event))
-	{
-	}
-
-	else
-	{
-		return;
-	}
 	showItem(items[item_.value_]);
 }
 
@@ -314,29 +310,28 @@ void MenuSM::stateSpeedMenu(Event *event)
 		event->setupGame();
 		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 300));
 	}
-	else if (processMenuStop(event))
+	else // not on entry
 	{
-		return;
-	}
-	else if (event->buttonDown().pressed())
-	{
-		speed_ = item_.value_;
-		eeprom_write_byte(&EE_speed, speed_);
-		LOAD_EFFECT_STANDART(stateSettingsMenu, event);
-		return;
-	}
-	else if (event->buttonUp().pressed())
-	{
-		TRANSITION(stateSettingsMenu, event);
-		return;
-	}
-	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
-	{
-		item_.advance(auto_trigger->direction() == ButtonAutoTrigger::BTN_2, false);
-	}
-	else
-	{
-		return;
+		if (processMenuStop(event))
+		{
+			return;
+		}
+		if (event->buttonDown().pressed())
+		{
+			speed_ = item_.value_;
+			eeprom_write_byte(&EE_speed, speed_);
+			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
+			return;
+		}
+		if (event->buttonUp().pressed())
+		{
+			TRANSITION(stateSettingsMenu, event);
+			return;
+		}
+		if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
+		{
+			item_.advance(auto_trigger->direction() == ButtonAutoTrigger::BTN_2, false);
+		}
 	}
 
 	display_->setBar(item_.value_ + 1, item_.num_);
@@ -354,30 +349,29 @@ void MenuSM::stateBrightnessMenu(Event *event)
 		event->setupGame();
 		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 400));
 	}
-	else if (processMenuStop(event))
+	else // not on entry
 	{
-		return;
-	}
-	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
-	{
-		item_.advance(auto_trigger->direction() == ButtonAutoTrigger::BTN_2, false);
-	}
-	else if (event->buttonDown().pressed())
-	{
-		brightness_ = item_.value_;
-		display_->setBrightness(brightness_);
-		eeprom_write_byte(&EE_brightness, brightness_);
-		LOAD_EFFECT_STANDART(stateSettingsMenu, event);
-		return;
-	}
-	else if (event->buttonUp().pressed())
-	{
-		TRANSITION(stateSettingsMenu, event);
-		return;
-	}
-	else
-	{
-		return;
+		if (processMenuStop(event))
+		{
+			return;
+		}
+		if (event->buttonDown().pressed())
+		{
+			brightness_ = item_.value_;
+			display_->setBrightness(brightness_);
+			eeprom_write_byte(&EE_brightness, brightness_);
+			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
+			return;
+		}
+		if (event->buttonUp().pressed())
+		{
+			TRANSITION(stateSettingsMenu, event);
+			return;
+		}
+		if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
+		{
+			item_.advance(auto_trigger->direction() == ButtonAutoTrigger::BTN_2, false);
+		}
 	}
 
 	display_->setBar(item_.value_ + 1, item_.num_);
@@ -393,28 +387,25 @@ void MenuSM::stateLanguageMenu(Event *event)
 		display_->loadMenuConfig();
 		event->setupMenu();
 	}
-	else if (processMenuStop(event))
+	else // not on entry
 	{
-		return;
-	}
-	else if (event->buttonDown().pressed())
-	{
-		language_ = Language(item_.value_);
-		eeprom_write_byte(&EE_language, byte(language_));
-		LOAD_EFFECT_STANDART(stateSettingsMenu, event);
-		return;
-	}
-	else if (event->buttonDown().pressed())
-	{
-		TRANSITION(stateSettingsMenu, event);
-		return;
-	}
-	else if (item_.advance(event))
-	{
-	}
-	else
-	{
-		return;
+		if (processMenuStop(event))
+		{
+			return;
+		}
+		if (event->buttonDown().pressed())
+		{
+			language_ = Language(item_.value_);
+			eeprom_write_byte(&EE_language, byte(language_));
+			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
+			return;
+		}
+		if (event->buttonDown().pressed())
+		{
+			TRANSITION(stateSettingsMenu, event);
+			return;
+		}
+		if (!item_.advance(event)) return;
 	}
 
 	display_->text1_.setText(item_.value_ == 0 ? "english" : "Deutsch", false);
@@ -433,33 +424,36 @@ void MenuSM::stateLoadEffect(Event *event)
 		event->setFlag(Event::ProcessTriggers);
 		event->setFlag(Event::ProcessStop);
 	}
-	else if (processMenuStop(event))
+	else
 	{
-		return;
-	}
-	if (event->trigger(0)->triggered())
-	{
-		if (count >= display_->rows() * display_->cols() / 2)
+		if (processMenuStop(event))
 		{
-			if (load_following_state_)
-			{
-				setState(load_following_state_);
-				load_following_state_ = nullptr;
-				event->clearFlags();
-				event->setOnEntry();
-				process(event);
-			}
-			else
-			{
-				TRANSITION(stateDefault, event);
-			}
 			return;
 		}
-		display_->setPixel(display_->cols() - 1 - (count % display_->cols()), count / display_->cols(), true);
-		display_->setPixel(count % display_->cols(), display_->rows() - 1 - (count / display_->cols()), true);
-		display_->show();
-		count++;
-		return;
+		if (event->trigger(0)->triggered())
+		{
+			if (count >= display_->rows() * display_->cols() / 2)
+			{
+				if (load_following_state_)
+				{
+					setState(load_following_state_);
+					load_following_state_ = nullptr;
+					event->clearFlags();
+					event->setOnEntry();
+					process(event);
+				}
+				else
+				{
+					TRANSITION(stateDefault, event);
+				}
+				return;
+			}
+			display_->setPixel(display_->cols() - 1 - (count % display_->cols()), count / display_->cols(), true);
+			display_->setPixel(count % display_->cols(), display_->rows() - 1 - (count / display_->cols()), true);
+			display_->show();
+			count++;
+			return;
+		}
 	}
 }
 
@@ -470,33 +464,33 @@ void MenuSM::stateHighscoreMenu(Event *event)
 		item_.init(5, 1);
 		event->setupMenu();
 	}
-	else if (processMenuStop(event))
-	{
-		return;
-	}
-	else if (event->buttonDown().pressed())
-	{
-		if (item_.value_ == 0)
-		{
-			TRANSITION(stateResetMenu, event);
-		}
-		else
-		{
-			TRANSITION(stateDefault, event);
-		}
-		return;
-	}
-	else if (event->buttonUp().pressed())
-	{
-		TRANSITION(stateDefault, event);
-		return;
-	}
-	else if (item_.advance(event))
-	{
-	}
 	else
 	{
-		return;
+		if (processMenuStop(event))
+		{
+			return;
+		}
+		if (event->buttonDown().pressed())
+		{
+			if (item_.value_ == 0)
+			{
+				TRANSITION(stateResetMenu, event);
+			}
+			else
+			{
+				TRANSITION(stateDefault, event);
+			}
+			return;
+		}
+		if (event->buttonUp().pressed())
+		{
+			TRANSITION(stateDefault, event);
+			return;
+		}
+		if (!item_.advance(event))
+		{
+			return;
+		}
 	}
 	Display::Icon icon(0);
 	int highscore;
@@ -541,27 +535,26 @@ void MenuSM::stateResetMenu(Event *event)
 		display_->loadMenuConfig();
 		event->setupMenu();
 	}
-	else if (processMenuStop(event))
-	{
-		return;
-	}
-	else if (event->buttonDown().pressed())
-	{
-		Tetris::resetHighscore();
-		Snake::resetHighscore();
-		Dodge::resetHighscore();
-		SpaceInvaders::resetHighscore();
-		LOAD_EFFECT_STANDART(stateDefault, event);
-		return;
-	}
-	else if (event->buttonUp().pressed())
-	{
-		TRANSITION(stateHighscoreMenu, event);
-		return;
-	}
 	else
 	{
-		return;
+		if (processMenuStop(event))
+		{
+			return;
+		}
+		if (event->buttonDown().pressed())
+		{
+			Tetris::resetHighscore();
+			Snake::resetHighscore();
+			Dodge::resetHighscore();
+			SpaceInvaders::resetHighscore();
+			LOAD_EFFECT_STANDART(stateDefault, event);
+			return;
+		}
+		if (event->buttonUp().pressed())
+		{
+			TRANSITION(stateHighscoreMenu, event);
+			return;
+		}
 	}
 	display_->clear();
 	display_->text1_.setText((language_ == EN ? "reset scores"
