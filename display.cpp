@@ -24,7 +24,7 @@ Display::Display(byte height, byte width) : MatrixDisplay(height, width), text1_
 	loadMenuConfig();
 }
 
-void Display::setIcon(Icon icon, byte offset, bool show)
+void Display::setIcon(const Icon icon, const byte offset, const bool show)
 {
 	for (int r = offset; r < 8 + offset; r++)
 	{
@@ -63,13 +63,13 @@ void Display::loadsGameCofig()
 	show();
 }
 
-void Display::setBar(byte n, byte max)
+void Display::setBar(byte n, const byte max)
 {
 	byte cols = this->cols() / float(max) * float(n);
 	clear();
-	for (int col = 0; col < cols; col++)
+	for (n = 0; n < cols; n++)
 	{
-		setColumn(col, 0xFF);
+		setColumn(n, 0xFF);
 	}
 }
 

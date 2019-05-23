@@ -26,11 +26,11 @@ public:
 	class Icon;
 	Display(byte height, byte width);
 
-	void setIcon(Icon icon, byte offset = 0, bool show = true);
+	void setIcon(const Icon icon, const byte offset = 0, const bool show = true);
 	void update();
 	void loadMenuConfig();
 	void loadsGameCofig();
-	void setBar(byte n, byte max);
+	void setBar(byte n, const byte max);
 
 	void setBrightness(byte brigthness) override;
 
