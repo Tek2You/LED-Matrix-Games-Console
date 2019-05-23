@@ -303,18 +303,24 @@ void MenuSM::stateSettingsMenu(Event *event)
 
 void MenuSM::stateSpeedMenu(Event *event)
 {
+	ButtonAutoTrigger *auto_trigger;
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		display_->loadMenuConfig();
 		item.init(5, speed_);
+		display_->loadMenuConfig();
 		event->setupMenu();
+		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 300));
 	}
 	else if (processMenuStop(event))
 	{
 		return;
 	}
-	else if (event->controlButtonPressed())
+	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
+	{
+		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+	}
+	else
 	{
 		switch (item.advance(event))
 		{
@@ -325,14 +331,13 @@ void MenuSM::stateSpeedMenu(Event *event)
 		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu, event);
 			return;
+		case MenuItem::NO_BTN:
+			return;
 		default:
 			break;
 		}
 	}
-	else
-	{
-		return;
-	}
+
 	display_->clear();
 	display_->text1_.setNumber(item.value_ + 1, false);
 	byte cols = display_->cols() / 5.0 * (item.value_ + 1);
