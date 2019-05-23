@@ -346,6 +346,8 @@ void MenuSM::stateSpeedMenu(Event *event)
 void MenuSM::stateBrightnessMenu(Event *event)
 {
 	static MenuItem item;
+	ButtonAutoTrigger *auto_trigger;
+
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
@@ -358,10 +360,9 @@ void MenuSM::stateBrightnessMenu(Event *event)
 	{
 		return;
 	}
-	else if (event->trigger(0)->triggered())
+	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
 	{
-		ButtonAutoTrigger::Direction dir = static_cast<ButtonAutoTrigger *>(event->trigger(0))->direction();
-		item.value_ += (dir == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
 	}
 	else
 	{
@@ -397,12 +398,11 @@ void MenuSM::stateBrightnessMenu(Event *event)
 
 void MenuSM::stateLanguageMenu(Event *event)
 {
-	const char *menu_text[2] = {"english", "Deutsch"};
 	static MenuItem item;
 	if (event->onEntry())
 	{
-		display_->loadMenuConfig();
 		item.init(2, (language_ == DE ? 0 : 1));
+		display_->loadMenuConfig();
 		event->setupMenu();
 	}
 	else if (processMenuStop(event))
@@ -414,7 +414,7 @@ void MenuSM::stateLanguageMenu(Event *event)
 		switch (item.advance(event))
 		{ // enter pressed
 		case MenuItem::DOWN_BTN:
-			language_ = (item.value_ == 0 ? EN : DE);
+			language_ = Language(item.value_);
 			eeprom_write_byte(&EE_language, byte(language_));
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 			return;
@@ -428,18 +428,8 @@ void MenuSM::stateLanguageMenu(Event *event)
 		}
 	}
 
-	switch (item.value_)
-	{
-	case 0:
-		display_->text2_.setText("E", false);
-		break;
-	case 1:
-		display_->text2_.setText("D", false);
-		break;
-	default:
-		break;
-	}
-	display_->text1_.setText(menu_text[item.value_]);
+	display_->text1_.setText(item.value_ == 0 ? "english" : "Deutsch", false);
+	display_->text2_.setText(item.value_ == 0 ? "E" : "D");
 }
 
 void MenuSM::stateLoadEffect(Event *event)
