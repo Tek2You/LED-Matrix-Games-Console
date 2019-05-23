@@ -68,6 +68,7 @@ bool Game::process(Event *event)
 				{
 					stop_state_ = false;
 					onContinue(event);
+					delete event->triggers_.last();
 					event->triggers_.removeLast();
 					return false;
 				}
@@ -89,6 +90,7 @@ bool Game::process(Event *event)
 				stop_state_ = false;
 				first_released_ = false;
 				reset_count_ = 0;
+				delete event->triggers_.last();
 				event->triggers_.removeLast();
 				return true;
 			}
