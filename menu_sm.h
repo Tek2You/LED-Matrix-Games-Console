@@ -27,12 +27,12 @@ class MenuSM : public StateMachine<Event *>
 {
 public:
 	MenuSM(Display *display, Event *event);
-    //	void processStateMaschine(Event *event);
+	//	void processStateMaschine(Event *event);
 private:
-    typedef void(MenuSM::*Function)(Event*);
-    void transition(Function function, Event *event);
+	typedef void (MenuSM::*Function)(Event *);
+	void transition(Function function, Event *event);
 
-    bool processMenuStop(Event *event);
+	bool processMenuStop(Event *event);
 	// states
 	void stateDefault(Event *event);
 	void stateGameOver(Event *event);
@@ -79,6 +79,8 @@ private:
 		char num_ = 0;
 	};
 
+	MenuItem item_;
+
 	enum Language
 	{
 		EN = 0,
@@ -94,4 +96,6 @@ private:
 										  // after its
 
 	Game::GameType last_played_game_ = Game::TETRIS;
+
+	char cachetext[64];
 };

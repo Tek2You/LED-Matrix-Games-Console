@@ -124,27 +124,24 @@ void MenuSM::stateDefault(Event *event)
 											Item{"Space Invaders", "Space Invaders", 0x1c08000841d46b91}};
 	;
 
-	static MenuItem item;
-
 	if (event->onEntry())
 	{
-		item.init(6);
-		item.value_ = last_played_game_ + 2;
+		item_.init(6,last_played_game_ + 2);
 		display_->loadMenuConfig();
 		event->setupMenu();
 	}
 	else if (event->buttonStop().pressed())
 	{
 		last_played_game_ = Game::TETRIS;
-		item.value_ = 2;
-		event->clear();
-		stateDefault(event);
+		item_.value_ = 2;
+//		event->clear();
+//		stateDefault(event);
 	}
 	else if (event->controlButtonPressed())
 	{
-		if (item.advance(event) == MenuItem::DOWN_BTN)
+		if (item_.advance(event) == MenuItem::DOWN_BTN)
 		{
-			switch (item.value_)
+			switch (item_.value_)
 			{
 			// last because we begin counting with 2
 			case 0:
@@ -154,7 +151,7 @@ void MenuSM::stateDefault(Event *event)
 				TRANSITION(stateSettingsMenu, event);
 				break;
 			default:
-				last_played_game_ = Game::GameType(item.value_ - 2);
+				last_played_game_ = Game::GameType(item_.value_ - 2);
 				TRANSITION(stateGame, event);
 				break;
 			}
@@ -166,7 +163,7 @@ void MenuSM::stateDefault(Event *event)
 		return;
 	}
 
-	showItem(items[item.value_]);
+	showItem(items[item_.value_]);
 }
 
 void MenuSM::stateGame(Event *event)
@@ -178,7 +175,6 @@ void MenuSM::stateGame(Event *event)
 			delete game_;
 			game_ = nullptr;
 		}
-		display_->loadsGameCofig();
 
 		switch (last_played_game_)
 		{
@@ -257,11 +253,10 @@ void MenuSM::stateSettingsMenu(Event *event)
 	static const Item items[3] = {Item{"speed", "Geschwindigkeit", 0x0000122448241200},
 											Item{"language", "Sprache", 0x2060ff818181ff00},
 											Item{"brightness", "Helligkeit", 0x0007133558900000}};
-	static MenuItem item;
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		item.init(3, 0);
+		item_.init(3, 0);
 		event->setupMenu();
 	}
 	else if (processMenuStop(event))
@@ -270,10 +265,10 @@ void MenuSM::stateSettingsMenu(Event *event)
 	}
 	else if (event->controlButtonPressed())
 	{
-		switch (item.advance(event))
+		switch (item_.advance(event))
 		{
 		case MenuItem::DOWN_BTN:
-			switch (item.value_)
+			switch (item_.value_)
 			{
 			case 0:
 				TRANSITION(stateSpeedMenu, event);
@@ -299,16 +294,15 @@ void MenuSM::stateSettingsMenu(Event *event)
 	{
 		return;
 	}
-	showItem(items[item.value_]);
+	showItem(items[item_.value_]);
 }
 
 void MenuSM::stateSpeedMenu(Event *event)
 {
 	ButtonAutoTrigger *auto_trigger;
-	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(5, speed_);
+		item_.init(5, speed_);
 		display_->loadMenuConfig();
 		event->setupGame();
 		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 300));
@@ -320,16 +314,18 @@ void MenuSM::stateSpeedMenu(Event *event)
 	auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0));
 	if (auto_trigger->triggered())
 	{
-		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
-		if(item.value_ < 0) item.value_ = 0;
-		else if(item.value_ > 4) item.value_ = 4;
+		item_.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+		if (item_.value_ < 0)
+			item_.value_ = 0;
+		else if (item_.value_ > 4)
+			item_.value_ = 4;
 	}
 	else
 	{
-		switch (item.advance(event))
+		switch (item_.advance(event))
 		{
 		case MenuItem::DOWN_BTN:
-			speed_ = item.value_;
+			speed_ = item_.value_;
 			eeprom_write_byte(&EE_speed, speed_);
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 		case MenuItem::UP_BTN:
@@ -343,8 +339,8 @@ void MenuSM::stateSpeedMenu(Event *event)
 	}
 
 	display_->clear();
-	display_->text1_.setNumber(item.value_ + 1, false);
-	byte cols = display_->cols() / 5.0 * (item.value_ + 1);
+	display_->text1_.setNumber(item_.value_ + 1, false);
+	byte cols = display_->cols() / 5.0 * (item_.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
 		display_->setColumn(col, 0xFF);
@@ -354,13 +350,12 @@ void MenuSM::stateSpeedMenu(Event *event)
 
 void MenuSM::stateBrightnessMenu(Event *event)
 {
-	static MenuItem item;
 	ButtonAutoTrigger *auto_trigger;
 
 	if (event->onEntry())
 	{
 		display_->loadMenuConfig();
-		item.init(4, brightness_);
+		item_.init(4, brightness_);
 		event->setupMenu();
 		event->setFlag(Event::ProcessTriggers);
 		event->addTrigger(new ButtonAutoTrigger(&event->buttonLeft(), &event->buttonRight(), 500, 400));
@@ -372,16 +367,18 @@ void MenuSM::stateBrightnessMenu(Event *event)
 	auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0));
 	if (auto_trigger->triggered())
 	{
-		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
-		if(item.value_ < 0) item.value_ = 0;
-		else if(item.value_ > 3) item.value_ = 3;
+		item_.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
+		if (item_.value_ < 0)
+			item_.value_ = 0;
+		else if (item_.value_ > 3)
+			item_.value_ = 3;
 	}
 	else
 	{
-		switch (item.advance(event))
+		switch (item_.advance(event))
 		{
 		case MenuItem::DOWN_BTN:
-			brightness_ = item.value_;
+			brightness_ = item_.value_;
 			display_->setBrightness(brightness_);
 			eeprom_write_byte(&EE_brightness, brightness_);
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
@@ -397,22 +394,21 @@ void MenuSM::stateBrightnessMenu(Event *event)
 	}
 
 	display_->clear();
-	display_->text1_.setNumber(item.value_ + 1, false);
-	byte cols = display_->cols() / 4.0 * (item.value_ + 1);
+	display_->text1_.setNumber(item_.value_ + 1, false);
+	byte cols = display_->cols() / 4.0 * (item_.value_ + 1);
 	for (int col = 0; col < cols; col++)
 	{
 		display_->setColumn(col, 0xFF);
 	}
 	display_->show();
-	display_->setBrightness(item.value_);
+	display_->setBrightness(item_.value_);
 }
 
 void MenuSM::stateLanguageMenu(Event *event)
 {
-	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(2, (language_ == DE ? 0 : 1));
+		item_.init(2, (language_ == DE ? 0 : 1));
 		display_->loadMenuConfig();
 		event->setupMenu();
 	}
@@ -420,12 +416,12 @@ void MenuSM::stateLanguageMenu(Event *event)
 	{
 		return;
 	}
-	else if(event->controlButtonChanged())
+	else if (event->controlButtonChanged())
 	{
-		switch (item.advance(event))
+		switch (item_.advance(event))
 		{ // enter pressed
 		case MenuItem::DOWN_BTN:
-			language_ = Language(item.value_);
+			language_ = Language(item_.value_);
 			eeprom_write_byte(&EE_language, byte(language_));
 			LOAD_EFFECT_STANDART(stateSettingsMenu, event);
 			return;
@@ -437,8 +433,8 @@ void MenuSM::stateLanguageMenu(Event *event)
 		}
 	}
 
-	display_->text1_.setText(item.value_ == 0 ? "english" : "Deutsch", false);
-	display_->text2_.setText(item.value_ == 0 ? "E" : "D");
+	display_->text1_.setText(item_.value_ == 0 ? "english" : "Deutsch", false);
+	display_->text2_.setText(item_.value_ == 0 ? "E" : "D");
 }
 
 void MenuSM::stateLoadEffect(Event *event)
@@ -485,10 +481,9 @@ void MenuSM::stateLoadEffect(Event *event)
 
 void MenuSM::stateHighscoreMenu(Event *event)
 {
-	static MenuItem item;
 	if (event->onEntry())
 	{
-		item.init(5, 1);
+		item_.init(5, 1);
 		event->setupMenu();
 	}
 	else if (processMenuStop(event))
@@ -497,10 +492,10 @@ void MenuSM::stateHighscoreMenu(Event *event)
 	}
 	else if (event->controlButtonPressed())
 	{
-		byte advanced = item.advance(event);
+		byte advanced = item_.advance(event);
 		if (advanced)
 		{
-			if (item.value_ == 0)
+			if (item_.value_ == 0)
 			{
 				if (advanced == MenuItem::DOWN_BTN)
 				{
@@ -523,7 +518,7 @@ void MenuSM::stateHighscoreMenu(Event *event)
 	{
 		return;
 	}
-	switch (item.value_)
+	switch (item_.value_)
 	{
 	case 0:
 		display_->setIcon(0xbd42a59999a542bd, 0, false);
