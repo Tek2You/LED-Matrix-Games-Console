@@ -50,8 +50,8 @@ public:
 	const inline bool onEntry() const { return on_entry_; }
 	inline void setOnEntry()
 	{
-		on_entry_ = true;
 		removeAllTriggers();
+		on_entry_ = true;
 	}
 
 	bool process();

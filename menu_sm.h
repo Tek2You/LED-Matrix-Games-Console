@@ -45,7 +45,6 @@ private:
 	void stateResetMenu(Event *event);
 
 	void stateGame(Event *event);
-	void processGame(Event *event);
 
 	struct Item
 	{

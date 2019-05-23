@@ -173,12 +173,13 @@ void MenuSM::stateGame(Event *event)
 {
 	if (event->onEntry())
 	{
-		display_->loadsGameCofig();
 		if (game_)
 		{
 			delete game_;
 			game_ = nullptr;
 		}
+		display_->loadsGameCofig();
+
 		switch (last_played_game_)
 		{
 		case Game::TETRIS:
@@ -588,14 +589,6 @@ void MenuSM::stateResetMenu(Event *event)
 									 false);
 	display_->setIcon(0x00040a1120408000, false);
 	display_->show();
-}
-
-void MenuSM::processGame(Event *event)
-{
-	if (game_->process(event))
-	{
-		TRANSITION(stateGameOver, event);
-	}
 }
 
 void MenuSM::showItem(const MenuSM::Item &item)
