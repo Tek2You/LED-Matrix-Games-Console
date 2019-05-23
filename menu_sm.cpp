@@ -317,7 +317,8 @@ void MenuSM::stateSpeedMenu(Event *event)
 	{
 		return;
 	}
-	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
+	auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0));
+	if (auto_trigger->triggered())
 	{
 		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
 		if(item.value_ < 0) item.value_ = 0;
@@ -368,7 +369,8 @@ void MenuSM::stateBrightnessMenu(Event *event)
 	{
 		return;
 	}
-	else if ((auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0)))->triggered())
+	auto_trigger = static_cast<ButtonAutoTrigger *>(event->trigger(0));
+	if (auto_trigger->triggered())
 	{
 		item.value_ += (auto_trigger->direction() == ButtonAutoTrigger::BTN_1 ? -1 : 1);
 		if(item.value_ < 0) item.value_ = 0;
@@ -418,7 +420,7 @@ void MenuSM::stateLanguageMenu(Event *event)
 	{
 		return;
 	}
-	else
+	else if(event->controlButtonChanged())
 	{
 		switch (item.advance(event))
 		{ // enter pressed
@@ -430,8 +432,6 @@ void MenuSM::stateLanguageMenu(Event *event)
 		case MenuItem::UP_BTN:
 			TRANSITION(stateSettingsMenu, event);
 			return;
-		case MenuItem::NO_BTN: // down and up not triggered
-			break;
 		default:
 			return;
 		}
