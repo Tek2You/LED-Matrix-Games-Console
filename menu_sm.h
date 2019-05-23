@@ -71,11 +71,9 @@ private:
 			DOWN_BTN = 2,
 		};
 
-		Button advance(Event *event);
-		static Button advance(Event *event, char &item, const char num, const char min = 0);
+		bool advance(Event *event, bool overflow = true);
+		bool advance(bool diretion, bool overflow=true);
 		char value_ = 0;
-
-	private:
 		char num_ = 0;
 	};
 
