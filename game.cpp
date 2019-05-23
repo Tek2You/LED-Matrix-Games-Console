@@ -116,7 +116,7 @@ void Game::onStop(Event *event)
 {
 	display_->clear();
 	display_->text1_.setOffset(0);
-	display_->text1_.setNumber(/*this->score()*/ freeRam(), false);
+	display_->text1_.setNumber(this->score(), false);
 	display_->setIcon(0x0000242424240000, 8, false);
 	display_->show();
 }
