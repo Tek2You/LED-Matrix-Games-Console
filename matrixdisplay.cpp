@@ -214,7 +214,7 @@ MatrixDisplay::~MatrixDisplay()
 
 void MatrixDisplay::processShow()
 {
-	static int row = 0;
+	static byte row = 0;
 	row++;
 	if (row >= 8)
 	{

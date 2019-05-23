@@ -30,20 +30,15 @@ public:
 	void setPixel(byte col, const byte row, const bool value = true);
 	inline void setPixel(const Pos p, const bool value = true) { setPixel(p.pos_x, p.pos_y); }
 	void setArray(const byte *array);
-	const byte rows()
-	{
-		return height_;
-	}
-	const byte cols()
-	{
-		return width_;
-	}
+	const byte rows() const { return height_; }
+	const byte cols() const { return width_; }
+
 	int setString(const char *s, int column, char spacing = 1, const byte offset = 0);
 	byte setChar(char ch, int column, const byte offset);
 	void clearRows(byte start, byte end);
-	void setColumn(const byte column, const byte value, const byte offset = 0);
+	void setColumn(byte column, const byte value, const byte offset = 0);
 	void clearColumns(byte start, byte end, byte value);
-	void setRow(byte row, int value);
+	void setRow(const byte row, int value);
 	void show(bool take_over = true);
 
 	virtual void setBrightness(const byte brightness);
@@ -63,12 +58,12 @@ protected:
 	byte mapCol(const byte row) const;
 
 private:
-	inline byte* getBuffer() const;
-	inline byte* getPendingBuffer() const;
+	inline byte *getBuffer() const;
+	inline byte *getPendingBuffer() const;
 	bool pending_;
 	byte *rows1_;
 	byte *rows2_;
 	const byte height_;
 	const byte width_;
-	int brigthness_;
+	byte brigthness_;
 };
