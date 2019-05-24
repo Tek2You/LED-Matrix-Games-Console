@@ -126,12 +126,11 @@ bool MenuSM::MenuItem::advance(bool diretion, bool overflow)
 void MenuSM::stateDefault(Event *event)
 {
 	static const Item items[6] = {Item{"highscore", "Highscore", 0x00081c2018043810},
-											Item{"settings", "Einstellungen", 0x000003c3c3c3c0000},
-											Item{"Tetris", "Tetris", 0xfffff7e300081c00},
-											Item{"Snake", "Snake", 0x3c20203c04045c00},
-											Item{"Dodge", "Dodge", 0x381003c00e30310},
-											Item{"Space Invaders", "Space Invaders", 0x1c08000841d46b91}};
-	;
+	                              Item{"settings", "Einstellungen", 0x000003c3c3c3c0000},
+	                              Item{"Tetris", "Tetris", 0xfffff7e300081c00},
+	                              Item{"Snake", "Snake", 0x3c20203c04045c00},
+	                              Item{"Space Invaders", "Space Invaders", 0x1c08000841d46b91},
+	                              Item{"Dodge", "Dodge", 0x381003c00e30310}};
 
 	if (event->onEntry())
 	{
@@ -186,10 +185,10 @@ void MenuSM::stateGame(Event *event)
 			game_ = new Snake(display_);
 			break;
 		case Game::DODGE:
-			game_ = new Dodge(display_);
+			game_ = new SpaceInvaders(display_);
 			break;
 		case Game::SPACE_INVADERS:
-			game_ = new SpaceInvaders(display_);
+			game_ = new Dodge(display_);
 			break;
 		default:
 			return;
@@ -513,12 +512,12 @@ void MenuSM::stateHighscoreMenu(Event *event)
 		highscore = Snake::highscore();
 		break;
 	case 3:
-		icon = Display::Icon(0x381003c00e30310);
-		highscore = Dodge::highscore();
-		break;
-	case 4:
 		icon = Display::Icon(0x1c08000841d46b91);
 		highscore = SpaceInvaders::highscore();
+		break;
+	case 4:
+		icon = Display::Icon(0x381003c00e30310);
+		highscore = Dodge::highscore();
 		break;
 	default:
 		break;
