@@ -30,7 +30,6 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 		timer_.clear();
 		return false;
 	}
-	// timer
 
 	// buttons
 	if (button1_->changed())
@@ -92,6 +91,7 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 			};
 		}
 	}
+	// timer	// timer
 	else if (timer_.process(t))
 	{
 		timer_.clear();
