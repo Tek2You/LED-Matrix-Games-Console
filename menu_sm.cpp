@@ -155,8 +155,7 @@ void MenuSM::stateDefault(Event *event)
 				TRANSITION(stateSettingsMenu, event, Event::ForwardEntry);
 				break;
 			default:
-				event->setOnEntry(Event::ForwardEntry);
-				setupGame(event, Game::GameType(item.value_ - 2));
+				newGame(event, Game::GameType(item.value_ - 2));
 				TRANSITION(stateGame, event, Event::ForwardEntry);
 				break;
 			}
@@ -166,15 +165,13 @@ void MenuSM::stateDefault(Event *event)
 		{
 			item.value_ = 2;
 		}
-		if (!item.advance(event)) return;
+		else if (!item.advance(event)) return;
 	}
 
 	showItem(items[item.value_]);
 }
 
-void MenuSM::setupGame(Event * event, Game::GameType game){
-	display_->loadsGameCofig();
-	event->setupGame();
+void MenuSM::newGame(Event * event, Game::GameType game){
 	switch (game)
 	{
 	case Game::TETRIS:
@@ -192,14 +189,16 @@ void MenuSM::setupGame(Event * event, Game::GameType game){
 	default:
 		return;
 	}
-	game_->setSpeed(speed_);
-	game_->start(event);
 }
 
 void MenuSM::stateGame(Event *event)
 {
 	if (event->onEntry())
 	{
+		display_->loadsGameCofig();
+		event->setupGame();
+		game_->setSpeed(speed_);
+		game_->start(event);
 		return;
 	}
 	else if (game_->process(event))

@@ -44,7 +44,7 @@ private:
 	void stateHighscoreMenu(Event *event);
 	void stateResetMenu(Event *event);
 
-	void setupGame(Event *event, Game::GameType game);
+	void newGame(Event *event, Game::GameType game);
 	void stateGame(Event *event);
 
 	struct Item
