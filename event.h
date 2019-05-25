@@ -47,11 +47,17 @@ public:
 
 	void clear();
 
-	const inline bool onEntry() const { return on_entry_; }
-	inline void setOnEntry()
+	enum EntryMode{
+		NotOnEntry = 0,
+		ForwardEntry = 1,
+		BackwardEntry = 2,
+	};
+
+	inline const EntryMode onEntry() const { return entry_;}
+	inline void setOnEntry(const EntryMode mode = ForwardEntry)
 	{
 		removeAllTriggers();
-		on_entry_ = true;
+		entry_ = mode;
 	}
 
 	bool process();
@@ -89,7 +95,7 @@ public:
 private:
 	bool processTriggers();
 
-	bool on_entry_;
+	EntryMode entry_;
 	Button button_up_;
 	Button button_down_;
 	Button button_left_;

@@ -30,7 +30,7 @@ public:
 	//	void processStateMaschine(Event *event);
 private:
 	typedef void (MenuSM::*Function)(Event *);
-	void transition(Function function, Event *event);
+	void transition(Function function, Event *event, Event::EntryMode entry = Event::ForwardEntry);
 
 	bool processMenuStop(Event *event);
 	// states
@@ -44,6 +44,7 @@ private:
 	void stateHighscoreMenu(Event *event);
 	void stateResetMenu(Event *event);
 
+	void setupGame(Event *event, Game::GameType game);
 	void stateGame(Event *event);
 
 	struct Item
@@ -57,10 +58,10 @@ private:
 	class MenuItem
 	{
 	public:
-		void init(char num, char initial)
+		void init(char num, char initial, Event::EntryMode entry = Event::ForwardEntry)
 		{
 			num_ = num;
-			value_ = initial;
+			if (entry == Event::ForwardEntry) value_ = initial;
 		}
 		void init(char num) { num_ = num; }
 
@@ -72,12 +73,10 @@ private:
 		};
 
 		bool advance(Event *event, bool overflow = true);
-		bool advance(bool diretion, bool overflow=true);
+		bool advance(bool diretion, bool overflow = true);
 		char value_ = 0;
 		char num_ = 0;
 	};
-
-	MenuItem item_;
 
 	enum Language
 	{
@@ -90,8 +89,9 @@ private:
 	Language language_ = EN;
 	byte speed_ = 0;
 	byte brightness_ = 0;
+
+	// load effect
 	State load_following_state_; // state load effect need a pointer to the state
 										  // after its
-
-	Game::GameType last_played_game_ = Game::TETRIS;
+	Event::EntryMode load_following_entry_mode_;
 };
