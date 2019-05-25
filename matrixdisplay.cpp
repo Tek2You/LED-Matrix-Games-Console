@@ -56,6 +56,7 @@
 
 #include "matrixdisplay.h"
 #include "spi.h"
+#include "avr.h"
 
 #define FIRST_LETTER (' ' - 10)
 #define LAST_LETTER '~'
