@@ -19,93 +19,43 @@
 #include "text.h"
 
 Text::Text(MatrixDisplay *display)
-	 : display_(display), shift_mode_(OFF), offset_(0), start_col_(0), end_col_(display->cols()-1), start_row_(0),
-		end_row_(display->rows()-1), shift_start_col_(3), alignment_(MIDDLE)
+	 : display_(display), shift_mode_(OFF), offset_(0), shift_start_col_(3), alignment_(MIDDLE)
 {
 	setShiftSpeed(5);
 }
 
 void Text::clear()
 {
-	display_->clearRows(start_row_, end_row_);
+	display_->clearRows(offset_, offset_ + 8);
 	first_ = text_ = nullptr;
 	shift_mode_ = OFF;
 	Timer::stop();
 }
 
 // shift text by one column and start over if nothing is shown anymore
-void Text::shift()
-{
-	--current_shift_start_col_;
-	if (display_->setString(first_, current_shift_start_col_, 1, offset_) <= 0)
-	{
-		first_ = text_;
-		current_shift_start_col_ = shift_start_col_;
-	}
-	else
-	{ // should we advance to next start char?
-		byte w = display_->width(*first_);
-		if (current_shift_start_col_ + w < 0)
-		{
-			++first_;
-			current_shift_start_col_ += w + 1; // char width + 1 column spacing
-		}
-	}
-}
 
 // display (and remember) text (for future shifting)
 void Text::setText(const char *text, const bool show)
 {
 	first_ = text_ = text;
-	display_->clearRows(start_row_, end_row_);
+	display_->clearRows(offset_, offset_ + 8);
+
 	computeShiftMode();
-	if(show){
+	if (show)
+	{
 		display_->show();
 	}
 }
 
 void Text::setNumber(const int value, const bool show)
 {
-	setText(display_->formatInt(number_buffer_, 10, value),show);
-}
-
-void Text::computeShiftMode()
-{
-	int width = display_->width(text_);
-	shift_mode_ = (width > (end_col_ - start_col_) + 1 ? SHIFT : NO_SHIFT);
-
-	if (shift_mode_ == SHIFT)
-	{ // when shifting, start in column 7
-		current_shift_start_col_ = shift_start_col_ + 1;
-		shift();
-		Timer::start();
-	}
-	else
-	{ // otherwise, start start like the alignment pretends
-		if(alignment_ == RIGHT){
-			current_shift_start_col_ = end_col_ - width + 1;
-		}
-		else if (alignment_ == MIDDLE){
-			current_shift_start_col_ = start_col_ + (end_col_ - start_col_ + 1 - width) / 2;
-		}
-		else { // its left
-			current_shift_start_col_ = 0;
-		}
-		display_->setString(text_, current_shift_start_col_, 1, offset_);
-		Timer::stop();
-	}
+	setText(display_->formatInt(number_buffer_, 10, value), show);
 }
 
 void Text::setShiftSpeed(const int speed)
 {
 	speed_ = speed;
-	setInterval(1000/speed_); // from shifts per second to mseconds per shift
-}
-
-void Text::setOperationRows(const byte start, const byte end)
-{
-	start_row_ = start;
-	end_row_ = end;
+	setInterval(1000 / speed_); // from shifts per second to mseconds per shift
 }
 
 void Text::setShiftStartCol(const byte col)
@@ -117,6 +67,55 @@ void Text::setShiftStartCol(const byte col)
 void Text::onTriggered()
 {
 	shift();
-	Timer::clear();
+	Timer::clearTriggered();
 	display_->show();
+}
+
+void Text::shift()
+{
+	--current_start_col_;
+	if (display_->setString(first_, current_start_col_, 1, offset_) <= 0)
+	{
+		first_ = text_;
+		current_start_col_ = shift_start_col_;
+	}
+	else
+	{ // should we advance to next start char?
+		byte w = display_->width(*first_);
+		if (current_start_col_ + w < 0)
+		{
+			++first_;
+			current_start_col_ += w + 1; // char width + 1 column spacing
+		}
+	}
+}
+
+void Text::computeShiftMode()
+{
+	int width = display_->width(text_);
+	shift_mode_ = (width > display_->cols() - 1 ? SHIFT : NO_SHIFT);
+
+	if (shift_mode_ == SHIFT)
+	{ // when shifting, start in column 7
+		current_start_col_ = shift_start_col_ + 1;
+		shift();
+		Timer::start();
+	}
+	else
+	{ // otherwise, start start like the alignment pretends
+		if (alignment_ == RIGHT)
+		{
+			current_start_col_ = display_->cols() - width;
+		}
+		else if (alignment_ == MIDDLE)
+		{
+			current_start_col_ = (display_->cols() - width + 1) / 2;
+		}
+		else
+		{ // its left
+			current_start_col_ = 0;
+		}
+		display_->setString(text_, current_start_col_, 1, offset_);
+		Timer::stop();
+	}
 }

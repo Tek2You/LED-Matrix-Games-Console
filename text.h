@@ -40,37 +40,47 @@ public:
 		RIGHT,
 	};
 
+	enum BinaryMode
+	{
+		OVERWRITE,
+		OR,
+		AND,
+	};
+
 	void setText(const char *text, const bool show = true);
 	void setNumber(const int number, const bool show = true);
-	void setAlignment(const Align align) { alignment_ = align; }
 
-	void clear();
+	void setAlignment(const Align align) { alignment_ = align; }
+	void setBinaryMode(const BinaryMode mode) { binary_mode_ = mode; }
 
 	void setShiftSpeed(const int speed);
-	int shiftSpeed() const { return speed_; }
+	const int shiftSpeed() const { return speed_; }
 
 	void setOffset(const byte offset) { offset_ = offset; }
 	const byte offset() const { return offset_; }
 
-	void setOperationRows(const byte start, const byte end);
-
 	void setShiftStartCol(const byte col);
 
+	void clear();
+
 private:
-	void shift();
 	void onTriggered() override;
+
+	void shift();
 	void computeShiftMode();
 
 	MatrixDisplay *display_;
 
 	const char *text_;  // displayed text
 	const char *first_; // first visible character
-	int current_shift_start_col_;
-	byte shift_start_col_;
+	int current_start_col_;
+
 	ShiftMode shift_mode_;
-	int speed_; // columns per second
+	BinaryMode binary_mode_;
+	byte shift_start_col_;
 	byte offset_;
-	byte start_col_, end_col_, start_row_, end_row_;
-	char number_buffer_[10];
 	Align alignment_;
+	int speed_; // columns per second
+
+	char number_buffer_[10];
 };

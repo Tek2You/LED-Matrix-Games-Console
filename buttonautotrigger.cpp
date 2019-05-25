@@ -27,7 +27,7 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 {
 	if (activated_ = false)
 	{
-		timer_.clear();
+		timer_.clearTriggered();
 		return false;
 	}
 
@@ -47,7 +47,7 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 		}
 		else if (dir_ == BTN_1)
 		{
-			timer_.clear();
+			timer_.clearTriggered();
 			if (button2_->state())
 			{
 				dir_ = BTN_2;
@@ -77,7 +77,7 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 		}
 		else if (dir_ == BTN_2)
 		{
-			timer_.clear();
+			timer_.clearTriggered();
 			if (button1_->state())
 			{
 				dir_ = BTN_1;
@@ -91,14 +91,15 @@ bool ButtonAutoTrigger::process(const unsigned long &t)
 			};
 		}
 	}
+
 	// timer	// timer
 	else if (timer_.process(t))
 	{
-		timer_.clear();
+		timer_.clearTriggered();
 		triggered_ = true;
 		onTriggered();
 		timer_.setInterval(interval_);
-		timer_.start();
+		timer_.restart();
 	}
 	return triggered_;
 }

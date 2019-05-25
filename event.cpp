@@ -53,9 +53,9 @@ void Event::clear()
 	unsigned int t = millis();
 	for (Trigger *t : triggers_)
 	{
-		t->clear();
+		t->clearTriggered();
 	}
-	on_entry_ = false;
+	entry_ = NotOnEntry;
 	triggered_ = false;
 }
 

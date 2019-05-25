@@ -30,7 +30,7 @@ public:
 	virtual void stop() = 0;
 	virtual void start() = 0;
 	inline void restart() { start(); }
-	virtual void clear() { triggered_ = false; }
+	virtual void clearTriggered() { triggered_ = false; }
 
 protected:
 	virtual void onTriggered() {}

@@ -43,16 +43,15 @@ void Display::update()
 
 void Display::loadMenuConfig()
 {
-	clear();
 	text1_.clear();
 	text2_.clear();
 	text1_.setOffset(8);
-	text1_.setOperationRows(8, 16);
 	text1_.setShiftStartCol(3);
 
 	text2_.setOffset(0);
-	text2_.setOperationRows(0, 8);
 	text2_.setShiftStartCol(3);
+	clear();
+	show();
 }
 
 void Display::loadsGameCofig()
