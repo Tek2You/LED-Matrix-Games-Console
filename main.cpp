@@ -32,8 +32,6 @@ Event event;
 Display dp(16, 8);
 MenuSM sm(&dp, &event);
 
-int counter = 0;
-
 bool process_debounce = false;
 bool check_buttons = false;
 
