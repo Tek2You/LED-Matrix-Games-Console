@@ -180,10 +180,10 @@ void MenuSM::newGame(Event * event, Game::GameType game){
 	case Game::SNAKE:
 		game_ = new Snake(display_);
 		break;
-	case Game::DODGE:
+	case Game::SPACE_INVADERS:
 		game_ = new SpaceInvaders(display_);
 		break;
-	case Game::SPACE_INVADERS:
+	case Game::DODGE:
 		game_ = new Dodge(display_);
 		break;
 	default:

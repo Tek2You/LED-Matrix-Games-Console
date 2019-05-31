@@ -30,8 +30,8 @@ public:
 	{
 		TETRIS,
 		SNAKE,
-		DODGE,
 		SPACE_INVADERS,
+		DODGE,
 	};
 
 	Game(Display *display, const GameType game_type);

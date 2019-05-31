@@ -76,13 +76,10 @@ void Tetromino::getPoints(Pos (&positions)[4]) const
 
 	for (int i = 0, j = 0; i < 16; i++)
 	{
-		if (array & (1 << i))
+		if (array & 1)
 		{
-			positions[j] = Pos(i / 4 - 1, i % 4 - 2) + pos_;
-			if (j++ == 4)
-			{
-				return;
-			}
+			positions[j++] = Pos(i / 4 - 1, i % 4 - 2) + pos_;
 		}
+		array >>= 1;
 	}
 }
