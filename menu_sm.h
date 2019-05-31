@@ -34,6 +34,7 @@ private:
 
 	bool processMenuStop(Event *event);
 	// states
+	void stateStartup(Event *event);
 	void stateDefault(Event *event);
 	void stateGameOver(Event *event);
 	void stateLoadEffect(Event *event);

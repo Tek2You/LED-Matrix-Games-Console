@@ -57,7 +57,7 @@ byte EE_language EEMEM = DEFAULT_LANGUAGE;
 byte EE_brightness EEMEM = DEFAULT_BRIGHTNESS;
 
 MenuSM::MenuSM(Display *display, Event *event)
-	 : StateMachine(STATE_CAST(&MenuSM::stateDefault)), display_(display), language_(EN)
+	 : StateMachine(STATE_CAST(&MenuSM::stateStartup)), display_(display), language_(EN)
 {
 	display_->text1_.setShiftSpeed(5);
 	display_->text2_.setShiftSpeed(5);
@@ -124,6 +124,122 @@ bool MenuSM::MenuItem::advance(bool diretion, bool overflow)
 	return false;
 }
 
+void MenuSM::stateStartup(Event *event)
+{
+	static int count;
+	if (event->onEntry())
+	{
+		count = 0;
+		event->setupGame();
+		event->addTrigger(new Timer(100));
+	}
+	else if(event->controlButtonChanged() || event->buttonStop().pressed()){
+		TRANSITION(stateDefault, event, Event::ForwardEntry);
+		return;
+	}
+	else if (event->trigger(0)->triggered())
+	{
+		switch (count)
+		{
+		case 0:
+			display_->setPixel(Pos(5, 13));
+			break;
+		case 1:
+			display_->setPixel(Pos(4, 13));
+			break;
+		case 2:
+			display_->setPixel(Pos(3, 13));
+			break;
+		case 3:
+			display_->setPixel(Pos(3, 12));
+			break;
+		case 4:
+			display_->setPixel(Pos(2, 12));
+			break;
+		case 5:
+			display_->setPixel(Pos(2, 11));
+			break;
+		case 6:
+			display_->setPixel(Pos(1, 11));
+			display_->setPixel(Pos(2, 10));
+			break;
+		case 7:
+			display_->setPixel(Pos(1, 10));
+			break;
+		case 8:
+			display_->setPixel(Pos(5, 11));
+			break;
+		case 9:
+			display_->setPixel(Pos(6, 10));
+			break;
+		case 10:
+			display_->setPixel(Pos(5, 10));
+			break;
+		case 11:
+			display_->setPixel(Pos(5, 9));
+			break;
+		case 12:
+			display_->setPixel(Pos(5, 8));
+			break;
+		case 13:
+			display_->setPixel(Pos(4, 8));
+			break;
+		case 14:
+			display_->setPixel(Pos(4, 7));
+			break;
+		case 15:
+			display_->setPixel(Pos(3, 7));
+			display_->setPixel(Pos(4, 6));
+			break;
+		case 16:
+			display_->setPixel(Pos(3, 6));
+			break;
+		case 17:
+			display_->setPixel(Pos(3, 5));
+			break;
+		case 18:
+			display_->setPixel(Pos(2, 5));
+			break;
+		case 19:
+			display_->setPixel(Pos(2, 4));
+			break;
+		case 20:
+			display_->setPixel(Pos(1, 4));
+			display_->setPixel(Pos(2, 3));
+			break;
+		case 21:
+			display_->setPixel(Pos(1, 3));
+			break;
+		case 22:
+			display_->setPixel(Pos(2, 3));
+			break;
+		case 23:
+			display_->setPixel(Pos(7, 5));
+			break;
+		case 24:
+			display_->setPixel(Pos(6, 5));
+			break;
+		case 25:
+			display_->setPixel(Pos(6, 4));
+			break;
+		case 26:
+			display_->setPixel(Pos(5, 4));
+			break;
+		case 27:
+			static_cast<Timer *>(event->trigger(0))->setInterval(2000);
+			static_cast<Timer *>(event->trigger(0))->restart();
+			break;
+		case 28:
+			TRANSITION(stateDefault, event, Event::ForwardEntry);
+			return;
+		default:
+			break;
+		}
+		count++;
+		display_->show();
+	}
+}
+
 void MenuSM::stateDefault(Event *event)
 {
 	static const Item items[6] = {Item{"highscore", "Highscore", 0x00081c2018043810},
@@ -165,13 +281,15 @@ void MenuSM::stateDefault(Event *event)
 		{
 			item.value_ = 2;
 		}
-		else if (!item.advance(event)) return;
+		else if (!item.advance(event))
+			return;
 	}
 
 	showItem(items[item.value_]);
 }
 
-void MenuSM::newGame(Event * event, Game::GameType game){
+void MenuSM::newGame(Event *event, Game::GameType game)
+{
 	switch (game)
 	{
 	case Game::TETRIS:
